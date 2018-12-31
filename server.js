@@ -85,10 +85,30 @@ app.get('/api/bikefacilities', function(req, res){
 
 });
 
-app.get('/api/addLines', function(req, res){
-  features = JSON.parse(req.query.features)
-  console.log(features.features);
-  res.status(200).send({message: 'hello.'});
+app.post('/api/addLines', function(req, res){
+  var features = JSON.parse(req.body.features);
+  var query = "INSERT INTO northKC(geom) VALUES "
+  features.features.forEach(function(item){
+    console.log(item.geometry);
+    query = query + "(ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(item.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326)), ";
+  });
+  query = query.slice(0,-2);
+  query = query +";"
+  console.log(query);
+  sequelize.query(query).then(results => {
+    res.status(200).send({
+      message: results,
+    })
+  })
+});
+
+app.get('/api/results', function(req, res){
+  console.log('get lines');
+  sequelize.query("SELECT * FROM northkc ").then(results => {
+    res.status(200).send({
+      data: results,
+    })
+  })
 });
 
 

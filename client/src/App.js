@@ -13,11 +13,18 @@ var map = {};
 var draw, snap; // global so we can remove them later
 const drawerWidth = '200px';
 var lines = new ol.geom.LineString();
+var results = new ol.geom.LineString();
 var source = new ol.source.Vector({
   features: lines
 });
+var resultsSource = new ol.source.Vector({
+  features: results
+});
 var vector = new ol.layer.Vector({
   source: source
+});
+var resultsLayer = new ol.layer.Vector({
+  source: resultsSource
 });
 
 class App extends Component {
@@ -30,6 +37,8 @@ class App extends Component {
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
+    this.getResults = this.getResults.bind(this);
+
 
 
   }
@@ -60,13 +69,34 @@ class App extends Component {
     var writer = new ol.format.GeoJSON()
     console.log(writer.writeFeatures(vector.getSource().getFeatures()));
     var drawnFeatures = writer.writeFeatures(vector.getSource().getFeatures());
-    axios.get('/api/addLines', {
-      params: {
-        features: drawnFeatures
-      }
+    axios.post('/api/addLines', {
+      features: drawnFeatures
     })
     .then(function(response){
       console.log(response);
+    });
+
+  }
+
+  getResults(){
+    console.log('get results');
+
+    axios.get('/api/results')
+    .then(function(response){
+
+      console.log(response.data.data[0]);
+      var lines = response.data.data[0];
+      lines.forEach(function(line){
+        var resulsStuff = (new ol.format.GeoJSON()).readFeatures(line.geom, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
+        console.log(resulsStuff);
+        var layerLines = new ol.layer.Vector({
+          source: new ol.source.Vector({
+            features: resulsStuff
+          }),
+        });
+        map.addLayer(layerLines);
+      })
+
     });
 
   }
@@ -99,6 +129,14 @@ class App extends Component {
             >
               Upload
             </Button>
+            <br />
+            <br />
+            <Button
+              variant='contained'
+              onClick = {this.getResults}
+            >
+              Get Results
+            </Button>
           </div>
         </Drawer>
         <div id='map'>
@@ -117,7 +155,8 @@ class App extends Component {
           transition: 0
         })
       }),
-      vector
+      vector,
+      resultsLayer
     ];
     map = new ol.Map({
         target: 'map',
@@ -125,7 +164,6 @@ class App extends Component {
         view: new ol.View({
           center: ol.proj.fromLonLat([-94.6, 39.1]),
           zoom: 12,
-          minZoom:9,
           maxZoom: 20
         }),
         controls: [
