@@ -11,7 +11,8 @@
     "openlayers": "^4.6.5",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
-    "react-scripts": "2.1.2"
+    "react-scripts": "2.1.2",
+    "turf": "^3.0.14"
   },
   "scripts": {
     "start": "react-scripts start",
