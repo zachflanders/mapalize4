@@ -1,43 +1,63 @@
 import React, { Component } from 'react';
 import './App.css';
-import ol from 'openlayers';
+
+//openlayers imports
+import 'ol/ol.css';
+import Map from 'ol/Map';
+import LineString from 'ol/geom/LineString';
+import Point from 'ol/geom/Point';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import Draw from 'ol/interaction/Draw';
+import Style from 'ol/style/Style';
+import Stroke from 'ol/style/Stroke';
+import CircleStyle from 'ol/style/Circle';
+import Fill from 'ol/style/Fill';
+import GeoJSON from 'ol/format/GeoJSON';
+import {toLonLat} from 'ol/proj';
+import {fromLonLat} from 'ol/proj';
+import {transform} from 'ol/proj';
+import TileLayer from 'ol/layer/Tile';
+import TileWMS from 'ol/source/TileWMS';
+import View from 'ol/View';
+import Zoom from 'ol/control/Zoom';
+import Heatmap from 'ol/layer/Heatmap';
+import Overlay from 'ol/Overlay';
+import Feature from 'ol/Feature';
+
+//Material-ui imports
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
+import Divider from '@material-ui/core/Divider';
+import Paper from '@material-ui/core/Paper';
+
 import turf from 'turf';
 import axios from 'axios';
 
 const drawerWidth = '200px';
 var map = {};
-var draw, snap; // global so we can remove them later
-var lines = new ol.geom.LineString();
-var results = new ol.geom.LineString();
-var points = new ol.geom.Point();
+var drawInteraction, snap; // global so we can remove them later
 
-var source = new ol.source.Vector({
-  features: lines
+var linesSource = new VectorSource({
 });
-var resultsSource = new ol.source.Vector({
-  features: results
+var resultsSource = new VectorSource({
 });
-var pointSource = new ol.source.Vector({
-  features: points
+var pointSource = new VectorSource({
 })
 
-var vector = new ol.layer.Vector({
-  source: source
+var linesLayer = new VectorLayer({
+  source: linesSource
 });
-var resultsLayer = new ol.layer.Vector({
+var resultsLayer = new VectorLayer({
   source: resultsSource
 });
 
-var pointsLayer = new ol.layer.Vector({
+var pointsLayer = new VectorLayer({
   source: pointSource
 });
-
-
 
 var turnLineIntoArrayOfPoints = function(geoJSONLine){
   //if statement should check to make sure geoJSON line is valid
@@ -48,55 +68,87 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine){
       if(length > 0 ){
         var thisPoint = turf.along(geoJSONLine, i, 'miles');
         points.push({lat:thisPoint.geometry.coordinates[1], lng:thisPoint.geometry.coordinates[0], value:1});
-        pointSource.addFeature(new ol.Feature(new ol.geom.Point(ol.proj.transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
+        pointSource.addFeature(new Feature(new Point(transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
       }
     }
     return points;
   }
 };
 
+function EditButton(props) {
+  const editing = props.editing;
+  if (editing) {
+    return (
+      <div>
+      <strong>Create Features</strong><br /><br />
+      <Paper style={{padding:'10px'}}>
+        <Typography variant='h6'>Draw Line</Typography>
+        <Button  size='small' color='primary' onClick={props.onClick4}>Finish Line</Button>
+        <br />
+        <Button size='small' color='primary' onClick={props.onClick2}>Delete Last Point</Button>
+        <br />
+        <Button  size='small' color='primary' onClick={props.onClick}>Stop Drawing</Button>
+      </Paper>
+      </div>
+    );
+  }
+  else{
+    return (
+      <div>
+      <strong>Create Features</strong><br /><br />
+      <Button
+        onClick = {props.onClick3}
+      >
+        Draw Line
+      </Button>
+      </div>
+    )
+  }
+}
 
 class App extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       title: 'NorthKC Bike Plan',
-      lineName: 'Draw Line'
+      lineName: 'Draw Line',
+      editing: false
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
+    this.cancelEdit = this.cancelEdit.bind(this);
+    this.finishLine = this.finishLine.bind(this);
     this.getResults = this.getResults.bind(this);
-
-
-
   }
 
   addInteraction(){
-    console.log('add interaction');
-    draw = new ol.interaction.Draw({
-          source: source,
+    drawInteraction = new Draw({
+          source: linesSource,
           type: 'LineString',
-          style: new ol.style.Style({
-              stroke: new ol.style.Stroke({
+          style: new Style({
+              stroke: new Stroke({
                 color: 'blue',
                 width: 8
               }),
-              image: new ol.style.Circle({
+              image: new CircleStyle({
                 radius: 6,
-                fill: new ol.style.Fill({
+                fill: new Fill({
                   color: 'blue'
                 })
               })
             })
         });
-        map.addInteraction(draw);
+        map.addInteraction(drawInteraction);
+        this.setState({
+          editing: true
+        })
+
   }
 
   upload(){
     console.log('upload');
-    var writer = new ol.format.GeoJSON()
-    var drawnFeatures = writer.writeFeatures(vector.getSource().getFeatures());
+    var writer = new GeoJSON();
+    var drawnFeatures = writer.writeFeatures(linesLayer.getSource().getFeatures());
     var drawnFeaturesJSON = JSON.parse(drawnFeatures);
     console.log(drawnFeaturesJSON.features);
     for (var feature in drawnFeaturesJSON.features){
@@ -113,14 +165,14 @@ class App extends Component {
       }
       geoJSONLine.geometry.coordinates.forEach(function(coord){
         console.log(coord);
-        console.log(ol.proj.toLonLat(coord, 'EPSG:3857'));
-        geoJSONLineReproject.geometry.coordinates.push(ol.proj.toLonLat(coord, 'EPSG:3857'))
+        console.log(toLonLat(coord, 'EPSG:3857'));
+        geoJSONLineReproject.geometry.coordinates.push(toLonLat(coord, 'EPSG:3857'))
       });
       console.log(geoJSONLineReproject)
       var points = turnLineIntoArrayOfPoints(geoJSONLineReproject);
       console.log(points);
     }
-    source.clear();
+    linesSource.clear();
 
     /*
     axios.post('/api/addLines', {
@@ -133,6 +185,26 @@ class App extends Component {
 
   }
 
+  cancelEdit(){
+    console.log('remove interaction');
+    map.removeInteraction(drawInteraction);
+    this.setState({
+      editing: false
+    });
+  }
+
+  finishLine(){
+    console.log('finish line');
+    if(drawInteraction){
+      drawInteraction.finishDrawing();
+    }
+  }
+
+  deleteLastPoint(){
+    console.log('delete last point');
+    drawInteraction.removeLastPoint();
+  }
+
   getResults(){
     console.log('get results');
 
@@ -142,10 +214,10 @@ class App extends Component {
       console.log(response.data.data[0]);
       var lines = response.data.data[0];
       lines.forEach(function(line){
-        var resulsStuff = (new ol.format.GeoJSON()).readFeatures(line.geom, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
+        var resulsStuff = (new GeoJSON()).readFeatures(line.geom, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
         console.log(resulsStuff);
-        var layerLines = new ol.layer.Vector({
-          source: new ol.source.Vector({
+        var layerLines = new VectorLayer({
+          source: new VectorSource({
             features: resulsStuff
           }),
         });
@@ -155,6 +227,8 @@ class App extends Component {
     });
 
   }
+
+
 
   render() {
     return (
@@ -170,13 +244,15 @@ class App extends Component {
           variant="permanent"
         >
           <div style={{width: drawerWidth, marginTop: '64px', padding: '15px'}}>
-            <Button
-              variant='contained'
-              onClick = {this.addInteraction}
-            >
-              {this.state.lineName}
-            </Button>
+            <EditButton
+              editing={this.state.editing}
+              onClick={this.cancelEdit}
+              onClick2={this.deleteLastPoint}
+              onClick3 = {this.addInteraction}
+              onClick4 = {this.finishLine}
+            />
             <br />
+            <Divider />
             <br />
             <Button
               variant='contained'
@@ -185,6 +261,8 @@ class App extends Component {
               Upload
             </Button>
             <br />
+            <br />
+            <Divider />
             <br />
             <Button
               variant='contained'
@@ -202,65 +280,54 @@ class App extends Component {
   componentDidMount(){
     var self =this;
     var layers = [
-      new ol.layer.Tile({
-        source: new ol.source.TileWMS({
+      new TileLayer({
+        source: new TileWMS({
           url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
           params: {'LAYERS': 'Mapalize:OSM-KC-ROADS', 'TILED': true},
           serverType: 'geoserver',
           transition: 0
         })
       }),
-      vector,
+      linesLayer,
       resultsLayer
       //pointsLayer,
     ];
 
-    map = new ol.Map({
+    map = new Map({
         target: 'map',
         layers: layers,
-        view: new ol.View({
-          center: ol.proj.fromLonLat([-94.6, 39.1]),
-          zoom: 18,
+        view: new View({
+          center: fromLonLat([-94.6, 39.1]),
+          zoom: 12,
           maxZoom: 20,
           minZoom: 9
         }),
         controls: [
-          new ol.control.Zoom()
+          new Zoom()
         ]
       });
 
+      var resolution = map.getView().getResolution(),
+           resolution_constant = 40075016.68557849,
+           tile_pixel = 256;
 
-      var heatmaplayer = new ol.layer.Heatmap({
+      var result_resol_const_tile_px = resolution_constant / tile_pixel / resolution;
+      var zoomRadius = result_resol_const_tile_px/25675;
+      var zoomBlur = result_resol_const_tile_px/5359;
+
+
+      var heatmaplayer = new Heatmap({
               source: pointSource,
-              blur: 48,
-              radius: 10
+              blur: zoomBlur,
+              radius: zoomRadius
             });
       map.addLayer(heatmaplayer);
-      map.getCurrentScale = function () {
-        //var map = this.getMap();
-        var map = this;
-        var view = map.getView();
-        var zoom = map.getView().getZoom();
-        var resolution = view.getResolution();
-        var units = map.getView().getProjection().getUnits();
-        console.log('zoom: ', zoom, 'resolution: ', resolution, ' ',units, '/pixel');
-        var dpi = 25.4 / 0.28;
-        var mpu = ol.proj.METERS_PER_UNIT[units];
-        var scale = resolution * mpu * 39.37 * dpi;
-        return scale;
-
-    };
-
 
       map.getView().on('change:resolution', function(evt){
-          var resolution = evt.target.get(evt.key),
-               resolution_constant = 40075016.68557849,
-               tile_pixel = 256;
-
-          var result_resol_const_tile_px = resolution_constant / tile_pixel / resolution;
-          map.getCurrentScale();
-          var zoomRadius = result_resol_const_tile_px/25675;
-          var zoomBlur = result_resol_const_tile_px/5359;
+          resolution = evt.target.get(evt.key);
+          result_resol_const_tile_px = resolution_constant / tile_pixel / resolution;
+          zoomRadius = result_resol_const_tile_px/25675;
+          zoomBlur = result_resol_const_tile_px/5359;
 
          console.info("radius: ", (zoomRadius), "blur: ",(zoomBlur));
          if(zoomRadius > 48){
@@ -272,17 +339,11 @@ class App extends Component {
 
          heatmaplayer.setRadius(zoomRadius);
          heatmaplayer.setBlur(zoomBlur);
-
       });
 
-
-
-
-      var popup = new ol.Overlay({element:document.getElementById('popup')});
+      var popup = new Overlay({element:document.getElementById('popup')});
 
       map.addOverlay(popup);
-
-
 
       // Add an event handler for the map "singleclick" event
       map.on('singleclick', function(evt) {
@@ -304,11 +365,8 @@ class App extends Component {
               // Offset the popup so it points at the middle of the marker not the tip
               popup.setOffset([0, -22]);
               //popup.show(coord);
-
           }
-
       });
-
     }
 }
 
