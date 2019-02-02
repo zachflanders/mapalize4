@@ -33,6 +33,20 @@ import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
 import Paper from '@material-ui/core/Paper';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import EditIcon from '@material-ui/icons/Edit';
+import FireIcon from '@material-ui/icons/Whatshot';
+import LineIcon from '@material-ui/icons/Timeline';
+import PointIcon from '@material-ui/icons/Place';
+import DeleteIcon from '@material-ui/icons/Delete';
+
+
+
+
+
+import Icon from '@mdi/react';
+import { mdiAccount } from '@mdi/js';
 
 import turf from 'turf';
 import axios from 'axios';
@@ -41,13 +55,9 @@ const drawerWidth = '200px';
 var map = {};
 var drawInteraction, snap; // global so we can remove them later
 
-var linesSource = new VectorSource({
-});
-var resultsSource = new VectorSource({
-});
-var pointSource = new VectorSource({
-})
-
+var linesSource = new VectorSource();
+var resultsSource = new VectorSource();
+var pointSource = new VectorSource();
 var linesLayer = new VectorLayer({
   source: linesSource
 });
@@ -56,6 +66,10 @@ var resultsLayer = new VectorLayer({
 });
 
 var pointsLayer = new VectorLayer({
+  source: pointSource
+});
+
+var heatmapLayer = new Heatmap({
   source: pointSource
 });
 
@@ -80,9 +94,10 @@ function EditButton(props) {
   if (editing) {
     return (
       <div>
+
       <strong>Create Features</strong><br /><br />
       <Paper style={{padding:'10px'}}>
-        <Typography variant='h6'>Draw Line</Typography>
+        <Typography variant='h6'><LineIcon /> &nbsp;Add Line</Typography>
         <Button  size='small' color='primary' onClick={props.onClick4}>Finish Line</Button>
         <br />
         <Button size='small' color='primary' onClick={props.onClick2}>Delete Last Point</Button>
@@ -99,7 +114,20 @@ function EditButton(props) {
       <Button
         onClick = {props.onClick3}
       >
-        Draw Line
+        <LineIcon /> &nbsp;&nbsp; Add Line
+      </Button>
+      <br />
+      <Button
+        onClick = {props.onClick3}
+      >
+        <PointIcon /> &nbsp;&nbsp; Add Point
+      </Button>
+      <br />
+      <Button>
+        <EditIcon /> &nbsp;&nbsp; Edit Features
+      </Button>
+      <Button>
+        <DeleteIcon /> &nbsp;&nbsp; Delete Features
       </Button>
       </div>
     )
@@ -112,13 +140,17 @@ class App extends Component {
     this.state = {
       title: 'NorthKC Bike Plan',
       lineName: 'Draw Line',
-      editing: false
+      editing: false,
+      view: 0
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
     this.cancelEdit = this.cancelEdit.bind(this);
     this.finishLine = this.finishLine.bind(this);
     this.getResults = this.getResults.bind(this);
+    this.getInput = this.getInput.bind(this);
+
+    this.switchView = this.switchView.bind(this);
   }
 
   addInteraction(){
@@ -145,6 +177,29 @@ class App extends Component {
 
   }
 
+  switchView(){
+    if(this.state.view == 0){
+      this.setState({
+        view: 1
+      });
+      map.addLayer(heatmapLayer);
+      this.getResults();
+    }
+    else{
+      this.setState({
+        view: 0
+      })
+      map.removeLayer(heatmapLayer);
+      this.getInput();
+    }
+  }
+
+  getInput(){
+    console.log('get input');
+    console.log(map.getLayers());
+    map.removeLayer(resultsLayer);
+  }
+
   upload(){
     console.log('upload');
     var writer = new GeoJSON();
@@ -169,19 +224,19 @@ class App extends Component {
         geoJSONLineReproject.geometry.coordinates.push(toLonLat(coord, 'EPSG:3857'))
       });
       console.log(geoJSONLineReproject)
-      var points = turnLineIntoArrayOfPoints(geoJSONLineReproject);
-      console.log(points);
+      //var points = turnLineIntoArrayOfPoints(geoJSONLineReproject);
+      //console.log(points);
     }
     linesSource.clear();
 
-    /*
+
     axios.post('/api/addLines', {
       features: drawnFeatures
     })
     .then(function(response){
       console.log(response);
     });
-    */
+
 
   }
 
@@ -207,22 +262,29 @@ class App extends Component {
 
   getResults(){
     console.log('get results');
-
     axios.get('/api/results')
     .then(function(response){
-
+      pointSource.clear();
       console.log(response.data.data[0]);
       var lines = response.data.data[0];
       lines.forEach(function(line){
-        var resulsStuff = (new GeoJSON()).readFeatures(line.geom, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
+        console.log(line);
+        var resultGeoJSONFeature = (new GeoJSON()).readFeature(line.geom, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
+        var resultGeoJSON = (new GeoJSON()).writeFeature(resultGeoJSONFeature)
+        console.log(resultGeoJSON);
+        turnLineIntoArrayOfPoints(line.geom);
+        /*
         console.log(resulsStuff);
+        resultsSource.addFeatures(resulsStuff);
         var layerLines = new VectorLayer({
           source: new VectorSource({
             features: resulsStuff
           }),
         });
-        map.addLayer(layerLines);
-      })
+        */
+
+      });
+
 
     });
 
@@ -233,12 +295,19 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <AppBar position="static" style={{position:'relative', zIndex: 1201}}>
-          <Toolbar>
-            <Typography variant="h6" color="inherit" >
+        <AppBar position="static" style={{position:'relative', zIndex: 1201, }}>
+          <Toolbar style={{height:'64px'}} >
+            <Typography variant="h6" color="inherit" style={{flexGrow:1}}>
               {this.state.title}
             </Typography>
+
+            <Tabs value={this.state.view} style={{height:'64px'}} onChange = {this.switchView}>
+              <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{height:'64px'}} />
+              <Tab label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} />
+            </Tabs>
+
           </Toolbar>
+
         </AppBar>
         <Drawer
           variant="permanent"
@@ -256,20 +325,12 @@ class App extends Component {
             <br />
             <Button
               variant='contained'
+              color='primary'
               onClick = {this.upload}
             >
               Upload
             </Button>
-            <br />
-            <br />
-            <Divider />
-            <br />
-            <Button
-              variant='contained'
-              onClick = {this.getResults}
-            >
-              Get Results
-            </Button>
+
           </div>
         </Drawer>
         <div id='map'>
@@ -289,7 +350,7 @@ class App extends Component {
         })
       }),
       linesLayer,
-      resultsLayer
+      //resultsLayer
       //pointsLayer,
     ];
 
@@ -297,8 +358,8 @@ class App extends Component {
         target: 'map',
         layers: layers,
         view: new View({
-          center: fromLonLat([-94.6, 39.1]),
-          zoom: 12,
+          center: fromLonLat([-94.573, 39.143]),
+          zoom: 14,
           maxZoom: 20,
           minZoom: 9
         }),
@@ -314,14 +375,11 @@ class App extends Component {
       var result_resol_const_tile_px = resolution_constant / tile_pixel / resolution;
       var zoomRadius = result_resol_const_tile_px/25675;
       var zoomBlur = result_resol_const_tile_px/5359;
+      heatmapLayer.setRadius(zoomRadius);
+      heatmapLayer.setBlur(zoomBlur);
 
 
-      var heatmaplayer = new Heatmap({
-              source: pointSource,
-              blur: zoomBlur,
-              radius: zoomRadius
-            });
-      map.addLayer(heatmaplayer);
+
 
       map.getView().on('change:resolution', function(evt){
           resolution = evt.target.get(evt.key);
@@ -337,8 +395,8 @@ class App extends Component {
            zoomBlur = 128
          }
 
-         heatmaplayer.setRadius(zoomRadius);
-         heatmaplayer.setBlur(zoomBlur);
+         heatmapLayer.setRadius(zoomRadius);
+         heatmapLayer.setBlur(zoomBlur);
       });
 
       var popup = new Overlay({element:document.getElementById('popup')});
