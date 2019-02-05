@@ -17,6 +17,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import {toLonLat} from 'ol/proj';
 import {fromLonLat} from 'ol/proj';
 import {transform} from 'ol/proj';
+import {toStringHDMS} from 'ol/coordinate.js';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
 import View from 'ol/View';
@@ -40,13 +41,11 @@ import FireIcon from '@material-ui/icons/Whatshot';
 import LineIcon from '@material-ui/icons/Timeline';
 import PointIcon from '@material-ui/icons/Place';
 import DeleteIcon from '@material-ui/icons/Delete';
+import Popper from '@material-ui/core/Popper';
+import Fade from '@material-ui/core/Fade';
+import TextField from '@material-ui/core/TextField';
 
 
-
-
-
-import Icon from '@mdi/react';
-import { mdiAccount } from '@mdi/js';
 
 import turf from 'turf';
 import axios from 'axios';
@@ -59,7 +58,13 @@ var linesSource = new VectorSource();
 var resultsSource = new VectorSource();
 var pointSource = new VectorSource();
 var linesLayer = new VectorLayer({
-  source: linesSource
+  source: linesSource,
+  style: new Style({
+      stroke: new Stroke({
+        color: '#2ecc71',
+        width: 8
+      })
+    })
 });
 var resultsLayer = new VectorLayer({
   source: resultsSource
@@ -72,6 +77,14 @@ var pointsLayer = new VectorLayer({
 var heatmapLayer = new Heatmap({
   source: pointSource
 });
+var overlay = new Overlay({
+  autoPan: true,
+  autoPanAnimation: {
+    duration: 250
+  }
+});
+
+var drawnFeatures = 0;
 
 var turnLineIntoArrayOfPoints = function(geoJSONLine){
   //if statement should check to make sure geoJSON line is valid
@@ -90,45 +103,57 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine){
 };
 
 function EditButton(props) {
-  const editing = props.editing;
-  if (editing) {
+  const drawing = props.drawing;
+  if (drawing == 'line') {
     return (
       <div>
-
-      <strong>Create Features</strong><br /><br />
-      <Paper style={{padding:'10px'}}>
-        <Typography variant='h6'><LineIcon /> &nbsp;Add Line</Typography>
-        <Button  size='small' color='primary' onClick={props.onClick4}>Finish Line</Button>
-        <br />
-        <Button size='small' color='primary' onClick={props.onClick2}>Delete Last Point</Button>
-        <br />
-        <Button  size='small' color='primary' onClick={props.onClick}>Stop Drawing</Button>
-      </Paper>
+        <strong>Create Features</strong><br /><br />
+        <Paper style={{padding:'10px'}}>
+          <Typography variant='h6'><LineIcon /> &nbsp;Add Line</Typography>
+          <Button  size='small' color='primary' onClick={props.onClick4}>Finish Line</Button>
+          <br />
+          <Button size='small' color='primary' onClick={props.onClick2}>Delete Last Point</Button>
+          <br />
+          <Button  size='small' color='primary' onClick={props.onClick}>Stop Drawing</Button>
+        </Paper>
       </div>
     );
   }
-  else{
+  else if(drawing == 'point') {
     return (
       <div>
-      <strong>Create Features</strong><br /><br />
-      <Button
-        onClick = {props.onClick3}
-      >
-        <LineIcon /> &nbsp;&nbsp; Add Line
-      </Button>
-      <br />
-      <Button
-        onClick = {props.onClick3}
-      >
-        <PointIcon /> &nbsp;&nbsp; Add Point
-      </Button>
-      <br />
-      <Button>
-        <EditIcon /> &nbsp;&nbsp; Edit Features
-      </Button>
-      <Button>
-        <DeleteIcon /> &nbsp;&nbsp; Delete Features
-      </Button>
+        <strong>Create Features</strong><br /><br />
+        <Paper style={{padding:'10px'}}>
+          <Typography variant='h6'><PointIcon /> &nbsp;Add Point</Typography>
+          <br />
+          <Button  size='small' color='primary' onClick={props.onClick}>Stop Drawing</Button>
+        </Paper>
+      </div>
+    );
+  }
+  else {
+    return (
+      <div>
+          <strong>Create Features</strong><br /><br />
+        <Button
+          onClick = {props.onClick3}
+          style = {{textAlign:'left'}}
+        >
+          <LineIcon color='#2ecc71' />  <span style ={{paddingLeft:'10px'}}>Add Bike Infrastructure</span>
+        </Button>
+        <br />
+        <Button
+          onClick = {props.onClick3}
+        >
+          <PointIcon /> &nbsp;&nbsp; Add Point
+        </Button>
+        <br />
+        <Button>
+          <EditIcon /> &nbsp;&nbsp; Edit Features
+        </Button>
+        <Button>
+          <DeleteIcon /> &nbsp;&nbsp; Delete Features
+        </Button>
       </div>
     )
   }
@@ -140,8 +165,10 @@ class App extends Component {
     this.state = {
       title: 'NorthKC Bike Plan',
       lineName: 'Draw Line',
-      editing: false,
-      view: 0
+      drawing: 'none',
+      view: 0,
+      popover: false,
+      targetFeatureId: null
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -149,31 +176,17 @@ class App extends Component {
     this.finishLine = this.finishLine.bind(this);
     this.getResults = this.getResults.bind(this);
     this.getInput = this.getInput.bind(this);
-
     this.switchView = this.switchView.bind(this);
   }
 
   addInteraction(){
-    drawInteraction = new Draw({
-          source: linesSource,
-          type: 'LineString',
-          style: new Style({
-              stroke: new Stroke({
-                color: 'blue',
-                width: 8
-              }),
-              image: new CircleStyle({
-                radius: 6,
-                fill: new Fill({
-                  color: 'blue'
-                })
-              })
-            })
-        });
+    var self = this;
+
         map.addInteraction(drawInteraction);
         this.setState({
-          editing: true
-        })
+          drawing: 'line'
+        });
+
 
   }
 
@@ -183,6 +196,7 @@ class App extends Component {
         view: 1
       });
       map.addLayer(heatmapLayer);
+      map.removeLayer(linesLayer);
       this.getResults();
     }
     else{
@@ -190,6 +204,8 @@ class App extends Component {
         view: 0
       })
       map.removeLayer(heatmapLayer);
+      map.addLayer(linesLayer);
+
       this.getInput();
     }
   }
@@ -244,7 +260,7 @@ class App extends Component {
     console.log('remove interaction');
     map.removeInteraction(drawInteraction);
     this.setState({
-      editing: false
+      drawing: 'none'
     });
   }
 
@@ -261,36 +277,17 @@ class App extends Component {
   }
 
   getResults(){
-    console.log('get results');
     axios.get('/api/results')
     .then(function(response){
       pointSource.clear();
-      console.log(response.data.data[0]);
       var lines = response.data.data[0];
       lines.forEach(function(line){
-        console.log(line);
         var resultGeoJSONFeature = (new GeoJSON()).readFeature(line.geom, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
         var resultGeoJSON = (new GeoJSON()).writeFeature(resultGeoJSONFeature)
-        console.log(resultGeoJSON);
         turnLineIntoArrayOfPoints(line.geom);
-        /*
-        console.log(resulsStuff);
-        resultsSource.addFeatures(resulsStuff);
-        var layerLines = new VectorLayer({
-          source: new VectorSource({
-            features: resulsStuff
-          }),
-        });
-        */
-
       });
-
-
     });
-
   }
-
-
 
   render() {
     return (
@@ -314,7 +311,7 @@ class App extends Component {
         >
           <div style={{width: drawerWidth, marginTop: '64px', padding: '15px'}}>
             <EditButton
-              editing={this.state.editing}
+              drawing={this.state.drawing}
               onClick={this.cancelEdit}
               onClick2={this.deleteLastPoint}
               onClick3 = {this.addInteraction}
@@ -333,12 +330,26 @@ class App extends Component {
 
           </div>
         </Drawer>
-        <div id='map'>
-        </div><div id='popup'>hello.</div>
+        <div id='map'></div>
+        <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-140px', top:'-203px'}}>
+         <form>
+          <TextField
+            label="Add Comment:"
+            multiline
+            rows="4"
+            margin="normal"
+            variant = 'outlined'
+            style = {{width:'100%'}}
+          />
+          <br />
+          <Button variant='contained' color='primary'>Save</Button>
+          </form>
+        </Paper>
       </div>
     );
   }
   componentDidMount(){
+    this.getResults();
     var self =this;
     var layers = [
       new TileLayer({
@@ -354,9 +365,14 @@ class App extends Component {
       //pointsLayer,
     ];
 
+    var container = document.getElementById('popover');
+    console.log(container);
+    overlay.setElement(container);
+
     map = new Map({
         target: 'map',
         layers: layers,
+        overlays: [overlay],
         view: new View({
           center: fromLonLat([-94.573, 39.143]),
           zoom: 14,
@@ -378,9 +394,6 @@ class App extends Component {
       heatmapLayer.setRadius(zoomRadius);
       heatmapLayer.setBlur(zoomBlur);
 
-
-
-
       map.getView().on('change:resolution', function(evt){
           resolution = evt.target.get(evt.key);
           result_resol_const_tile_px = resolution_constant / tile_pixel / resolution;
@@ -399,32 +412,51 @@ class App extends Component {
          heatmapLayer.setBlur(zoomBlur);
       });
 
-      var popup = new Overlay({element:document.getElementById('popup')});
-
-      map.addOverlay(popup);
-
-      // Add an event handler for the map "singleclick" event
-      map.on('singleclick', function(evt) {
-
-          // Hide existing popup and reset it's offset
-          //popup.hide();
-          popup.setOffset([0, 0]);
-
-          // Attempt to find a feature in one of the visible vector layers
-          var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-              return feature;
+      drawInteraction = new Draw({
+            source: linesSource,
+            type: 'LineString',
+            style: new Style({
+                stroke: new Stroke({
+                  color: '#2ecc71',
+                  width: 8
+                }),
+                image: new CircleStyle({
+                  radius: 6,
+                  fill: new Fill({
+                    color: '#2ecc71'
+                  })
+                })
+              })
           });
 
-          if (feature) {
+          drawInteraction.on('drawend', function(target){
+            var coordinate = target.feature.getGeometry().getCoordinateAt(0.5);
+            target.feature.setId(drawnFeatures);
+            drawnFeatures++;
+            overlay.setPosition(coordinate);
+            self.setState({popover: true});
+            self.setState({targetFeatureId: target.feature.getId()});
+            console.log(target.feature.getId());
+            self.cancelEdit();
 
-              var coord = feature.getGeometry().getCoordinates();
-              var props = feature.getProperties();
-              //var info = "<h2>"+props+"</h2>";
-              // Offset the popup so it points at the middle of the marker not the tip
-              popup.setOffset([0, -22]);
-              //popup.show(coord);
-          }
+          });
+
+      /*
+      map.on('singleclick', function(evt) {
+        var coordinate = evt.coordinate;
+        var hdms = toStringHDMS(toLonLat(coordinate));
+
+        container.innerHTML = '<p>You clicked here:</p><code>' + hdms +
+            '</code>';
+        overlay.setPosition(coordinate);
       });
+      */
+
+
+
+
+
+
     }
 }
 
