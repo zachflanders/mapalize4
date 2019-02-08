@@ -25,6 +25,8 @@ import Zoom from 'ol/control/Zoom';
 import Heatmap from 'ol/layer/Heatmap';
 import Overlay from 'ol/Overlay';
 import Feature from 'ol/Feature';
+import Select from 'ol/interaction/Select.js';
+import {click, pointerMove, altKeyOnly} from 'ol/events/condition.js';
 
 //Material-ui imports
 import AppBar from '@material-ui/core/AppBar';
@@ -53,18 +55,18 @@ import axios from 'axios';
 const drawerWidth = '200px';
 var map = {};
 var drawInteraction, snap; // global so we can remove them later
-
+var drawLineStyle = new Style({
+    stroke: new Stroke({
+      color: '#2ecc71',
+      width: 8
+    })
+  })
 var linesSource = new VectorSource();
 var resultsSource = new VectorSource();
 var pointSource = new VectorSource();
 var linesLayer = new VectorLayer({
   source: linesSource,
-  style: new Style({
-      stroke: new Stroke({
-        color: '#2ecc71',
-        width: 8
-      })
-    })
+  style: drawLineStyle
 });
 var resultsLayer = new VectorLayer({
   source: resultsSource
@@ -82,6 +84,11 @@ var overlay = new Overlay({
   autoPanAnimation: {
     duration: 250
   }
+});
+var select = new Select({
+  condition: click,
+  style: drawLineStyle,
+  layers: [linesLayer]
 });
 
 var drawnFeatures = 0;
@@ -168,7 +175,8 @@ class App extends Component {
       drawing: 'none',
       view: 0,
       popover: false,
-      targetFeatureId: null
+      targetFeatureId: null,
+      comment: null,
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -177,26 +185,30 @@ class App extends Component {
     this.getResults = this.getResults.bind(this);
     this.getInput = this.getInput.bind(this);
     this.switchView = this.switchView.bind(this);
+    this.updateComment = this.updateComment.bind(this);
+    this.saveComment = this.saveComment.bind(this);
   }
 
   addInteraction(){
     var self = this;
-
-        map.addInteraction(drawInteraction);
-        this.setState({
-          drawing: 'line'
-        });
-
+    map.removeInteraction(select);
+    map.addInteraction(drawInteraction);
+    this.setState({
+      drawing: 'line'
+    });
+    document.getElementById('map').style.cursor = 'crosshair';
 
   }
 
-  switchView(){
-    if(this.state.view == 0){
+  switchView(event, value){
+    if(value == 1){
       this.setState({
         view: 1
       });
       map.addLayer(heatmapLayer);
       map.removeLayer(linesLayer);
+      map.removeOverlay(overlay);
+      map.removeInteraction(select);
       this.getResults();
     }
     else{
@@ -205,14 +217,15 @@ class App extends Component {
       })
       map.removeLayer(heatmapLayer);
       map.addLayer(linesLayer);
+      map.addOverlay(overlay);
+      map.addInteraction(select);
+
 
       this.getInput();
     }
   }
 
   getInput(){
-    console.log('get input');
-    console.log(map.getLayers());
     map.removeLayer(resultsLayer);
   }
 
@@ -259,6 +272,8 @@ class App extends Component {
   cancelEdit(){
     console.log('remove interaction');
     map.removeInteraction(drawInteraction);
+    map.addInteraction(select);
+    document.getElementById('map').style.cursor = 'default';
     this.setState({
       drawing: 'none'
     });
@@ -277,6 +292,7 @@ class App extends Component {
   }
 
   getResults(){
+    console.log('get results');
     axios.get('/api/results')
     .then(function(response){
       pointSource.clear();
@@ -287,6 +303,22 @@ class App extends Component {
         turnLineIntoArrayOfPoints(line.geom);
       });
     });
+  }
+
+  updateComment(event) {
+    this.setState({comment: event.target.value});
+  }
+
+  saveComment(event, target){
+    console.log(event.target, target);
+    event.preventDefault();
+    var selectedFeature = linesSource.getFeatureById(this.state.targetFeatureId);
+    selectedFeature.setProperties({comment:this.state.comment});
+    console.log(selectedFeature);
+    overlay.setPosition(undefined);
+    this.setState({comment:''});
+    console.log(this.state.comment);
+    select.getFeatures().clear();
   }
 
   render() {
@@ -331,8 +363,8 @@ class App extends Component {
           </div>
         </Drawer>
         <div id='map'></div>
-        <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-140px', top:'-203px'}}>
-         <form>
+        <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
+         <form onSubmit={this.saveComment}>
           <TextField
             label="Add Comment:"
             multiline
@@ -340,10 +372,14 @@ class App extends Component {
             margin="normal"
             variant = 'outlined'
             style = {{width:'100%'}}
+            value = {this.state.comment}
+            onChange = {this.updateComment}
+            autoFocus = "true"
           />
           <br />
-          <Button variant='contained' color='primary'>Save</Button>
+          <Button type='submit' variant='contained' color='primary' >Save</Button>
           </form>
+          <div className='arrow'></div>
         </Paper>
       </div>
     );
@@ -366,7 +402,6 @@ class App extends Component {
     ];
 
     var container = document.getElementById('popover');
-    console.log(container);
     overlay.setElement(container);
 
     map = new Map({
@@ -400,7 +435,6 @@ class App extends Component {
           zoomRadius = result_resol_const_tile_px/25675;
           zoomBlur = result_resol_const_tile_px/5359;
 
-         console.info("radius: ", (zoomRadius), "blur: ",(zoomBlur));
          if(zoomRadius > 48){
            zoomRadius = 48;
          }
@@ -430,6 +464,7 @@ class App extends Component {
           });
 
           drawInteraction.on('drawend', function(target){
+            self.setState({comment: ''});
             var coordinate = target.feature.getGeometry().getCoordinateAt(0.5);
             target.feature.setId(drawnFeatures);
             drawnFeatures++;
@@ -439,18 +474,35 @@ class App extends Component {
             console.log(target.feature.getId());
             self.cancelEdit();
 
+
+
           });
 
-      /*
-      map.on('singleclick', function(evt) {
+
+      map.on('pointermove', function(evt) {
         var coordinate = evt.coordinate;
         var hdms = toStringHDMS(toLonLat(coordinate));
-
-        container.innerHTML = '<p>You clicked here:</p><code>' + hdms +
-            '</code>';
-        overlay.setPosition(coordinate);
+        //console.log(hdms);
       });
-      */
+
+      select.on('select', function(e) {
+
+        var selectedFeature2 = e.selected[0];
+        if(selectedFeature2){
+          self.setState({targetFeatureId: e.selected[0].getId()});
+
+          console.log(e.selected[0].getId())
+          console.log(e.selected[0].getProperties().comment);
+          self.setState({comment: selectedFeature2.getProperties().comment});
+          var coordinate = selectedFeature2.getGeometry().getCoordinateAt(0.5);
+          overlay.setPosition(coordinate);
+          self.setState({popover: true});
+        }
+      });
+
+
+
+
 
 
 
