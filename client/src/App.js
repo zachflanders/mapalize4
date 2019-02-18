@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import MainDisplay from './main.js';
 
 //openlayers imports
 import 'ol/ol.css';
@@ -17,6 +18,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import {toLonLat} from 'ol/proj';
 import {fromLonLat} from 'ol/proj';
 import {transform} from 'ol/proj';
+import {METERS_PER_UNIT} from 'ol/proj';
 import {toStringHDMS} from 'ol/coordinate.js';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
@@ -41,23 +43,54 @@ import Tab from '@material-ui/core/Tab';
 import EditIcon from '@material-ui/icons/Edit';
 import FireIcon from '@material-ui/icons/Whatshot';
 import LineIcon from '@material-ui/icons/Timeline';
-import PointIcon from '@material-ui/icons/Place';
+import PointIcon from '@material-ui/icons/AddLocation';
+import UploadIcon from '@material-ui/icons/CloudUpload';
+import MapIcon from '@material-ui/icons/Map';
+import PlaceIcon from '@material-ui/icons/Place';
+import ViewIcon from '@material-ui/icons/ViewModule';
+import AddIcon from '@material-ui/icons/Add';
+import DoneIcon from '@material-ui/icons/Done';
+import CancelIcon from '@material-ui/icons/Close';
+import RemoveIcon from '@material-ui/icons/Remove';
+import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Popper from '@material-ui/core/Popper';
 import Fade from '@material-ui/core/Fade';
 import TextField from '@material-ui/core/TextField';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider } from '@material-ui/core/styles';
 
+import indigo from '@material-ui/core/colors/indigo';
+import pink from '@material-ui/core/colors/pink';
+import cyan from '@material-ui/core/colors/cyan';
+import teal from '@material-ui/core/colors/teal';
+import amber from '@material-ui/core/colors/amber';
+import lightGreen from '@material-ui/core/colors/lightGreen';
+import blue from '@material-ui/core/colors/blue';
 
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
 
 import turf from 'turf';
 import axios from 'axios';
 
-const drawerWidth = '200px';
+const theme = createMuiTheme({
+  palette: {
+    primary: indigo,
+    secondary: teal
+  },
+});
+
+const drawerWidth = '220px';
 var map = {};
-var drawInteraction, snap; // global so we can remove them later
+var drawInteraction = []
+var snap;
 var drawLineStyle = new Style({
     stroke: new Stroke({
-      color: '#2ecc71',
+      color: '#00c853',
       width: 8
     })
   })
@@ -77,7 +110,8 @@ var pointsLayer = new VectorLayer({
 });
 
 var heatmapLayer = new Heatmap({
-  source: pointSource
+  source: pointSource,
+  renderMode: 'image'
 });
 var overlay = new Overlay({
   autoPan: true,
@@ -87,6 +121,11 @@ var overlay = new Overlay({
 });
 var select = new Select({
   condition: click,
+  style: drawLineStyle,
+  layers: [linesLayer]
+});
+var selectHover = new Select({
+  condition: pointerMove,
   style: drawLineStyle,
   layers: [linesLayer]
 });
@@ -109,74 +148,40 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine){
   }
 };
 
-function EditButton(props) {
-  const drawing = props.drawing;
-  if (drawing == 'line') {
-    return (
-      <div>
-        <strong>Create Features</strong><br /><br />
-        <Paper style={{padding:'10px'}}>
-          <Typography variant='h6'><LineIcon /> &nbsp;Add Line</Typography>
-          <Button  size='small' color='primary' onClick={props.onClick4}>Finish Line</Button>
-          <br />
-          <Button size='small' color='primary' onClick={props.onClick2}>Delete Last Point</Button>
-          <br />
-          <Button  size='small' color='primary' onClick={props.onClick}>Stop Drawing</Button>
-        </Paper>
-      </div>
-    );
-  }
-  else if(drawing == 'point') {
-    return (
-      <div>
-        <strong>Create Features</strong><br /><br />
-        <Paper style={{padding:'10px'}}>
-          <Typography variant='h6'><PointIcon /> &nbsp;Add Point</Typography>
-          <br />
-          <Button  size='small' color='primary' onClick={props.onClick}>Stop Drawing</Button>
-        </Paper>
-      </div>
-    );
-  }
-  else {
-    return (
-      <div>
-          <strong>Create Features</strong><br /><br />
-        <Button
-          onClick = {props.onClick3}
-          style = {{textAlign:'left'}}
-        >
-          <LineIcon color='#2ecc71' />  <span style ={{paddingLeft:'10px'}}>Add Bike Infrastructure</span>
-        </Button>
-        <br />
-        <Button
-          onClick = {props.onClick3}
-        >
-          <PointIcon /> &nbsp;&nbsp; Add Point
-        </Button>
-        <br />
-        <Button>
-          <EditIcon /> &nbsp;&nbsp; Edit Features
-        </Button>
-        <Button>
-          <DeleteIcon /> &nbsp;&nbsp; Delete Features
-        </Button>
-      </div>
-    )
-  }
-}
-
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       title: 'NorthKC Bike Plan',
       lineName: 'Draw Line',
-      drawing: 'none',
+      features:[
+        {
+          name:'Add Bike Infrastructure',
+          prompt:'Where would you bike if it was comfortable?',
+          type:'line',
+          color: '#00c853'
+        },
+        {
+          name:'Add Bike Share',
+          prompt:'Where would you want bike share?',
+          type:'point',
+          color: '#2196f3'
+        },
+        {
+          name:'Unsafe Location',
+          prompt:'What locations feel unsafe or uncomfortable for biking?',
+          type:'point',
+          color: '#f44336'
+        }
+      ],
+      drawing: false,
       view: 0,
       popover: false,
       targetFeatureId: null,
-      comment: null,
+      comment: undefined,
+      mode: 'map',
+      viewMap: true,
+      lineData: null
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -187,14 +192,15 @@ class App extends Component {
     this.switchView = this.switchView.bind(this);
     this.updateComment = this.updateComment.bind(this);
     this.saveComment = this.saveComment.bind(this);
+    this.changeMode = this.changeMode.bind(this);
+    this.renderSidebar = this.renderSidebar.bind(this);
   }
 
-  addInteraction(){
-    var self = this;
+  addInteraction(counter){
     map.removeInteraction(select);
-    map.addInteraction(drawInteraction);
+    map.addInteraction(drawInteraction[counter]);
     this.setState({
-      drawing: 'line'
+      drawing: counter
     });
     document.getElementById('map').style.cursor = 'crosshair';
 
@@ -219,46 +225,21 @@ class App extends Component {
       map.addLayer(linesLayer);
       map.addOverlay(overlay);
       map.addInteraction(select);
-
-
       this.getInput();
     }
   }
 
   getInput(){
     map.removeLayer(resultsLayer);
+    this.changeMode('map');
   }
 
   upload(){
     console.log('upload');
+    overlay.setPosition(undefined);
     var writer = new GeoJSON();
     var drawnFeatures = writer.writeFeatures(linesLayer.getSource().getFeatures());
-    var drawnFeaturesJSON = JSON.parse(drawnFeatures);
-    console.log(drawnFeaturesJSON.features);
-    for (var feature in drawnFeaturesJSON.features){
-      if(!drawnFeaturesJSON.features.hasOwnProperty(feature)) continue;
-      var geoJSONLine = drawnFeaturesJSON.features[feature];
-      console.log(geoJSONLine);
-      var geoJSONLineReproject = {
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: [],
-        },
-        properties: null
-      }
-      geoJSONLine.geometry.coordinates.forEach(function(coord){
-        console.log(coord);
-        console.log(toLonLat(coord, 'EPSG:3857'));
-        geoJSONLineReproject.geometry.coordinates.push(toLonLat(coord, 'EPSG:3857'))
-      });
-      console.log(geoJSONLineReproject)
-      //var points = turnLineIntoArrayOfPoints(geoJSONLineReproject);
-      //console.log(points);
-    }
     linesSource.clear();
-
-
     axios.post('/api/addLines', {
       features: drawnFeatures
     })
@@ -269,13 +250,13 @@ class App extends Component {
 
   }
 
-  cancelEdit(){
+  cancelEdit(counter){
     console.log('remove interaction');
-    map.removeInteraction(drawInteraction);
+    map.removeInteraction(drawInteraction[counter]);
     map.addInteraction(select);
     document.getElementById('map').style.cursor = 'default';
     this.setState({
-      drawing: 'none'
+      drawing: false
     });
   }
 
@@ -292,10 +273,13 @@ class App extends Component {
   }
 
   getResults(){
+    var self = this;
     console.log('get results');
     axios.get('/api/results')
     .then(function(response){
       pointSource.clear();
+      console.log(response.data.data[0]);
+      self.setState({lineData: response.data.data[0]});
       var lines = response.data.data[0];
       lines.forEach(function(line){
         var resultGeoJSONFeature = (new GeoJSON()).readFeature(line.geom, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
@@ -321,67 +305,141 @@ class App extends Component {
     select.getFeatures().clear();
   }
 
-  render() {
-    return (
-      <div className="App">
-        <AppBar position="static" style={{position:'relative', zIndex: 1201, }}>
-          <Toolbar style={{height:'64px'}} >
-            <Typography variant="h6" color="inherit" style={{flexGrow:1}}>
-              {this.state.title}
-            </Typography>
+  changeMode(mode){
+    if(mode == 'map'){
+      map.setTarget('map');
+      this.setState({viewMap: true});
+      this.setState({mode:'map'});
+    }
+    else{
+      map.setTarget(null);
+      this.setState({viewMap: false});
+      this.setState({mode: 'cards'});
+    }
+  }
 
-            <Tabs value={this.state.view} style={{height:'64px'}} onChange = {this.switchView}>
-              <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{height:'64px'}} />
-              <Tab label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} />
-            </Tabs>
-
-          </Toolbar>
-
-        </AppBar>
-        <Drawer
-          variant="permanent"
-        >
-          <div style={{width: drawerWidth, marginTop: '64px', padding: '15px'}}>
-            <EditButton
-              drawing={this.state.drawing}
-              onClick={this.cancelEdit}
-              onClick2={this.deleteLastPoint}
-              onClick3 = {this.addInteraction}
-              onClick4 = {this.finishLine}
-            />
+  renderSidebar(){
+    if(this.state.view == 0){
+      if (this.state.drawing !== false) {
+        return (
+          <div>
+          <div style={{paddingLeft: '32px', textIndent:'-32px'}}><strong><LineIcon style={{color:'#00c853', verticalAlign:'middle'}} /> &nbsp;Add Bike Infrastructure</strong></div>
             <br />
-            <Divider />
+            <Paper style={{padding:'10px'}}>
+              <Button
+                onClick = {this.finishLine}
+                className='full-width-left'
+                size='small'
+              >
+                <DoneIcon /> &nbsp;&nbsp; Finish Line
+              </Button>
+              <br />
+              <Button
+                onClick = {this.deleteLastPoint}
+                className='full-width-left'
+                size='small'  >
+                  <RemoveIcon /> &nbsp;&nbsp; Delete Last Point
+              </Button>
+              <br />
+              <Button
+                onClick = {()=>this.cancelEdit(this.state.drawing)}
+                className='full-width-left'
+                size='small' >
+                  <CancelIcon /> &nbsp;&nbsp; Cancel
+                </Button>
+            </Paper>
+            </div>
+        );
+      }
+      else {
+        return (
+            <div>
+              <div ><strong><AddIcon style={{verticalAlign:'middle'}} /> &nbsp; Create Features</strong></div>
+              <br />
+            <Paper style={{padding:'8px'}}>
+              {this.state.features.map(function(item, counter){
+                return(
+                  <Tooltip title={item.prompt} placement='right'>
+                    <Button
+                      onClick = {((item.type === 'line') ? ()=>this.addInteraction(counter) : ()=>this.addInteraction(counter))}
+                      className='full-width-left'
+                    >
+                      {((item.type === 'line') ? <LineIcon style={{color:item.color}} /> : <PointIcon style={{color:item.color}}/>)} <span style ={{paddingLeft:'10px'}}>{item.name}</span>
+                    </Button>
+                  </Tooltip>
+                )
+              }.bind(this))}
+            </Paper>
+            <br />
+            <Paper style={{padding:'8px'}}>
+            <Button
+              className='full-width-left'        >
+              <EditIcon /> &nbsp;&nbsp; Edit Features
+            </Button>
+            <Button
+              className='full-width-left'        >
+              <DeleteIcon /> &nbsp;&nbsp; Delete Features
+            </Button>
+            </Paper>
             <br />
             <Button
               variant='contained'
               color='primary'
               onClick = {this.upload}
+              className = 'full-width'
             >
-              Upload
+              <UploadIcon /> &nbsp;&nbsp; Upload
             </Button>
+            </div>
+        )
+      }
+    }
+  }
 
-          </div>
-        </Drawer>
-        <div id='map'></div>
-        <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
-         <form onSubmit={this.saveComment}>
-          <TextField
-            label="Add Comment:"
-            multiline
-            rows="4"
-            margin="normal"
-            variant = 'outlined'
-            style = {{width:'100%'}}
-            value = {this.state.comment}
-            onChange = {this.updateComment}
-            autoFocus = "true"
-          />
-          <br />
-          <Button type='submit' variant='contained' color='primary' >Save</Button>
-          </form>
-          <div className='arrow'></div>
-        </Paper>
-      </div>
+  render() {
+    return (
+      <MuiThemeProvider theme={theme}>
+        <div className="App">
+          <AppBar position="fixed" style={{zIndex: 1201, }}>
+            <Toolbar style={{height:'64px'}} >
+              <Typography variant="h6" color="inherit" style={{flexGrow:1}}>
+                {this.state.title}
+              </Typography>
+
+              <Tabs value={this.state.view} style={{height:'64px'}} onChange = {this.switchView}>
+                <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{height:'64px'}} />
+                <Tab label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} />
+              </Tabs>
+
+            </Toolbar>
+
+          </AppBar>
+          <Drawer variant="permanent">
+            <div style={{width: drawerWidth, marginTop: '64px', padding: '15px'}}>
+              {this.renderSidebar()}
+            </div>
+          </Drawer>
+          <MainDisplay mode={this.state.mode} data={this.state.lineData} />
+          <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
+          <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
+            <form onSubmit={this.saveComment}>
+              <TextField
+                label="Add Comment:"
+                multiline
+                rows="4"
+                margin="normal"
+                variant = 'outlined'
+                style = {{width:'100%'}}
+                value = {this.state.comment}
+                onChange = {this.updateComment}
+              />
+              <br />
+              <Button type='submit' variant='contained' color='primary' >Save</Button>
+            </form>
+            <div className='arrow'></div>
+          </Paper>
+        </div>
+      </MuiThemeProvider>
     );
   }
   componentDidMount(){
@@ -420,64 +478,62 @@ class App extends Component {
       });
 
       var resolution = map.getView().getResolution(),
-           resolution_constant = 40075016.68557849,
-           tile_pixel = 256;
-
-      var result_resol_const_tile_px = resolution_constant / tile_pixel / resolution;
-      var zoomRadius = result_resol_const_tile_px/25675;
-      var zoomBlur = result_resol_const_tile_px/5359;
+      radiusSize = 4,
+      blurSize = 36;
+      var zoomRadius = radiusSize/resolution;
+      var zoomBlur = blurSize/resolution;
       heatmapLayer.setRadius(zoomRadius);
       heatmapLayer.setBlur(zoomBlur);
 
       map.getView().on('change:resolution', function(evt){
           resolution = evt.target.get(evt.key);
-          result_resol_const_tile_px = resolution_constant / tile_pixel / resolution;
-          zoomRadius = result_resol_const_tile_px/25675;
-          zoomBlur = result_resol_const_tile_px/5359;
 
-         if(zoomRadius > 48){
-           zoomRadius = 48;
-         }
-         if(zoomBlur > 128){
-           zoomBlur = 128
-         }
-
+          zoomRadius =  radiusSize/resolution;
+          zoomBlur = blurSize/resolution;
          heatmapLayer.setRadius(zoomRadius);
          heatmapLayer.setBlur(zoomBlur);
       });
 
-      drawInteraction = new Draw({
+      this.state.features.map(function(item){
+        drawInteraction.push(
+          new Draw({
             source: linesSource,
-            type: 'LineString',
+            type: ((item.type === 'line')?'LineString':'Point'),
             style: new Style({
-                stroke: new Stroke({
-                  color: '#2ecc71',
-                  width: 8
-                }),
-                image: new CircleStyle({
-                  radius: 6,
-                  fill: new Fill({
-                    color: '#2ecc71'
-                  })
+              stroke: new Stroke({
+                color: item.color,
+                width: 8
+              }),
+              image: new CircleStyle({
+                radius: 6,
+                fill: new Fill({
+                  color: item.color
                 })
               })
-          });
-
-          drawInteraction.on('drawend', function(target){
-            self.setState({comment: ''});
-            var coordinate = target.feature.getGeometry().getCoordinateAt(0.5);
-            target.feature.setId(drawnFeatures);
-            drawnFeatures++;
-            overlay.setPosition(coordinate);
-            self.setState({popover: true});
-            self.setState({targetFeatureId: target.feature.getId()});
-            console.log(target.feature.getId());
-            self.cancelEdit();
-
-
-
-          });
-
+            })
+          })
+        )
+      });
+      drawInteraction.map(function(item, counter){
+        console.log(this.state.features[counter]);
+        drawInteraction[counter].on('drawend', function(target){
+          self.setState({comment: ''});
+          var coordinate;
+          if(this.state.features[counter].type === 'line'){
+            coordinate = target.feature.getGeometry().getCoordinateAt(0.5);
+          }
+          else{
+            coordinate = target.feature.getGeometry().getCoordinates();
+          }
+          target.feature.setId(drawnFeatures);
+          drawnFeatures++;
+          overlay.setPosition(coordinate);
+          self.setState({popover: true});
+          self.setState({targetFeatureId: target.feature.getId()});
+          console.log(target.feature.getId());
+          self.cancelEdit(counter);
+        }.bind(this));
+      }.bind(this));
 
       map.on('pointermove', function(evt) {
         var coordinate = evt.coordinate;
@@ -499,16 +555,19 @@ class App extends Component {
           self.setState({popover: true});
         }
       });
+      map.addInteraction(selectHover);
 
-
-
-
-
-
-
-
-
-
+      selectHover.on('select', function(e) {
+        if(e.selected.length > 0){
+          document.getElementById('map').style.cursor = 'pointer';
+        }
+        else{
+          document.getElementById('map').style.cursor = 'default';
+        }
+      });
+    }
+    componentDidUpdate(){
+      map.updateSize();
     }
 }
 

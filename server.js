@@ -87,10 +87,16 @@ app.get('/api/bikefacilities', function(req, res){
 
 app.post('/api/addLines', function(req, res){
   var features = JSON.parse(req.body.features);
-  var query = "INSERT INTO northKC(geom) VALUES "
+  var query = "INSERT INTO northKC(geom, line_comment) VALUES "
   features.features.forEach(function(item){
-    console.log(item.geometry);
-    query = query + "(ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(item.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326)), ";
+    console.log(item);
+    if(item.properties != null){
+      query = query + "(ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(item.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326),'"+item.properties.comment+"'), ";
+    }
+    else{
+      query = query + "(ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(item.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326),' '), ";
+
+    }
   });
   query = query.slice(0,-2);
   query = query +";"
