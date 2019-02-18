@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import MainDisplay from './main.js';
+import PlaceSVG from './assets/place.svg';
 
 //openlayers imports
 import 'ol/ol.css';
@@ -14,6 +15,7 @@ import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import CircleStyle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
+import Icon from 'ol/style/Icon';
 import GeoJSON from 'ol/format/GeoJSON';
 import {toLonLat} from 'ol/proj';
 import {fromLonLat} from 'ol/proj';
@@ -82,33 +84,19 @@ const theme = createMuiTheme({
     primary: indigo,
     secondary: teal
   },
+  typography: {
+    useNextVariants: true,
+  }
 });
+
+var sourceArray = [];
+var layerArray = [];
 
 const drawerWidth = '220px';
 var map = {};
 var drawInteraction = []
 var snap;
-var drawLineStyle = new Style({
-    stroke: new Stroke({
-      color: '#00c853',
-      width: 8
-    })
-  })
-var linesSource = new VectorSource();
-var resultsSource = new VectorSource();
 var pointSource = new VectorSource();
-var linesLayer = new VectorLayer({
-  source: linesSource,
-  style: drawLineStyle
-});
-var resultsLayer = new VectorLayer({
-  source: resultsSource
-});
-
-var pointsLayer = new VectorLayer({
-  source: pointSource
-});
-
 var heatmapLayer = new Heatmap({
   source: pointSource,
   renderMode: 'image'
@@ -121,14 +109,9 @@ var overlay = new Overlay({
 });
 var select = new Select({
   condition: click,
-  style: drawLineStyle,
-  layers: [linesLayer]
+  layers: layerArray
 });
-var selectHover = new Select({
-  condition: pointerMove,
-  style: drawLineStyle,
-  layers: [linesLayer]
-});
+var selectHover = [];
 
 var drawnFeatures = 0;
 
@@ -212,7 +195,9 @@ class App extends Component {
         view: 1
       });
       map.addLayer(heatmapLayer);
-      map.removeLayer(linesLayer);
+      this.state.features.map(function(item, count){
+        map.removeLayer(layerArray[count+1]);
+      });
       map.removeOverlay(overlay);
       map.removeInteraction(select);
       this.getResults();
@@ -222,7 +207,9 @@ class App extends Component {
         view: 0
       })
       map.removeLayer(heatmapLayer);
-      map.addLayer(linesLayer);
+      this.state.features.map(function(item, count){
+        map.addLayer(layerArray[count+1]);
+      });
       map.addOverlay(overlay);
       map.addInteraction(select);
       this.getInput();
@@ -230,7 +217,6 @@ class App extends Component {
   }
 
   getInput(){
-    map.removeLayer(resultsLayer);
     this.changeMode('map');
   }
 
@@ -238,14 +224,24 @@ class App extends Component {
     console.log('upload');
     overlay.setPosition(undefined);
     var writer = new GeoJSON();
-    var drawnFeatures = writer.writeFeatures(linesLayer.getSource().getFeatures());
-    linesSource.clear();
+    var drawnFeatures = [];
+    layerArray.map(function(item, counter){
+      if(counter > 0){
+        drawnFeatures.push(writer.writeFeatures(item.getSource().getFeatures()))
+      }
+    });
+    sourceArray.map(function(item, count){
+      item.clear();
+    });
+    console.log(drawnFeatures);
+
     axios.post('/api/addLines', {
       features: drawnFeatures
     })
     .then(function(response){
       console.log(response);
     });
+  
 
 
   }
@@ -273,20 +269,19 @@ class App extends Component {
   }
 
   getResults(){
-    var self = this;
     console.log('get results');
     axios.get('/api/results')
     .then(function(response){
       pointSource.clear();
       console.log(response.data.data[0]);
-      self.setState({lineData: response.data.data[0]});
+      this.setState({lineData: response.data.data[0]});
       var lines = response.data.data[0];
       lines.forEach(function(line){
         var resultGeoJSONFeature = (new GeoJSON()).readFeature(line.geom, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
         var resultGeoJSON = (new GeoJSON()).writeFeature(resultGeoJSONFeature)
         turnLineIntoArrayOfPoints(line.geom);
       });
-    });
+    }.bind(this));
   }
 
   updateComment(event) {
@@ -296,7 +291,12 @@ class App extends Component {
   saveComment(event, target){
     console.log(event.target, target);
     event.preventDefault();
-    var selectedFeature = linesSource.getFeatureById(this.state.targetFeatureId);
+    var selectedFeature;
+    this.state.features.map(function(item, count){
+      if(sourceArray[count].getFeatureById(this.state.targetFeatureId)){
+        selectedFeature = sourceArray[count].getFeatureById(this.state.targetFeatureId);
+      }
+    }.bind(this));
     selectedFeature.setProperties({comment:this.state.comment});
     console.log(selectedFeature);
     overlay.setPosition(undefined);
@@ -359,7 +359,7 @@ class App extends Component {
             <Paper style={{padding:'8px'}}>
               {this.state.features.map(function(item, counter){
                 return(
-                  <Tooltip title={item.prompt} placement='right'>
+                  <Tooltip title={item.prompt} placement='right' key={item.name}>
                     <Button
                       onClick = {((item.type === 'line') ? ()=>this.addInteraction(counter) : ()=>this.addInteraction(counter))}
                       className='full-width-left'
@@ -444,27 +444,116 @@ class App extends Component {
   }
   componentDidMount(){
     this.getResults();
-    var self =this;
-    var layers = [
-      new TileLayer({
-        source: new TileWMS({
-          url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-          params: {'LAYERS': 'Mapalize:OSM-KC-ROADS', 'TILED': true},
-          serverType: 'geoserver',
-          transition: 0
-        })
-      }),
-      linesLayer,
-      //resultsLayer
-      //pointsLayer,
-    ];
+    layerArray.push(new TileLayer({
+      source: new TileWMS({
+        url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
+        params: {'LAYERS': 'Mapalize:OSM-KC-ROADS', 'TILED': true},
+        serverType: 'geoserver',
+        transition: 0
+      })
+    }));
+    this.state.features.map(function(item, count){
+      sourceArray.push(new VectorSource());
+      if(item.type === 'line'){
+        layerArray.push(new VectorLayer({
+          source: sourceArray[count],
+          style: new Style({
+              stroke: new Stroke({
+                color: item.color,
+                width: 8
+              })
+            })
+        }));
+        drawInteraction.push(
+          new Draw({
+            source: sourceArray[count],
+            type: 'LineString',
+            style: new Style({
+              stroke: new Stroke({
+                color: item.color,
+                width: 8
+              }),
+              image: new CircleStyle({
+                radius: 6,
+                fill: new Fill({
+                  color: item.color
+                })
+              })
+            })
+          })
+        );
+        selectHover.push(new Select({
+          condition: pointerMove,
+          style: new Style({
+            stroke: new Stroke({
+              color: item.color,
+              width: 8
+            }),
+            image: new CircleStyle({
+              radius: 6,
+              fill: new Fill({
+                color: item.color
+              })
+            })
+          }),
+          layers: [layerArray[count+1]]
+        }));
+      }
+      else{
+        layerArray.push(new VectorLayer({
+          source: sourceArray[count],
+          style: new Style({
+            image: new Icon(({
+              anchor: [0.5, 60],
+              anchorXUnits: 'fraction',
+              anchorYUnits: 'pixels',
+              crossOrigin: 'anonymous',
+              src: PlaceSVG,
+              color: item.color,
+              scale: 0.5
+            }))
+          })
+        }));
+        drawInteraction.push(
+          new Draw({
+            source: sourceArray[count],
+            type: 'Point',
+            style: new Style({
+              image: new Icon(({
+                anchor: [0.5, 60],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'pixels',
+                crossOrigin: 'anonymous',
+                src: PlaceSVG,
+                color: item.color,
+                scale: 0.5
+              }))
+            })
+          })
+        );
+        selectHover.push(new Select({
+          condition: pointerMove,
+          style: new Style({
+            image: new Icon(({
+              anchor: [0.5, 60],
+              anchorXUnits: 'fraction',
+              anchorYUnits: 'pixels',
+              crossOrigin: 'anonymous',
+              src: PlaceSVG,
+              color: item.color,
+              scale: 0.5
+            }))
+          }),
+          layers: [layerArray[count+1]]
+        }));
+      }
 
+    });
     var container = document.getElementById('popover');
     overlay.setElement(container);
-
     map = new Map({
         target: 'map',
-        layers: layers,
+        layers: layerArray,
         overlays: [overlay],
         view: new View({
           center: fromLonLat([-94.573, 39.143]),
@@ -493,31 +582,9 @@ class App extends Component {
          heatmapLayer.setRadius(zoomRadius);
          heatmapLayer.setBlur(zoomBlur);
       });
-
-      this.state.features.map(function(item){
-        drawInteraction.push(
-          new Draw({
-            source: linesSource,
-            type: ((item.type === 'line')?'LineString':'Point'),
-            style: new Style({
-              stroke: new Stroke({
-                color: item.color,
-                width: 8
-              }),
-              image: new CircleStyle({
-                radius: 6,
-                fill: new Fill({
-                  color: item.color
-                })
-              })
-            })
-          })
-        )
-      });
       drawInteraction.map(function(item, counter){
-        console.log(this.state.features[counter]);
         drawInteraction[counter].on('drawend', function(target){
-          self.setState({comment: ''});
+          this.setState({comment: ''});
           var coordinate;
           if(this.state.features[counter].type === 'line'){
             coordinate = target.feature.getGeometry().getCoordinateAt(0.5);
@@ -528,43 +595,52 @@ class App extends Component {
           target.feature.setId(drawnFeatures);
           drawnFeatures++;
           overlay.setPosition(coordinate);
-          self.setState({popover: true});
-          self.setState({targetFeatureId: target.feature.getId()});
+          this.setState({popover: true});
+          this.setState({targetFeatureId: target.feature.getId()});
           console.log(target.feature.getId());
-          self.cancelEdit(counter);
+          this.cancelEdit(counter);
         }.bind(this));
       }.bind(this));
 
-      map.on('pointermove', function(evt) {
-        var coordinate = evt.coordinate;
-        var hdms = toStringHDMS(toLonLat(coordinate));
-        //console.log(hdms);
-      });
-
       select.on('select', function(e) {
-
         var selectedFeature2 = e.selected[0];
         if(selectedFeature2){
-          self.setState({targetFeatureId: e.selected[0].getId()});
+          this.setState({targetFeatureId: e.selected[0].getId()});
 
-          console.log(e.selected[0].getId())
-          console.log(e.selected[0].getProperties().comment);
-          self.setState({comment: selectedFeature2.getProperties().comment});
-          var coordinate = selectedFeature2.getGeometry().getCoordinateAt(0.5);
+          console.log(e.selected[0].getProperties())
+          console.log(e.selected[0].getProperties().geometry);
+          this.setState({comment: selectedFeature2.getProperties().comment});
+          var coordinate;
+          if(e.selected[0].getGeometry().getType() === 'LineString'){
+            console.log('linestring')
+            coordinate = selectedFeature2.getGeometry().getCoordinateAt(0.5);
+          }
+          else{
+            coordinate = selectedFeature2.getGeometry().getCoordinates();
+          }
+
           overlay.setPosition(coordinate);
-          self.setState({popover: true});
+          this.setState({popover: true});
         }
-      });
-      map.addInteraction(selectHover);
+      }.bind(this));
 
-      selectHover.on('select', function(e) {
-        if(e.selected.length > 0){
-          document.getElementById('map').style.cursor = 'pointer';
-        }
-        else{
-          document.getElementById('map').style.cursor = 'default';
-        }
+
+
+      selectHover.map(function(item, count){
+        console.log(item);
+        map.addInteraction(item);
+        item.on('select', function(e) {
+          if(e.selected.length > 0){
+            document.getElementById('map').style.cursor = 'pointer';
+          }
+          else{
+            document.getElementById('map').style.cursor = 'default';
+          }
+        });
+
       });
+
+
     }
     componentDidUpdate(){
       map.updateSize();

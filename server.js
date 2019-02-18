@@ -86,7 +86,15 @@ app.get('/api/bikefacilities', function(req, res){
 });
 
 app.post('/api/addLines', function(req, res){
-  var features = JSON.parse(req.body.features);
+  console.log(req.body.features);
+  var featureLayers = req.body.features;
+  featureLayers.map(function(featureLayer, count){
+    var featureCollection = JSON.parse(featureLayer);
+    featureCollection.features.map(function(feature){
+      console.log(feature);
+    })
+  })
+  /*
   var query = "INSERT INTO northKC(geom, line_comment) VALUES "
   features.features.forEach(function(item){
     console.log(item);
@@ -106,6 +114,7 @@ app.post('/api/addLines', function(req, res){
       message: results,
     })
   })
+  */
 });
 
 app.get('/api/results', function(req, res){
