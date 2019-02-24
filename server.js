@@ -88,23 +88,29 @@ app.get('/api/bikefacilities', function(req, res){
 app.post('/api/addLines', function(req, res){
   console.log(req.body.features);
   var featureLayers = req.body.features;
+  var query = "INSERT INTO northKC(line, point, comment, name) VALUES ";
   featureLayers.map(function(featureLayer, count){
     var featureCollection = JSON.parse(featureLayer);
     featureCollection.features.map(function(feature){
       console.log(feature);
-    })
-  })
-  /*
-  var query = "INSERT INTO northKC(geom, line_comment) VALUES "
-  features.features.forEach(function(item){
-    console.log(item);
-    if(item.properties != null){
-      query = query + "(ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(item.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326),'"+item.properties.comment+"'), ";
-    }
-    else{
-      query = query + "(ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(item.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326),' '), ";
+      if(feature.geometry.type === 'LineString'){
+        if(feature.properties != null){
+          query = query + "(ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(feature.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326), null, '"+feature.properties.comment+"','"+feature.properties.layerName+"'), ";
+        }
+        else{
+          query = query + "(ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(feature.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326), null, ' ','"+feature.properties.layerName+"'), ";
+        }
+      }
+      else{
+        if(feature.properties != null){
+          query = query + "(null, ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(feature.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326), '"+feature.properties.comment+"','"+feature.properties.layerName+"'), ";
+        }
+        else{
+          query = query + "(null, ST_Transform(ST_GeomFromGeoJSON('"+JSON.stringify(feature.geometry).slice(0,-1)+",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}'), 4326), ' ','"+feature.properteis.LayerName+"'), ";
+        }
+      }
 
-    }
+    });
   });
   query = query.slice(0,-2);
   query = query +";"
@@ -114,7 +120,6 @@ app.post('/api/addLines', function(req, res){
       message: results,
     })
   })
-  */
 });
 
 app.get('/api/results', function(req, res){

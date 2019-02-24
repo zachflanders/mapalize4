@@ -61,7 +61,6 @@ import Fade from '@material-ui/core/Fade';
 import TextField from '@material-ui/core/TextField';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { MuiThemeProvider } from '@material-ui/core/styles';
-
 import indigo from '@material-ui/core/colors/indigo';
 import pink from '@material-ui/core/colors/pink';
 import cyan from '@material-ui/core/colors/cyan';
@@ -69,7 +68,6 @@ import teal from '@material-ui/core/colors/teal';
 import amber from '@material-ui/core/colors/amber';
 import lightGreen from '@material-ui/core/colors/lightGreen';
 import blue from '@material-ui/core/colors/blue';
-
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
@@ -91,10 +89,12 @@ const theme = createMuiTheme({
 
 var sourceArray = [];
 var layerArray = [];
+var resultsSourceArray = [];
+var resultsLayerArray = [];
 
 const drawerWidth = '220px';
 var map = {};
-var drawInteraction = []
+var drawInteraction = [];
 var snap;
 var pointSource = new VectorSource();
 var heatmapLayer = new Heatmap({
@@ -118,16 +118,14 @@ var drawnFeatures = 0;
 var turnLineIntoArrayOfPoints = function(geoJSONLine){
   //if statement should check to make sure geoJSON line is valid
   if(true){
-    var points = [];
     var length = turf.lineDistance(geoJSONLine, 'miles');
     for(var i=0; i <= length; i=i+0.01){
       if(length > 0 ){
         var thisPoint = turf.along(geoJSONLine, i, 'miles');
-        points.push({lat:thisPoint.geometry.coordinates[1], lng:thisPoint.geometry.coordinates[0], value:1});
         pointSource.addFeature(new Feature(new Point(transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
       }
     }
-    return points;
+    return;
   }
 };
 
@@ -164,7 +162,7 @@ class App extends Component {
       comment: undefined,
       mode: 'map',
       viewMap: true,
-      lineData: null
+      featureData: null
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -197,6 +195,7 @@ class App extends Component {
       map.addLayer(heatmapLayer);
       this.state.features.map(function(item, count){
         map.removeLayer(layerArray[count+1]);
+        map.addLayer(resultsLayerArray[count]);
       });
       map.removeOverlay(overlay);
       map.removeInteraction(select);
@@ -208,6 +207,7 @@ class App extends Component {
       })
       map.removeLayer(heatmapLayer);
       this.state.features.map(function(item, count){
+        map.removeLayer(resultsLayerArray[count]);
         map.addLayer(layerArray[count+1]);
       });
       map.addOverlay(overlay);
@@ -241,7 +241,7 @@ class App extends Component {
     .then(function(response){
       console.log(response);
     });
-  
+
 
 
   }
@@ -273,14 +273,29 @@ class App extends Component {
     axios.get('/api/results')
     .then(function(response){
       pointSource.clear();
+      resultsSourceArray.map(function(item){
+        item.clear();
+      })
       console.log(response.data.data[0]);
-      this.setState({lineData: response.data.data[0]});
-      var lines = response.data.data[0];
-      lines.forEach(function(line){
-        var resultGeoJSONFeature = (new GeoJSON()).readFeature(line.geom, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
-        var resultGeoJSON = (new GeoJSON()).writeFeature(resultGeoJSONFeature)
-        turnLineIntoArrayOfPoints(line.geom);
-      });
+      this.setState({featureData: response.data.data[0]});
+      var features = response.data.data[0];
+      features.map(function(feature, count){
+        if(feature.line){
+          var resultGeoJSONFeature = (new GeoJSON()).readFeature(feature.line, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
+          var resultGeoJSON = (new GeoJSON()).writeFeature(resultGeoJSONFeature)
+          turnLineIntoArrayOfPoints(feature.line);
+        }
+        else{
+          this.state.features.map(function(featureLayer,count){
+            if(feature.name === featureLayer.name){
+              //console.log(transform([feature.point.coordinates[0],feature.point.coordinates[1]],'ESPG:4326','ESPG:3857'));
+              resultsSourceArray[count].addFeature(new Feature(new Point(fromLonLat([feature.point.coordinates[0],feature.point.coordinates[1]]))));
+            }
+          })
+          //pointSource.addFeature(new Feature(new Point(transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
+
+        }
+      }.bind(this));
     }.bind(this));
   }
 
@@ -419,7 +434,7 @@ class App extends Component {
               {this.renderSidebar()}
             </div>
           </Drawer>
-          <MainDisplay mode={this.state.mode} data={this.state.lineData} />
+          <MainDisplay mode={this.state.mode} data={this.state.featureData} />
           <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
           <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
             <form onSubmit={this.saveComment}>
@@ -443,7 +458,6 @@ class App extends Component {
     );
   }
   componentDidMount(){
-    this.getResults();
     layerArray.push(new TileLayer({
       source: new TileWMS({
         url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
@@ -454,9 +468,19 @@ class App extends Component {
     }));
     this.state.features.map(function(item, count){
       sourceArray.push(new VectorSource());
+      resultsSourceArray.push(new VectorSource());
       if(item.type === 'line'){
         layerArray.push(new VectorLayer({
           source: sourceArray[count],
+          style: new Style({
+              stroke: new Stroke({
+                color: item.color,
+                width: 8
+              })
+            })
+        }));
+        resultsLayerArray.push(new VectorLayer({
+          source: resultsSourceArray[count],
           style: new Style({
               stroke: new Stroke({
                 color: item.color,
@@ -514,6 +538,20 @@ class App extends Component {
             }))
           })
         }));
+        resultsLayerArray.push(new VectorLayer({
+          source: resultsSourceArray[count],
+          style: new Style({
+            image: new Icon(({
+              anchor: [0.5, 60],
+              anchorXUnits: 'fraction',
+              anchorYUnits: 'pixels',
+              crossOrigin: 'anonymous',
+              src: PlaceSVG,
+              color: item.color,
+              scale: 0.5
+            }))
+          })
+        }));
         drawInteraction.push(
           new Draw({
             source: sourceArray[count],
@@ -549,6 +587,8 @@ class App extends Component {
       }
 
     });
+    this.getResults();
+
     var container = document.getElementById('popover');
     overlay.setElement(container);
     map = new Map({
@@ -584,6 +624,7 @@ class App extends Component {
       });
       drawInteraction.map(function(item, counter){
         drawInteraction[counter].on('drawend', function(target){
+          target.feature.setProperties({layerName: this.state.features[counter].name});
           this.setState({comment: ''});
           var coordinate;
           if(this.state.features[counter].type === 'line'){
@@ -597,7 +638,7 @@ class App extends Component {
           overlay.setPosition(coordinate);
           this.setState({popover: true});
           this.setState({targetFeatureId: target.feature.getId()});
-          console.log(target.feature.getId());
+          console.log(target.feature);
           this.cancelEdit(counter);
         }.bind(this));
       }.bind(this));
@@ -606,7 +647,6 @@ class App extends Component {
         var selectedFeature2 = e.selected[0];
         if(selectedFeature2){
           this.setState({targetFeatureId: e.selected[0].getId()});
-
           console.log(e.selected[0].getProperties())
           console.log(e.selected[0].getProperties().geometry);
           this.setState({comment: selectedFeature2.getProperties().comment});
@@ -623,8 +663,6 @@ class App extends Component {
           this.setState({popover: true});
         }
       }.bind(this));
-
-
 
       selectHover.map(function(item, count){
         console.log(item);
