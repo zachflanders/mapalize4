@@ -15,6 +15,7 @@ import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import CircleStyle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
+import Text from 'ol/style/Text';
 import Icon from 'ol/style/Icon';
 import GeoJSON from 'ol/format/GeoJSON';
 import {toLonLat} from 'ol/proj';
@@ -31,6 +32,10 @@ import Overlay from 'ol/Overlay';
 import Feature from 'ol/Feature';
 import Select from 'ol/interaction/Select.js';
 import {click, pointerMove, altKeyOnly} from 'ol/events/condition.js';
+import Cluster from 'ol/source/Cluster';
+import {defaults as defaultInteractions} from 'ol/interaction.js';
+
+
 
 //Material-ui imports
 import AppBar from '@material-ui/core/AppBar';
@@ -76,6 +81,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 
 import turf from 'turf';
 import axios from 'axios';
+import chroma from 'chroma-js';
 
 const theme = createMuiTheme({
   palette: {
@@ -91,6 +97,8 @@ var sourceArray = [];
 var layerArray = [];
 var resultsSourceArray = [];
 var resultsLayerArray = [];
+var clusterLayerArray = [];
+var styleCache = [];
 
 const drawerWidth = '220px';
 var map = {};
@@ -99,7 +107,8 @@ var snap;
 var pointSource = new VectorSource();
 var heatmapLayer = new Heatmap({
   source: pointSource,
-  renderMode: 'image'
+  renderMode: 'image',
+  shadow: 1000
 });
 var overlay = new Overlay({
   autoPan: true,
@@ -111,6 +120,14 @@ var select = new Select({
   condition: click,
   layers: layerArray
 });
+var clusterSelect = new Select({
+  condition: pointerMove,
+  layers: clusterLayerArray,
+  style: new Style({
+    stroke: "none",
+    fill: "none"
+  })
+});
 var selectHover = [];
 
 var drawnFeatures = 0;
@@ -119,7 +136,7 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine){
   //if statement should check to make sure geoJSON line is valid
   if(true){
     var length = turf.lineDistance(geoJSONLine, 'miles');
-    for(var i=0; i <= length; i=i+0.01){
+    for(var i=0; i <= length; i=i+0.02){
       if(length > 0 ){
         var thisPoint = turf.along(geoJSONLine, i, 'miles');
         pointSource.addFeature(new Feature(new Point(transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
@@ -195,8 +212,13 @@ class App extends Component {
       map.addLayer(heatmapLayer);
       this.state.features.map(function(item, count){
         map.removeLayer(layerArray[count+1]);
-        map.addLayer(resultsLayerArray[count]);
       });
+      resultsLayerArray.map(function(item){
+        map.addLayer(item);
+      })
+      clusterLayerArray.map(function(item){
+        map.addLayer(item);
+      })
       map.removeOverlay(overlay);
       map.removeInteraction(select);
       this.getResults();
@@ -207,9 +229,14 @@ class App extends Component {
       })
       map.removeLayer(heatmapLayer);
       this.state.features.map(function(item, count){
-        map.removeLayer(resultsLayerArray[count]);
         map.addLayer(layerArray[count+1]);
       });
+      resultsLayerArray.map(function(item){
+        map.removeLayer(item);
+      })
+      clusterLayerArray.map(function(item){
+        map.removeLayer(item);
+      })
       map.addOverlay(overlay);
       map.addInteraction(select);
       this.getInput();
@@ -256,16 +283,16 @@ class App extends Component {
     });
   }
 
-  finishLine(){
+  finishLine(counter){
     console.log('finish line');
-    if(drawInteraction){
-      drawInteraction.finishDrawing();
+    if(drawInteraction[counter]){
+      drawInteraction[counter].finishDrawing();
     }
   }
 
-  deleteLastPoint(){
+  deleteLastPoint(counter){
     console.log('delete last point');
-    drawInteraction.removeLastPoint();
+    drawInteraction[counter].removeLastPoint();
   }
 
   getResults(){
@@ -342,7 +369,7 @@ class App extends Component {
             <br />
             <Paper style={{padding:'10px'}}>
               <Button
-                onClick = {this.finishLine}
+                onClick = {()=>this.finishLine(this.state.drawing)}
                 className='full-width-left'
                 size='small'
               >
@@ -350,7 +377,7 @@ class App extends Component {
               </Button>
               <br />
               <Button
-                onClick = {this.deleteLastPoint}
+                onClick = {() => this.deleteLastPoint(this.state.drawing)}
                 className='full-width-left'
                 size='small'  >
                   <RemoveIcon /> &nbsp;&nbsp; Delete Last Point
@@ -538,20 +565,7 @@ class App extends Component {
             }))
           })
         }));
-        resultsLayerArray.push(new VectorLayer({
-          source: resultsSourceArray[count],
-          style: new Style({
-            image: new Icon(({
-              anchor: [0.5, 60],
-              anchorXUnits: 'fraction',
-              anchorYUnits: 'pixels',
-              crossOrigin: 'anonymous',
-              src: PlaceSVG,
-              color: item.color,
-              scale: 0.5
-            }))
-          })
-        }));
+
         drawInteraction.push(
           new Draw({
             source: sourceArray[count],
@@ -584,6 +598,61 @@ class App extends Component {
           }),
           layers: [layerArray[count+1]]
         }));
+        clusterLayerArray.push(
+          new VectorLayer({
+            source: new Cluster({
+              source: resultsSourceArray[count],
+              distance: 40
+            }),
+            style: function(feature){
+              var size = feature.get('features').length;
+              var style;
+              if(size < 2){
+                style = new Style({
+                  image: new Icon(({
+                    anchor: [0.5, 60],
+                    anchorXUnits: 'fraction',
+                    anchorYUnits: 'pixels',
+                    crossOrigin: 'anonymous',
+                    src: PlaceSVG,
+                    color: item.color,
+                    scale: 0.5
+                  }))
+                });
+              }
+              else{
+                style = [
+                  new Style({
+                    image:
+                      new CircleStyle({
+                        radius: 22,
+                        fill: new Fill({
+                          color: chroma(item.color).alpha(0.6).rgba()
+                        })
+                      }),
+
+                    text: new Text({
+                      text: size.toString(),
+                      fill: new Fill({
+                        color: '#fff'
+                      })
+                    })
+                  }),
+                    new Style({
+                      image:
+                        new CircleStyle({
+                          radius: 16,
+                          fill: new Fill({
+                            color: item.color
+                          })
+                        })
+                    })]
+
+              }
+              return style;
+            }
+          })
+        );
       }
 
     });
@@ -595,6 +664,7 @@ class App extends Component {
         target: 'map',
         layers: layerArray,
         overlays: [overlay],
+        interactions: defaultInteractions().extend([clusterSelect]),
         view: new View({
           center: fromLonLat([-94.573, 39.143]),
           zoom: 14,
@@ -607,8 +677,8 @@ class App extends Component {
       });
 
       var resolution = map.getView().getResolution(),
-      radiusSize = 4,
-      blurSize = 36;
+      radiusSize = 12,
+      blurSize = 64;
       var zoomRadius = radiusSize/resolution;
       var zoomBlur = blurSize/resolution;
       heatmapLayer.setRadius(zoomRadius);
@@ -616,7 +686,6 @@ class App extends Component {
 
       map.getView().on('change:resolution', function(evt){
           resolution = evt.target.get(evt.key);
-
           zoomRadius =  radiusSize/resolution;
           zoomBlur = blurSize/resolution;
          heatmapLayer.setRadius(zoomRadius);
@@ -678,7 +747,17 @@ class App extends Component {
 
       });
 
-
+      clusterSelect.on('select', function(e) {
+        if(e.selected.length > 0){
+          e.selected[0].getProperties().features.map(function(feature){
+            console.log(feature.getProperties());
+          });
+          document.getElementById('map').style.cursor = 'pointer';
+        }
+        else{
+          document.getElementById('map').style.cursor = 'default';
+        }
+      }.bind(this));
     }
     componentDidUpdate(){
       map.updateSize();
