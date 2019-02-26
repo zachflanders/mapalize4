@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import './App.css';
 import MainDisplay from './main.js';
+import Sidebar from './sidebar.js';
+
 import PlaceSVG from './assets/place.svg';
 
 //openlayers imports
 import 'ol/ol.css';
 import Map from 'ol/Map';
-import LineString from 'ol/geom/LineString';
 import Point from 'ol/geom/Point';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
@@ -18,11 +19,8 @@ import Fill from 'ol/style/Fill';
 import Text from 'ol/style/Text';
 import Icon from 'ol/style/Icon';
 import GeoJSON from 'ol/format/GeoJSON';
-import {toLonLat} from 'ol/proj';
 import {fromLonLat} from 'ol/proj';
 import {transform} from 'ol/proj';
-import {METERS_PER_UNIT} from 'ol/proj';
-import {toStringHDMS} from 'ol/coordinate.js';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
 import View from 'ol/View';
@@ -31,11 +29,9 @@ import Heatmap from 'ol/layer/Heatmap';
 import Overlay from 'ol/Overlay';
 import Feature from 'ol/Feature';
 import Select from 'ol/interaction/Select.js';
-import {click, pointerMove, altKeyOnly} from 'ol/events/condition.js';
+import {click, pointerMove} from 'ol/events/condition.js';
 import Cluster from 'ol/source/Cluster';
 import {defaults as defaultInteractions} from 'ol/interaction.js';
-
-
 
 //Material-ui imports
 import AppBar from '@material-ui/core/AppBar';
@@ -43,41 +39,16 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
-import Divider from '@material-ui/core/Divider';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import EditIcon from '@material-ui/icons/Edit';
 import FireIcon from '@material-ui/icons/Whatshot';
-import LineIcon from '@material-ui/icons/Timeline';
-import PointIcon from '@material-ui/icons/AddLocation';
-import UploadIcon from '@material-ui/icons/CloudUpload';
-import MapIcon from '@material-ui/icons/Map';
-import PlaceIcon from '@material-ui/icons/Place';
-import ViewIcon from '@material-ui/icons/ViewModule';
-import AddIcon from '@material-ui/icons/Add';
-import DoneIcon from '@material-ui/icons/Done';
-import CancelIcon from '@material-ui/icons/Close';
-import RemoveIcon from '@material-ui/icons/Remove';
-import Tooltip from '@material-ui/core/Tooltip';
-import DeleteIcon from '@material-ui/icons/Delete';
-import Popper from '@material-ui/core/Popper';
-import Fade from '@material-ui/core/Fade';
 import TextField from '@material-ui/core/TextField';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import indigo from '@material-ui/core/colors/indigo';
-import pink from '@material-ui/core/colors/pink';
-import cyan from '@material-ui/core/colors/cyan';
 import teal from '@material-ui/core/colors/teal';
-import amber from '@material-ui/core/colors/amber';
-import lightGreen from '@material-ui/core/colors/lightGreen';
-import blue from '@material-ui/core/colors/blue';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
 
 import turf from 'turf';
 import axios from 'axios';
@@ -92,15 +63,15 @@ const theme = createMuiTheme({
     useNextVariants: true,
   }
 });
+const drawerWidth = '220px';
 
+
+//Defining Globals
 var sourceArray = [];
 var layerArray = [];
 var resultsSourceArray = [];
 var resultsLayerArray = [];
 var clusterLayerArray = [];
-var styleCache = [];
-
-const drawerWidth = '220px';
 var map = {};
 var drawInteraction = [];
 var snap;
@@ -129,9 +100,7 @@ var clusterSelect = new Select({
   })
 });
 var selectHover = [];
-
 var drawnFeatures = 0;
-
 var turnLineIntoArrayOfPoints = function(geoJSONLine){
   //if statement should check to make sure geoJSON line is valid
   if(true){
@@ -191,7 +160,6 @@ class App extends Component {
     this.updateComment = this.updateComment.bind(this);
     this.saveComment = this.saveComment.bind(this);
     this.changeMode = this.changeMode.bind(this);
-    this.renderSidebar = this.renderSidebar.bind(this);
   }
 
   addInteraction(counter){
@@ -201,23 +169,22 @@ class App extends Component {
       drawing: counter
     });
     document.getElementById('map').style.cursor = 'crosshair';
-
   }
 
   switchView(event, value){
-    if(value == 1){
+    if(value === 1){
       this.setState({
         view: 1
       });
       map.addLayer(heatmapLayer);
       this.state.features.map(function(item, count){
-        map.removeLayer(layerArray[count+1]);
+         return map.removeLayer(layerArray[count+1]);
       });
       resultsLayerArray.map(function(item){
-        map.addLayer(item);
+        return map.addLayer(item);
       })
       clusterLayerArray.map(function(item){
-        map.addLayer(item);
+        return map.addLayer(item);
       })
       map.removeOverlay(overlay);
       map.removeInteraction(select);
@@ -229,13 +196,13 @@ class App extends Component {
       })
       map.removeLayer(heatmapLayer);
       this.state.features.map(function(item, count){
-        map.addLayer(layerArray[count+1]);
+        return map.addLayer(layerArray[count+1]);
       });
       resultsLayerArray.map(function(item){
-        map.removeLayer(item);
+        return map.removeLayer(item);
       })
       clusterLayerArray.map(function(item){
-        map.removeLayer(item);
+        return map.removeLayer(item);
       })
       map.addOverlay(overlay);
       map.addInteraction(select);
@@ -248,33 +215,29 @@ class App extends Component {
   }
 
   upload(){
-    console.log('upload');
     overlay.setPosition(undefined);
     var writer = new GeoJSON();
     var drawnFeatures = [];
     layerArray.map(function(item, counter){
       if(counter > 0){
-        drawnFeatures.push(writer.writeFeatures(item.getSource().getFeatures()))
+        return drawnFeatures.push(writer.writeFeatures(item.getSource().getFeatures()));
+      }
+      else{
+        return null;
       }
     });
     sourceArray.map(function(item, count){
-      item.clear();
+      return item.clear();
     });
-    console.log(drawnFeatures);
-
     axios.post('/api/addLines', {
       features: drawnFeatures
     })
     .then(function(response){
       console.log(response);
     });
-
-
-
   }
 
   cancelEdit(counter){
-    console.log('remove interaction');
     map.removeInteraction(drawInteraction[counter]);
     map.addInteraction(select);
     document.getElementById('map').style.cursor = 'default';
@@ -284,43 +247,37 @@ class App extends Component {
   }
 
   finishLine(counter){
-    console.log('finish line');
     if(drawInteraction[counter]){
       drawInteraction[counter].finishDrawing();
     }
   }
 
   deleteLastPoint(counter){
-    console.log('delete last point');
     drawInteraction[counter].removeLastPoint();
   }
 
   getResults(){
-    console.log('get results');
     axios.get('/api/results')
     .then(function(response){
       pointSource.clear();
       resultsSourceArray.map(function(item){
-        item.clear();
-      })
-      console.log(response.data.data[0]);
+        return item.clear();
+      });
       this.setState({featureData: response.data.data[0]});
       var features = response.data.data[0];
       features.map(function(feature, count){
         if(feature.line){
-          var resultGeoJSONFeature = (new GeoJSON()).readFeature(feature.line, {dataProjection:"EPSG:4326",featureProjection:"EPSG:3857"});
-          var resultGeoJSON = (new GeoJSON()).writeFeature(resultGeoJSONFeature)
-          turnLineIntoArrayOfPoints(feature.line);
+          return turnLineIntoArrayOfPoints(feature.line);
         }
         else{
           this.state.features.map(function(featureLayer,count){
             if(feature.name === featureLayer.name){
-              //console.log(transform([feature.point.coordinates[0],feature.point.coordinates[1]],'ESPG:4326','ESPG:3857'));
-              resultsSourceArray[count].addFeature(new Feature(new Point(fromLonLat([feature.point.coordinates[0],feature.point.coordinates[1]]))));
+              return resultsSourceArray[count].addFeature(new Feature(new Point(fromLonLat([feature.point.coordinates[0],feature.point.coordinates[1]]))));
+            }
+            else{
+              return null;
             }
           })
-          //pointSource.addFeature(new Feature(new Point(transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
-
         }
       }.bind(this));
     }.bind(this));
@@ -331,24 +288,21 @@ class App extends Component {
   }
 
   saveComment(event, target){
-    console.log(event.target, target);
     event.preventDefault();
     var selectedFeature;
     this.state.features.map(function(item, count){
       if(sourceArray[count].getFeatureById(this.state.targetFeatureId)){
-        selectedFeature = sourceArray[count].getFeatureById(this.state.targetFeatureId);
+        return selectedFeature = sourceArray[count].getFeatureById(this.state.targetFeatureId);
       }
     }.bind(this));
     selectedFeature.setProperties({comment:this.state.comment});
-    console.log(selectedFeature);
     overlay.setPosition(undefined);
     this.setState({comment:''});
-    console.log(this.state.comment);
     select.getFeatures().clear();
   }
 
   changeMode(mode){
-    if(mode == 'map'){
+    if(mode === 'map'){
       map.setTarget('map');
       this.setState({viewMap: true});
       this.setState({mode:'map'});
@@ -357,84 +311,6 @@ class App extends Component {
       map.setTarget(null);
       this.setState({viewMap: false});
       this.setState({mode: 'cards'});
-    }
-  }
-
-  renderSidebar(){
-    if(this.state.view == 0){
-      if (this.state.drawing !== false) {
-        return (
-          <div>
-          <div style={{paddingLeft: '32px', textIndent:'-32px'}}><strong><LineIcon style={{color:'#00c853', verticalAlign:'middle'}} /> &nbsp;Add Bike Infrastructure</strong></div>
-            <br />
-            <Paper style={{padding:'10px'}}>
-              <Button
-                onClick = {()=>this.finishLine(this.state.drawing)}
-                className='full-width-left'
-                size='small'
-              >
-                <DoneIcon /> &nbsp;&nbsp; Finish Line
-              </Button>
-              <br />
-              <Button
-                onClick = {() => this.deleteLastPoint(this.state.drawing)}
-                className='full-width-left'
-                size='small'  >
-                  <RemoveIcon /> &nbsp;&nbsp; Delete Last Point
-              </Button>
-              <br />
-              <Button
-                onClick = {()=>this.cancelEdit(this.state.drawing)}
-                className='full-width-left'
-                size='small' >
-                  <CancelIcon /> &nbsp;&nbsp; Cancel
-                </Button>
-            </Paper>
-            </div>
-        );
-      }
-      else {
-        return (
-            <div>
-              <div ><strong><AddIcon style={{verticalAlign:'middle'}} /> &nbsp; Create Features</strong></div>
-              <br />
-            <Paper style={{padding:'8px'}}>
-              {this.state.features.map(function(item, counter){
-                return(
-                  <Tooltip title={item.prompt} placement='right' key={item.name}>
-                    <Button
-                      onClick = {((item.type === 'line') ? ()=>this.addInteraction(counter) : ()=>this.addInteraction(counter))}
-                      className='full-width-left'
-                    >
-                      {((item.type === 'line') ? <LineIcon style={{color:item.color}} /> : <PointIcon style={{color:item.color}}/>)} <span style ={{paddingLeft:'10px'}}>{item.name}</span>
-                    </Button>
-                  </Tooltip>
-                )
-              }.bind(this))}
-            </Paper>
-            <br />
-            <Paper style={{padding:'8px'}}>
-            <Button
-              className='full-width-left'        >
-              <EditIcon /> &nbsp;&nbsp; Edit Features
-            </Button>
-            <Button
-              className='full-width-left'        >
-              <DeleteIcon /> &nbsp;&nbsp; Delete Features
-            </Button>
-            </Paper>
-            <br />
-            <Button
-              variant='contained'
-              color='primary'
-              onClick = {this.upload}
-              className = 'full-width'
-            >
-              <UploadIcon /> &nbsp;&nbsp; Upload
-            </Button>
-            </div>
-        )
-      }
     }
   }
 
@@ -447,18 +323,24 @@ class App extends Component {
               <Typography variant="h6" color="inherit" style={{flexGrow:1}}>
                 {this.state.title}
               </Typography>
-
               <Tabs value={this.state.view} style={{height:'64px'}} onChange = {this.switchView}>
                 <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{height:'64px'}} />
                 <Tab label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} />
               </Tabs>
-
             </Toolbar>
-
           </AppBar>
           <Drawer variant="permanent">
             <div style={{width: drawerWidth, marginTop: '64px', padding: '15px'}}>
-              {this.renderSidebar()}
+              <Sidebar
+                view={this.state.view}
+                drawing={this.state.drawing}
+                features = {this.state.features}
+                finishLine = {this.finishLine}
+                deleteLastPoint = {this.deleteLastPoint}
+                cancelEdit = {this.cancelEdit}
+                addInteraction = {this.addInteraction}
+                upload = {this.upload}
+              />
             </div>
           </Drawer>
           <MainDisplay mode={this.state.mode} data={this.state.featureData} />
@@ -669,7 +551,7 @@ class App extends Component {
           center: fromLonLat([-94.573, 39.143]),
           zoom: 14,
           maxZoom: 20,
-          minZoom: 9
+          minZoom: 12
         }),
         controls: [
           new Zoom()
@@ -734,34 +616,33 @@ class App extends Component {
       }.bind(this));
 
       selectHover.map(function(item, count){
-        console.log(item);
-        map.addInteraction(item);
-        item.on('select', function(e) {
-          if(e.selected.length > 0){
-            document.getElementById('map').style.cursor = 'pointer';
-          }
-          else{
-            document.getElementById('map').style.cursor = 'default';
-          }
-        });
-
+        return(
+          map.addInteraction(item),
+          item.on('select', function(e) {
+            if(e.selected.length > 0){
+              document.getElementById('map').style.cursor = 'pointer';
+            }
+            else{
+              document.getElementById('map').style.cursor = 'default';
+            }
+          })
+        )
       });
 
       clusterSelect.on('select', function(e) {
         if(e.selected.length > 0){
           e.selected[0].getProperties().features.map(function(feature){
-            console.log(feature.getProperties());
+            return console.log(feature.getProperties());
           });
           document.getElementById('map').style.cursor = 'pointer';
         }
         else{
           document.getElementById('map').style.cursor = 'default';
         }
-      }.bind(this));
+      });
     }
     componentDidUpdate(){
       map.updateSize();
     }
 }
-
 export default App;
