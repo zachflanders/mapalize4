@@ -21,9 +21,12 @@
   position: absolute;
   top: 64px;
   bottom: 0px;
-  left: 250px;
+  left: 251px;
   right:0px;
-  z-index: 0;
+  z-index: 1200;
+  background-color: #fff;
+
+
 
 }
 

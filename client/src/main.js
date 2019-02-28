@@ -11,7 +11,7 @@ class MapCard extends React.Component {
    return (
      <Card style={{width:'100%'}}>
        <CardContent>
-            <LineIcon style={{color:'#00c853', verticalAlign:'middle'}}/> &nbsp;&nbsp; <strong>Bike Infastructure</strong>
+            <LineIcon style={{color:this.props.data.color, verticalAlign:'middle'}}/> &nbsp;&nbsp; <strong>{this.props.data.name}</strong>
         </ CardContent>
          <div id={'cardmap-'+this.props.data.id} className='cardmap'></div>
          <CardContent>
@@ -43,10 +43,11 @@ class MainDisplay extends Component {
     }
     else{
       var lines = this.props.data.reverse().map(function(item) {
+        console.log(item);
         return (
-          <div key={item.id} style={{width:'300px', flex:'1 auto', margin:'8px'}}>{self.renderMapCard(item)}</div>
+          <div key={item.id} style={{width:'300px', flex:'1 auto', margin:'8px'}}>{this.renderMapCard(item)}</div>
         );
-      });
+      }.bind(this));
       return (
           <div id='cards' style={{display:'flex', flexFlow:'row wrap', padding:'8px'}}>
             {lines}
@@ -54,6 +55,8 @@ class MainDisplay extends Component {
       );
     }
   }
+
+
 
 }
 export default MainDisplay;

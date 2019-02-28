@@ -32,6 +32,10 @@ import Select from 'ol/interaction/Select.js';
 import {click, pointerMove} from 'ol/events/condition.js';
 import Cluster from 'ol/source/Cluster';
 import {defaults as defaultInteractions} from 'ol/interaction.js';
+import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
+
+
+
 
 //Material-ui imports
 import AppBar from '@material-ui/core/AppBar';
@@ -44,6 +48,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import EditIcon from '@material-ui/icons/Edit';
 import FireIcon from '@material-ui/icons/Whatshot';
+import BikeIcon from '@material-ui/icons/DirectionsBike';
+
 import TextField from '@material-ui/core/TextField';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { MuiThemeProvider } from '@material-ui/core/styles';
@@ -71,7 +77,6 @@ var sourceArray = [];
 var layerArray = [];
 var resultsSourceArray = [];
 var resultsLayerArray = [];
-var clusterLayerArray = [];
 var map = {};
 var drawInteraction = [];
 var snap;
@@ -91,14 +96,12 @@ var select = new Select({
   condition: click,
   layers: layerArray
 });
+/*
 var clusterSelect = new Select({
   condition: pointerMove,
-  layers: clusterLayerArray,
-  style: new Style({
-    stroke: "none",
-    fill: "none"
-  })
+  layers: resultsLayerArray
 });
+*/
 var selectHover = [];
 var drawnFeatures = 0;
 var turnLineIntoArrayOfPoints = function(geoJSONLine){
@@ -108,7 +111,9 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine){
     for(var i=0; i <= length; i=i+0.02){
       if(length > 0 ){
         var thisPoint = turf.along(geoJSONLine, i, 'miles');
-        pointSource.addFeature(new Feature(new Point(transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
+        if(resultsSourceArray[0]){
+          resultsSourceArray[0].addFeature(new Feature(new Point(transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
+        }
       }
     }
     return;
@@ -126,19 +131,22 @@ class App extends Component {
           name:'Add Bike Infrastructure',
           prompt:'Where would you bike if it was comfortable?',
           type:'line',
-          color: '#00c853'
+          color: '#00c853',
+          viewResults: true
         },
         {
           name:'Add Bike Share',
           prompt:'Where would you want bike share?',
           type:'point',
-          color: '#2196f3'
+          color: '#2196f3',
+          viewResults: true
         },
         {
           name:'Unsafe Location',
           prompt:'What locations feel unsafe or uncomfortable for biking?',
           type:'point',
-          color: '#f44336'
+          color: '#f44336',
+          viewResults: true
         }
       ],
       drawing: false,
@@ -160,6 +168,7 @@ class App extends Component {
     this.updateComment = this.updateComment.bind(this);
     this.saveComment = this.saveComment.bind(this);
     this.changeMode = this.changeMode.bind(this);
+    this.switchLayer = this.switchLayer.bind(this);
   }
 
   addInteraction(counter){
@@ -176,16 +185,13 @@ class App extends Component {
       this.setState({
         view: 1
       });
-      map.addLayer(heatmapLayer);
+      //map.addLayer(heatmapLayer);
       this.state.features.map(function(item, count){
          return map.removeLayer(layerArray[count+1]);
       });
       resultsLayerArray.map(function(item){
         return map.addLayer(item);
-      })
-      clusterLayerArray.map(function(item){
-        return map.addLayer(item);
-      })
+      });
       map.removeOverlay(overlay);
       map.removeInteraction(select);
       this.getResults();
@@ -194,19 +200,34 @@ class App extends Component {
       this.setState({
         view: 0
       })
-      map.removeLayer(heatmapLayer);
+      //map.removeLayer(heatmapLayer);
       this.state.features.map(function(item, count){
         return map.addLayer(layerArray[count+1]);
       });
       resultsLayerArray.map(function(item){
         return map.removeLayer(item);
-      })
-      clusterLayerArray.map(function(item){
-        return map.removeLayer(item);
-      })
+      });
       map.addOverlay(overlay);
       map.addInteraction(select);
       this.getInput();
+    }
+  }
+
+  switchLayer(count){
+    if(this.state.features[count].viewResults === true){
+      map.removeLayer(resultsLayerArray[count]);
+      var features = this.state.features;
+      var feature = features[count];
+      feature.viewResults= false;
+      this.setState({features:features});
+    }
+    else{
+      map.addLayer(resultsLayerArray[count]);
+
+      var features = this.state.features;
+      var feature = features[count];
+      feature.viewResults= true;
+      this.setState({features:features});
     }
   }
 
@@ -319,11 +340,12 @@ class App extends Component {
       <MuiThemeProvider theme={theme}>
         <div className="App">
           <AppBar position="fixed" style={{zIndex: 1201, }}>
-            <Toolbar style={{height:'64px'}} >
+            <Toolbar style={{flexWrap:'wrap'}} >
               <Typography variant="h6" color="inherit" style={{flexGrow:1}}>
-                {this.state.title}
+                <BikeIcon style={{verticalAlign:'middle', marginBottom:'5px', height:'32px'}} />
+                &nbsp;&nbsp;{this.state.title}
               </Typography>
-              <Tabs value={this.state.view} style={{height:'64px'}} onChange = {this.switchView}>
+              <Tabs value={this.state.view} style={{height:'64px'}} onChange = {this.switchView} variant='fullWidth'>
                 <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{height:'64px'}} />
                 <Tab label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} />
               </Tabs>
@@ -340,6 +362,8 @@ class App extends Component {
                 cancelEdit = {this.cancelEdit}
                 addInteraction = {this.addInteraction}
                 upload = {this.upload}
+                switchLayer={this.switchLayer}
+                changeMode = {this.changeMode}
               />
             </div>
           </Drawer>
@@ -388,14 +412,10 @@ class App extends Component {
               })
             })
         }));
-        resultsLayerArray.push(new VectorLayer({
+        resultsLayerArray.push(new Heatmap({
           source: resultsSourceArray[count],
-          style: new Style({
-              stroke: new Stroke({
-                color: item.color,
-                width: 8
-              })
-            })
+          renderMode: 'image',
+          shadow: 1000
         }));
         drawInteraction.push(
           new Draw({
@@ -480,17 +500,18 @@ class App extends Component {
           }),
           layers: [layerArray[count+1]]
         }));
-        clusterLayerArray.push(
-          new VectorLayer({
+        resultsLayerArray.push(
+          new AnimatedCluster({
             source: new Cluster({
               source: resultsSourceArray[count],
               distance: 40
             }),
+            animationDuration: 500,
             style: function(feature){
               var size = feature.get('features').length;
               var style;
               if(size < 2){
-                style = new Style({
+                style = [new Style({
                   image: new Icon(({
                     anchor: [0.5, 60],
                     anchorXUnits: 'fraction',
@@ -500,16 +521,20 @@ class App extends Component {
                     color: item.color,
                     scale: 0.5
                   }))
-                });
+                })]
               }
               else{
-                style = [
-                  new Style({
+                style =
+                  [new Style({
                     image:
                       new CircleStyle({
-                        radius: 22,
+                        radius: 16,
+                        stroke: new Stroke({
+                          color:chroma(item.color).alpha(0.6).rgba(),
+                          width: 6
+                        }),
                         fill: new Fill({
-                          color: chroma(item.color).alpha(0.6).rgba()
+                          color: item.color
                         })
                       }),
 
@@ -519,16 +544,7 @@ class App extends Component {
                         color: '#fff'
                       })
                     })
-                  }),
-                    new Style({
-                      image:
-                        new CircleStyle({
-                          radius: 16,
-                          fill: new Fill({
-                            color: item.color
-                          })
-                        })
-                    })]
+                  })]
 
               }
               return style;
@@ -546,7 +562,7 @@ class App extends Component {
         target: 'map',
         layers: layerArray,
         overlays: [overlay],
-        interactions: defaultInteractions().extend([clusterSelect]),
+        //interactions: defaultInteractions().extend([clusterSelect]),
         view: new View({
           center: fromLonLat([-94.573, 39.143]),
           zoom: 14,
@@ -563,15 +579,15 @@ class App extends Component {
       blurSize = 64;
       var zoomRadius = radiusSize/resolution;
       var zoomBlur = blurSize/resolution;
-      heatmapLayer.setRadius(zoomRadius);
-      heatmapLayer.setBlur(zoomBlur);
+      resultsLayerArray[0].setRadius(zoomRadius);
+      resultsLayerArray[0].setBlur(zoomBlur);
 
       map.getView().on('change:resolution', function(evt){
           resolution = evt.target.get(evt.key);
           zoomRadius =  radiusSize/resolution;
           zoomBlur = blurSize/resolution;
-         heatmapLayer.setRadius(zoomRadius);
-         heatmapLayer.setBlur(zoomBlur);
+         resultsLayerArray[0].setRadius(zoomRadius);
+         resultsLayerArray[0].setBlur(zoomBlur);
       });
       drawInteraction.map(function(item, counter){
         drawInteraction[counter].on('drawend', function(target){
@@ -615,6 +631,12 @@ class App extends Component {
         }
       }.bind(this));
 
+      select.on('change', function(e) {
+          console.log('deselct');
+          overlay.setPosition(undefined);
+          this.setState({popover: false});
+      }.bind(this));
+
       selectHover.map(function(item, count){
         return(
           map.addInteraction(item),
@@ -628,7 +650,7 @@ class App extends Component {
           })
         )
       });
-
+      /*
       clusterSelect.on('select', function(e) {
         if(e.selected.length > 0){
           e.selected[0].getProperties().features.map(function(feature){
@@ -640,6 +662,7 @@ class App extends Component {
           document.getElementById('map').style.cursor = 'default';
         }
       });
+      */
     }
     componentDidUpdate(){
       map.updateSize();

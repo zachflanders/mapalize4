@@ -3,6 +3,8 @@ import './App.css';
 
 //Material-ui imports
 import Button from '@material-ui/core/Button';
+import Divider from '@material-ui/core/Divider';
+
 import Paper from '@material-ui/core/Paper';
 import EditIcon from '@material-ui/icons/Edit';
 import LineIcon from '@material-ui/icons/Timeline';
@@ -16,6 +18,12 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import LayersIcon from '@material-ui/icons/Layers';
+import MapIcon from '@material-ui/icons/Map';
+import CardsIcon from '@material-ui/icons/ViewModule';
+import ViewIcon from '@material-ui/icons/Visibility';
+
+
+
 
 
 import FormGroup from '@material-ui/core/FormGroup';
@@ -39,6 +47,8 @@ class Sidebar extends Component {
             key = {count}
             control={
               <Checkbox
+                onChange={()=>this.props.switchLayer(count)}
+                checked={item.viewResults}
               />
             }
             label= {<span><PlaceIcon style={{color:item.color, verticalAlign:'middle'}} />{item.name}</span>}
@@ -51,6 +61,8 @@ class Sidebar extends Component {
             key = {count}
             control={
               <Checkbox
+                onChange={()=>this.props.switchLayer(count)}
+                checked={item.viewResults}
               />
             }
             label= {
@@ -72,7 +84,7 @@ class Sidebar extends Component {
           />
         );
       }
-    })
+    }.bind(this))
     return (
       <FormGroup>
         {features}
@@ -84,10 +96,13 @@ class Sidebar extends Component {
       if(this.props.view === 0){
         if (this.props.drawing !== false) {
           return (
-            <div>
-            <div style={{paddingLeft: '32px', textIndent:'-32px'}}><strong><LineIcon style={{color:'#00c853', verticalAlign:'middle'}} /> &nbsp;Add Bike Infrastructure</strong></div>
-              <br />
-              <Paper style={{padding:'10px'}}>
+              <Paper >
+              <div style={{padding:'8px'}}>
+                <div style={{paddingLeft: '32px', textIndent:'-32px'}}><strong><LineIcon style={{color:'#00c853', verticalAlign:'middle'}} /> &nbsp;Add Bike Infrastructure</strong></div>
+              </div>
+              <Divider />
+              <div style={{padding:'8px'}}>
+
                 <Button
                   onClick = {()=>this.props.finishLine(this.props.drawing)}
                   className='full-width-left'
@@ -109,16 +124,21 @@ class Sidebar extends Component {
                   size='small' >
                     <CancelIcon /> &nbsp;&nbsp; Cancel
                   </Button>
+                  </div>
+
               </Paper>
-              </div>
           );
         }
         else {
           return (
               <div>
-                <div ><strong><AddIcon style={{verticalAlign:'middle'}} /> &nbsp; Create Features</strong></div>
-                <br />
-              <Paper style={{padding:'8px'}}>
+              <Paper>
+                <div style={{padding:'8px'}}>
+                  <strong><AddIcon style={{verticalAlign:'middle'}} /> &nbsp; Create Features</strong>
+                </div>
+                <Divider />
+                <div style={{padding:'8px'}}>
+
                 {this.props.features.map(function(item, counter){
                   return(
                     <Tooltip title={item.prompt} placement='right' key={item.name}>
@@ -131,6 +151,7 @@ class Sidebar extends Component {
                     </Tooltip>
                   )
                 }.bind(this))}
+                </div>
               </Paper>
               <br />
               <Paper style={{padding:'8px'}}>
@@ -159,8 +180,39 @@ class Sidebar extends Component {
       else{
         return(
           <div>
-            <LayersIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>View Layers</strong>
-            {this.renderResultsLayerList()}
+          <Paper>
+            <div style={{padding:'8px'}}>
+              <ViewIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>View Results As</strong>
+            </div>
+            <Divider />
+            <div style={{padding:'8px'}}>
+
+              <Button
+              onClick = {() => this.props.changeMode('map')}
+                className='full-width-left'
+                size='small'
+              >
+                <MapIcon /> &nbsp;&nbsp; Map
+              </Button>
+              <br />
+              <Button
+                onClick = {() => this.props.changeMode('cards')}
+                className='full-width-left'
+                size='small'  >
+                  <CardsIcon /> &nbsp;&nbsp; Cards
+              </Button>
+              </div>
+          </Paper>
+          <br />
+          <Paper>
+            <div style={{padding:'8px'}}>
+              <LayersIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>View Layers</strong>
+            </div>
+            <Divider />
+            <div style={{padding:'8px 8px 8px 12px'}}>
+              {this.renderResultsLayerList()}
+            </div>
+          </Paper>
           </div>
         )
       }
