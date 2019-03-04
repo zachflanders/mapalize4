@@ -95,39 +95,96 @@ class Sidebar extends Component {
   render() {
       if(this.props.view === 0){
         if (this.props.drawing !== false) {
-          return (
-              <Paper >
+          var item = this.props.features[this.props.drawing];
+          console.log(item);
+          if(item.type === 'line'){
+            return (
+                <Paper >
+                <div style={{padding:'8px'}}>
+                  <div style={{paddingLeft: '32px', textIndent:'-32px'}}><strong><LineIcon style={{color:item.color, verticalAlign:'middle'}} /> &nbsp;{item.name}</strong></div>
+                </div>
+                <Divider />
+                <div style={{padding:'8px'}}>
+                  <Button
+                    onClick = {()=>this.props.finishLine(this.props.drawing)}
+                    className='full-width-left'
+                    size='small'
+                  >
+                    <DoneIcon /> &nbsp;&nbsp; Finish Line
+                  </Button>
+                  <br />
+                  <Button
+                    onClick = {() => this.props.deleteLastPoint(this.props.drawing)}
+                    className='full-width-left'
+                    size='small'  >
+                      <RemoveIcon /> &nbsp;&nbsp; Delete Last Point
+                  </Button>
+                  <br />
+                  <Button
+                    onClick = {()=>this.props.cancelEdit(this.props.drawing)}
+                    className='full-width-left'
+                    size='small' >
+                      <CancelIcon /> &nbsp;&nbsp; Cancel
+                    </Button>
+                    </div>
+
+                </Paper>
+            );
+          }
+          else{
+            console.log('edit point');
+            return (
+                <Paper >
+                <div style={{padding:'8px'}}>
+                  <div style={{paddingLeft: '32px', textIndent:'-32px'}}><strong><PointIcon style={{color:item.color, verticalAlign:'middle'}} /> &nbsp;{item.name}</strong></div>
+                </div>
+                <Divider />
+                <div style={{padding:'8px'}}>
+                  <Button
+                    onClick = {()=>this.props.cancelEdit(this.props.drawing)}
+                    className='full-width-left'
+                    size='small' >
+                      <CancelIcon /> &nbsp;&nbsp; Cancel
+                    </Button>
+                    </div>
+                </Paper>
+            );
+          }
+
+        }
+        else if(this.props.editing === true){
+          return(
+            <Paper>
               <div style={{padding:'8px'}}>
-                <div style={{paddingLeft: '32px', textIndent:'-32px'}}><strong><LineIcon style={{color:'#00c853', verticalAlign:'middle'}} /> &nbsp;Add Bike Infrastructure</strong></div>
+                <div style={{paddingLeft: '32px', textIndent:'-32px'}}><strong><EditIcon style={{verticalAlign:'middle'}} /> &nbsp;&nbsp;Edit Features</strong></div>
               </div>
               <Divider />
               <div style={{padding:'8px'}}>
-
                 <Button
-                  onClick = {()=>this.props.finishLine(this.props.drawing)}
-                  className='full-width-left'
-                  size='small'
-                >
-                  <DoneIcon /> &nbsp;&nbsp; Finish Line
+                  onClick = {this.props.toggleEdit}
+                  className='full-width-left'        >
+                  <CancelIcon /> &nbsp;&nbsp; Stop Editing
                 </Button>
-                <br />
+                </div>
+            </Paper>
+          )
+        }
+        else if(this.props.deleting === true){
+          return(
+            <Paper>
+              <div style={{padding:'8px'}}>
+                <div style={{paddingLeft: '32px', textIndent:'-32px'}}><strong><DeleteIcon style={{verticalAlign:'middle'}} /> &nbsp;&nbsp;Delete Features</strong></div>
+              </div>
+              <Divider />
+              <div style={{padding:'8px'}}>
                 <Button
-                  onClick = {() => this.props.deleteLastPoint(this.props.drawing)}
-                  className='full-width-left'
-                  size='small'  >
-                    <RemoveIcon /> &nbsp;&nbsp; Delete Last Point
+                  onClick = {this.props.toggleDelete}
+                  className='full-width-left'        >
+                  <CancelIcon /> &nbsp;&nbsp; Stop Deleting
                 </Button>
-                <br />
-                <Button
-                  onClick = {()=>this.props.cancelEdit(this.props.drawing)}
-                  className='full-width-left'
-                  size='small' >
-                    <CancelIcon /> &nbsp;&nbsp; Cancel
-                  </Button>
-                  </div>
-
-              </Paper>
-          );
+                </div>
+            </Paper>
+          )
         }
         else {
           return (
@@ -156,10 +213,12 @@ class Sidebar extends Component {
               <br />
               <Paper style={{padding:'8px'}}>
               <Button
+                onClick = {this.props.toggleEdit}
                 className='full-width-left'        >
                 <EditIcon /> &nbsp;&nbsp; Edit Features
               </Button>
               <Button
+                onClick = {this.props.toggleDelete}
                 className='full-width-left'        >
                 <DeleteIcon /> &nbsp;&nbsp; Delete Features
               </Button>

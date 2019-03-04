@@ -12,6 +12,7 @@ import Point from 'ol/geom/Point';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import Draw from 'ol/interaction/Draw';
+import Modify from 'ol/interaction/Modify';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import CircleStyle from 'ol/style/Circle';
@@ -80,6 +81,7 @@ var resultsLayerArray = [];
 var map = {};
 var drawInteraction = [];
 var snap;
+var modify = [];
 var pointSource = new VectorSource();
 var heatmapLayer = new Heatmap({
   source: pointSource,
@@ -96,6 +98,14 @@ var select = new Select({
   condition: click,
   layers: layerArray
 });
+var selectDelete = new Select({
+  condition: click,
+  layers: layerArray,
+  style: new Style({
+    stroke: null,
+    image: null
+  })
+});
 /*
 var clusterSelect = new Select({
   condition: pointerMove,
@@ -108,7 +118,7 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine){
   //if statement should check to make sure geoJSON line is valid
   if(true){
     var length = turf.lineDistance(geoJSONLine, 'miles');
-    for(var i=0; i <= length; i=i+0.02){
+    for(var i=(Math.random()*(0.02)); i <= length; i=i+0.02){
       if(length > 0 ){
         var thisPoint = turf.along(geoJSONLine, i, 'miles');
         if(resultsSourceArray[0]){
@@ -150,6 +160,8 @@ class App extends Component {
         }
       ],
       drawing: false,
+      editing: false,
+      deleting: false,
       view: 0,
       popover: false,
       targetFeatureId: null,
@@ -169,6 +181,9 @@ class App extends Component {
     this.saveComment = this.saveComment.bind(this);
     this.changeMode = this.changeMode.bind(this);
     this.switchLayer = this.switchLayer.bind(this);
+    this.toggleEdit = this.toggleEdit.bind(this);
+    this.toggleDelete = this.toggleDelete.bind(this);
+
   }
 
   addInteraction(counter){
@@ -308,6 +323,57 @@ class App extends Component {
     this.setState({comment: event.target.value});
   }
 
+  toggleEdit(){
+    if(this.state.editing === false){
+      this.setState({editing: true});
+      modify.map(function(layer){
+        return map.addInteraction(layer);
+      });
+      this.state.features.map(function(item, count){
+        console.log(item, count);
+        map.removeInteraction(selectHover[count]);
+        if(item.type === 'line'){
+          console.log(layerArray[count+1].getStyle());
+          layerArray[count+1].getStyle().getStroke().setColor(chroma(item.color).alpha(0.5).rgba());
+          layerArray[count+1].getStyle().getStroke().setLineDash([12,12,12,12]);
+          sourceArray[count].refresh()
+        }
+      });
+      map.removeInteraction(select);
+    }
+    else{
+      this.setState({editing: false});
+      modify.map(function(layer){
+        return map.removeInteraction(layer);
+      });
+      this.state.features.map(function(item, count){
+        map.addInteraction(selectHover[count]);
+
+        if(item.type === 'line'){
+          layerArray[count+1].getStyle().getStroke().setColor(chroma(item.color).alpha(1).rgba());
+          layerArray[count+1].getStyle().getStroke().setLineDash([1]);
+          sourceArray[count].refresh()
+        }
+      });
+      map.addInteraction(select);
+
+    }
+  }
+
+  toggleDelete(){
+    if(this.state.deleting === false){
+      this.setState({deleting: true});
+      map.removeInteraction(select);
+      map.addInteraction(selectDelete);
+
+    }
+    else{
+      this.setState({deleting: false});
+      map.addInteraction(select);
+      map.removeInteraction(selectDelete);
+    }
+  }
+
   saveComment(event, target){
     event.preventDefault();
     var selectedFeature;
@@ -339,23 +405,25 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={theme}>
         <div className="App">
-          <AppBar position="fixed" style={{zIndex: 1201, }}>
-            <Toolbar style={{flexWrap:'wrap'}} >
-              <Typography variant="h6" color="inherit" style={{flexGrow:1}}>
+          <AppBar position="fixed" style={{zIndex: 1201, flexWrap:'wrap', width:'100%' }}>
+            <Toolbar style={{flexWrap:'wrap'}}>
+              <Typography variant="h6" color="inherit" style={{flexGrow:2}} id='menuTitle'>
                 <BikeIcon style={{verticalAlign:'middle', marginBottom:'5px', height:'32px'}} />
                 &nbsp;&nbsp;{this.state.title}
               </Typography>
-              <Tabs value={this.state.view} style={{height:'64px'}} onChange = {this.switchView} variant='fullWidth'>
-                <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{height:'64px'}} />
-                <Tab label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} />
+              <Tabs value={this.state.view} style={{height:'64px'}} onChange = {this.switchView} variant='fullWidth' id='menuTabs'>
+                <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{height:'64px', flexGrow: 1}} />
+                <Tab label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} style={{flexGrow: 1}} />
               </Tabs>
             </Toolbar>
           </AppBar>
           <Drawer variant="permanent">
-            <div style={{width: drawerWidth, marginTop: '64px', padding: '15px'}}>
+            <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>
               <Sidebar
                 view={this.state.view}
                 drawing={this.state.drawing}
+                editing={this.state.editing}
+                deleting = {this.state.deleting}
                 features = {this.state.features}
                 finishLine = {this.finishLine}
                 deleteLastPoint = {this.deleteLastPoint}
@@ -364,6 +432,8 @@ class App extends Component {
                 upload = {this.upload}
                 switchLayer={this.switchLayer}
                 changeMode = {this.changeMode}
+                toggleEdit =  {this.toggleEdit}
+                toggleDelete =  {this.toggleDelete}
               />
             </div>
           </Drawer>
@@ -551,7 +621,9 @@ class App extends Component {
             }
           })
         );
-      }
+      };
+      modify.push(new Modify({source: sourceArray[count]}));
+
 
     });
     this.getResults();
@@ -632,9 +704,22 @@ class App extends Component {
       }.bind(this));
 
       select.on('change', function(e) {
-          console.log('deselct');
           overlay.setPosition(undefined);
           this.setState({popover: false});
+      }.bind(this));
+
+      selectDelete.on('select', function(e) {
+        var selectedFeature = e.selected[0];
+        console.log(selectDelete.getFeatures());
+        if(selectedFeature){
+          sourceArray.map(function(layer, count){
+            if(layer.hasFeature(selectedFeature)){
+              layer.removeFeature(selectedFeature);
+              selectHover[count].getFeatures().clear();
+              document.getElementById('map').style.cursor = 'default';
+            }
+          })
+        }
       }.bind(this));
 
       selectHover.map(function(item, count){

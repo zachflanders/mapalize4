@@ -25,9 +25,6 @@
   right:0px;
   z-index: 1200;
   background-color: #fff;
-
-
-
 }
 
 div.ol-zoom {
@@ -65,4 +62,20 @@ div.ol-zoom {
   width:100%;
   text-align: left;
   justify-content: normal !important;
+}
+
+#sidebar{
+  margin-top: 64px;
+}
+
+@media screen and (max-width: 500px) {
+  #menuTabs {
+    width: 100%;
+  }
+  #menuTitle{
+    padding-top:25px;
+  }
+  #sidebar{
+    margin-top: 126px;
+  }
 }
