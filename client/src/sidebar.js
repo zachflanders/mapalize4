@@ -213,11 +213,13 @@ class Sidebar extends Component {
               <br />
               <Paper style={{padding:'8px'}}>
               <Button
+                disabled = {(this.props.drawnFeatures > 0)? false: true}
                 onClick = {this.props.toggleEdit}
                 className='full-width-left'        >
                 <EditIcon /> &nbsp;&nbsp; Edit Features
               </Button>
               <Button
+                disabled = {(this.props.drawnFeatures > 0)? false: true}
                 onClick = {this.props.toggleDelete}
                 className='full-width-left'        >
                 <DeleteIcon /> &nbsp;&nbsp; Delete Features
@@ -225,6 +227,7 @@ class Sidebar extends Component {
               </Paper>
               <br />
               <Button
+                disabled = {(this.props.drawnFeatures > 0)? false: true}
                 variant='contained'
                 color='primary'
                 onClick = {this.props.upload}

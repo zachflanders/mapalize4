@@ -43,6 +43,8 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+
 import Drawer from '@material-ui/core/Drawer';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
@@ -56,6 +58,8 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import indigo from '@material-ui/core/colors/indigo';
 import teal from '@material-ui/core/colors/teal';
+import CancelIcon from '@material-ui/icons/Close';
+
 
 import turf from 'turf';
 import axios from 'axios';
@@ -187,6 +191,7 @@ class App extends Component {
   }
 
   addInteraction(counter){
+    overlay.setPosition(undefined);
     map.removeInteraction(select);
     map.addInteraction(drawInteraction[counter]);
     this.setState({
@@ -324,6 +329,7 @@ class App extends Component {
   }
 
   toggleEdit(){
+    overlay.setPosition(undefined);
     if(this.state.editing === false){
       this.setState({editing: true});
       modify.map(function(layer){
@@ -334,9 +340,13 @@ class App extends Component {
         map.removeInteraction(selectHover[count]);
         if(item.type === 'line'){
           console.log(layerArray[count+1].getStyle());
-          layerArray[count+1].getStyle().getStroke().setColor(chroma(item.color).alpha(0.5).rgba());
+          layerArray[count+1].getStyle().getStroke().setColor(chroma(item.color).alpha(0.6).rgba());
           layerArray[count+1].getStyle().getStroke().setLineDash([12,12,12,12]);
           sourceArray[count].refresh()
+        }
+        else{
+          console.log(layerArray[count+1].getStyle());
+      
         }
       });
       map.removeInteraction(select);
@@ -361,6 +371,7 @@ class App extends Component {
   }
 
   toggleDelete(){
+    overlay.setPosition(undefined);
     if(this.state.deleting === false){
       this.setState({deleting: true});
       map.removeInteraction(select);
@@ -425,6 +436,7 @@ class App extends Component {
                 editing={this.state.editing}
                 deleting = {this.state.deleting}
                 features = {this.state.features}
+                drawnFeatures = {drawnFeatures}
                 finishLine = {this.finishLine}
                 deleteLastPoint = {this.deleteLastPoint}
                 cancelEdit = {this.cancelEdit}
@@ -442,6 +454,7 @@ class App extends Component {
           <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
             <form onSubmit={this.saveComment}>
               <TextField
+                id='commentArea'
                 label="Add Comment:"
                 multiline
                 rows="4"
@@ -622,7 +635,21 @@ class App extends Component {
           })
         );
       };
-      modify.push(new Modify({source: sourceArray[count]}));
+      modify.push(new Modify({
+        source: sourceArray[count],
+        style: new Style({
+          image: new CircleStyle({
+            radius: 6,
+            fill: new Fill({
+              color: '#fff'
+            }),
+            stroke: new Stroke({
+              width: 1,
+              color: '#000'
+            })
+          })
+        })
+      }));
 
 
     });
@@ -661,26 +688,7 @@ class App extends Component {
          resultsLayerArray[0].setRadius(zoomRadius);
          resultsLayerArray[0].setBlur(zoomBlur);
       });
-      drawInteraction.map(function(item, counter){
-        drawInteraction[counter].on('drawend', function(target){
-          target.feature.setProperties({layerName: this.state.features[counter].name});
-          this.setState({comment: ''});
-          var coordinate;
-          if(this.state.features[counter].type === 'line'){
-            coordinate = target.feature.getGeometry().getCoordinateAt(0.5);
-          }
-          else{
-            coordinate = target.feature.getGeometry().getCoordinates();
-          }
-          target.feature.setId(drawnFeatures);
-          drawnFeatures++;
-          overlay.setPosition(coordinate);
-          this.setState({popover: true});
-          this.setState({targetFeatureId: target.feature.getId()});
-          console.log(target.feature);
-          this.cancelEdit(counter);
-        }.bind(this));
-      }.bind(this));
+
 
       select.on('select', function(e) {
         var selectedFeature2 = e.selected[0];
@@ -701,12 +709,35 @@ class App extends Component {
           overlay.setPosition(coordinate);
           this.setState({popover: true});
         }
-      }.bind(this));
-
-      select.on('change', function(e) {
+        else{
+          console.log(e, 'nothing selected');
           overlay.setPosition(undefined);
           this.setState({popover: false});
+        }
       }.bind(this));
+
+      drawInteraction.map(function(item, counter){
+        drawInteraction[counter].on('drawend', function(target){
+          target.feature.setProperties({layerName: this.state.features[counter].name});
+          this.setState({comment: ''});
+          var coordinate;
+          if(this.state.features[counter].type === 'line'){
+            coordinate = target.feature.getGeometry().getCoordinateAt(0.5);
+          }
+          else{
+            coordinate = target.feature.getGeometry().getCoordinates();
+          }
+          target.feature.setId(drawnFeatures);
+          drawnFeatures++;
+          overlay.setPosition(coordinate);
+          document.getElementById("commentArea").focus();
+          this.setState({popover: true});
+          this.setState({targetFeatureId: target.feature.getId()});
+          console.log(target.feature);
+          this.cancelEdit(counter);
+        }.bind(this));
+      }.bind(this));
+
 
       selectDelete.on('select', function(e) {
         var selectedFeature = e.selected[0];
@@ -715,6 +746,7 @@ class App extends Component {
           sourceArray.map(function(layer, count){
             if(layer.hasFeature(selectedFeature)){
               layer.removeFeature(selectedFeature);
+              drawnFeatures--;
               selectHover[count].getFeatures().clear();
               document.getElementById('map').style.cursor = 'default';
             }
@@ -735,6 +767,7 @@ class App extends Component {
           })
         )
       });
+
       /*
       clusterSelect.on('select', function(e) {
         if(e.selected.length > 0){
@@ -748,6 +781,8 @@ class App extends Component {
         }
       });
       */
+
+
     }
     componentDidUpdate(){
       map.updateSize();
