@@ -98,9 +98,18 @@ var overlay = new Overlay({
     duration: 250
   }
 });
+var resultsOverlay = new Overlay({
+  autoPan: true,
+  autoPanAnimation: {
+    duration: 250
+  }
+});
 var select = new Select({
   condition: click,
-  layers: layerArray
+  layers: layerArray,
+  style: new Style({
+    stroke: null
+  })
 });
 var selectDelete = new Select({
   condition: click,
@@ -110,12 +119,16 @@ var selectDelete = new Select({
     image: null
   })
 });
-/*
-var clusterSelect = new Select({
-  condition: pointerMove,
-  layers: resultsLayerArray
+
+var clusterSelectHover =[];
+var clusterSelectClick = new Select({
+  condition: click,
+  layers: resultsLayerArray,
+  style: new Style({
+    stroke: null
+  })
 });
-*/
+
 var selectHover = [];
 var drawnFeatures = 0;
 var turnLineIntoArrayOfPoints = function(geoJSONLine){
@@ -213,8 +226,11 @@ class App extends Component {
         return map.addLayer(item);
       });
       map.removeOverlay(overlay);
+      map.addOverlay(resultsOverlay);
+
       map.removeInteraction(select);
       this.getResults();
+      map.addInteraction(clusterSelectClick);
     }
     else{
       this.setState({
@@ -228,7 +244,9 @@ class App extends Component {
         return map.removeLayer(item);
       });
       map.addOverlay(overlay);
+      map.removeOverlay(resultsOverlay);
       map.addInteraction(select);
+      map.removeInteraction(clusterSelectClick);
       this.getInput();
     }
   }
@@ -499,6 +517,10 @@ class App extends Component {
             </form>
             <div className='arrow'></div>
           </Paper>
+          <Paper id='resultsPopover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-75px'}}>
+            results popover
+            <div className='arrow'></div>
+          </Paper>
         </div>
       </MuiThemeProvider>
     );
@@ -564,6 +586,7 @@ class App extends Component {
           }),
           layers: [layerArray[count+1]]
         }));
+        clusterSelectHover.push('line');
       }
       else{
         layerArray.push(new VectorLayer({
@@ -664,6 +687,52 @@ class App extends Component {
             }
           })
         );
+        clusterSelectHover.push(new Select({
+          condition: pointerMove,
+          layers: [resultsLayerArray[count]],
+          style: function(feature){
+            var size = feature.get('features').length;
+            var style;
+            if(size < 2){
+              style = [new Style({
+                image: new Icon(({
+                  anchor: [0.5, 60],
+                  anchorXUnits: 'fraction',
+                  anchorYUnits: 'pixels',
+                  crossOrigin: 'anonymous',
+                  src: PlaceSVG,
+                  color: item.color,
+                  scale: 0.5
+                }))
+              })]
+            }
+            else{
+              style =
+                [new Style({
+                  image:
+                    new CircleStyle({
+                      radius: 16,
+                      stroke: new Stroke({
+                        color:chroma(item.color).alpha(0.6).rgba(),
+                        width: 6
+                      }),
+                      fill: new Fill({
+                        color: item.color
+                      })
+                    }),
+
+                  text: new Text({
+                    text: size.toString(),
+                    fill: new Fill({
+                      color: '#fff'
+                    })
+                  })
+                })]
+
+            }
+            return style;
+          }
+        }));
       };
       modify.push(new Modify({
         source: sourceArray[count],
@@ -687,11 +756,13 @@ class App extends Component {
 
     var container = document.getElementById('popover');
     overlay.setElement(container);
+    var container2 = document.getElementById('resultsPopover');
+    resultsOverlay.setElement(container2);
     map = new Map({
         target: 'map',
         layers: layerArray,
-        overlays: [overlay],
-        //interactions: defaultInteractions().extend([clusterSelect]),
+        overlays: [overlay, resultsOverlay],
+        //interactions: defaultInteractions().extend(clusterSelectHover),
         view: new View({
           center: fromLonLat([-94.573, 39.143]),
           zoom: 14,
@@ -784,6 +855,29 @@ class App extends Component {
         }
       }.bind(this));
 
+      clusterSelectClick.on('select', function(e) {
+        console.log(e.selected);
+        var selectedFeature2 = e.selected[0];
+        if(selectedFeature2){
+          var coordinate;
+          if(e.selected[0].getGeometry().getType() === 'LineString'){
+            console.log('linestring')
+            coordinate = selectedFeature2.getGeometry().getCoordinateAt(0.5);
+          }
+          else{
+            coordinate = selectedFeature2.getGeometry().getCoordinates();
+          }
+          resultsOverlay.setPosition(coordinate);
+          this.setState({popover: true});
+        }
+        else{
+          console.log(e, 'nothing selected');
+          resultsOverlay.setPosition(undefined);
+          this.setState({popover: false});
+        }
+
+      }.bind(this));
+
       selectHover.map(function(item, count){
         return(
           map.addInteraction(item),
@@ -798,19 +892,26 @@ class App extends Component {
         )
       });
 
-      /*
-      clusterSelect.on('select', function(e) {
-        if(e.selected.length > 0){
-          e.selected[0].getProperties().features.map(function(feature){
-            return console.log(feature.getProperties());
-          });
-          document.getElementById('map').style.cursor = 'pointer';
+
+      clusterSelectHover.map(function(item, count){
+        if(item != 'line'){
+          return(
+            map.addInteraction(item),
+            item.on('select', function(e) {
+              if(e.selected.length > 0){
+                document.getElementById('map').style.cursor = 'pointer';
+              }
+              else{
+                document.getElementById('map').style.cursor = 'default';
+              }
+            })
+          )
+
         }
-        else{
-          document.getElementById('map').style.cursor = 'default';
-        }
+
       });
-      */
+
+
 
 
     }
