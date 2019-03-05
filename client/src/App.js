@@ -345,8 +345,38 @@ class App extends Component {
           sourceArray[count].refresh()
         }
         else{
-          console.log(layerArray[count+1].getStyle());
-      
+          console.log(layerArray[count+1].getStyle().getImage().setOpacity(0.5));
+          layerArray[count+1].getStyle().setImage(
+            new Icon(({
+              anchor: [0.5, 60],
+              anchorXUnits: 'fraction',
+              anchorYUnits: 'pixels',
+              crossOrigin: 'anonymous',
+              src: PlaceSVG,
+              color: chroma(item.color).alpha(0.6).rgba(),
+              scale: 0.5
+            })),
+            new CircleStyle({
+              radius: 6,
+              fill: new Fill({
+                color: item.color
+              })
+            })
+          );
+          layerArray[count+1].getStyle().getImage().setOpacity(0.5);
+
+          sourceArray[count].refresh()
+          /*
+          layerArray[count+1].getStyle().getImage().setImage(
+            new CircleStyle({
+              radius: 6,
+              fill: new Fill({
+                color: item.color
+              })
+            })
+          );
+          */
+
         }
       });
       map.removeInteraction(select);
