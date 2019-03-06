@@ -121,13 +121,7 @@ var selectDelete = new Select({
 });
 
 var clusterSelectHover =[];
-var clusterSelectClick = new Select({
-  condition: click,
-  layers: resultsLayerArray,
-  style: new Style({
-    stroke: null
-  })
-});
+var clusterSelectClick  = [];
 
 var selectHover = [];
 var drawnFeatures = 0;
@@ -185,7 +179,8 @@ class App extends Component {
       comment: undefined,
       mode: 'map',
       viewMap: true,
-      featureData: null
+      featureData: null,
+      resultFeature: null,
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -230,7 +225,11 @@ class App extends Component {
 
       map.removeInteraction(select);
       this.getResults();
-      map.addInteraction(clusterSelectClick);
+      clusterSelectClick.map(function(item, count){
+        if(item !== 'line'){
+          map.addInteraction(item);
+        }
+      });
     }
     else{
       this.setState({
@@ -246,7 +245,11 @@ class App extends Component {
       map.addOverlay(overlay);
       map.removeOverlay(resultsOverlay);
       map.addInteraction(select);
-      map.removeInteraction(clusterSelectClick);
+      clusterSelectClick.map(function(item, count){
+        if(item !== 'line'){
+          map.removeInteraction(item);
+        }
+      })   ;
       this.getInput();
     }
   }
@@ -325,13 +328,17 @@ class App extends Component {
       this.setState({featureData: response.data.data[0]});
       var features = response.data.data[0];
       features.map(function(feature, count){
+        console.log(feature);
         if(feature.line){
           return turnLineIntoArrayOfPoints(feature.line);
         }
         else{
           this.state.features.map(function(featureLayer,count){
             if(feature.name === featureLayer.name){
-              return resultsSourceArray[count].addFeature(new Feature(new Point(fromLonLat([feature.point.coordinates[0],feature.point.coordinates[1]]))));
+              var pointFeature = new Feature(new Point(fromLonLat([feature.point.coordinates[0],feature.point.coordinates[1]])));
+              pointFeature.setId(feature.id);
+              pointFeature.setProperties({name: feature.name, date: feature.date, comment: feature.comment});
+              return resultsSourceArray[count].addFeature(pointFeature);
             }
             else{
               return null;
@@ -460,6 +467,18 @@ class App extends Component {
     }
   }
 
+  renderResultsPopover(){
+    var selectedFeatures = this.state.resultFeature;
+    if(selectedFeatures !== null){
+      selectedFeatures.map(function(feature, count){
+        var properties = feature.getProperties();
+        console.log(properties);
+      })
+      return(<div>results popover</div>)
+    }
+
+  }
+
   render() {
     return (
       <MuiThemeProvider theme={theme}>
@@ -518,7 +537,7 @@ class App extends Component {
             <div className='arrow'></div>
           </Paper>
           <Paper id='resultsPopover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-75px'}}>
-            results popover
+            {this.renderResultsPopover()}
             <div className='arrow'></div>
           </Paper>
         </div>
@@ -587,6 +606,7 @@ class App extends Component {
           layers: [layerArray[count+1]]
         }));
         clusterSelectHover.push('line');
+        clusterSelectClick.push('line');
       }
       else{
         layerArray.push(new VectorLayer({
@@ -733,6 +753,13 @@ class App extends Component {
             return style;
           }
         }));
+        clusterSelectClick.push(new Select({
+          condition: click,
+          layers: [resultsLayerArray[count]],
+          style: new Style({
+            stroke: null
+          })
+        }))
       };
       modify.push(new Modify({
         source: sourceArray[count],
@@ -855,27 +882,27 @@ class App extends Component {
         }
       }.bind(this));
 
-      clusterSelectClick.on('select', function(e) {
-        console.log(e.selected);
-        var selectedFeature2 = e.selected[0];
-        if(selectedFeature2){
-          var coordinate;
-          if(e.selected[0].getGeometry().getType() === 'LineString'){
-            console.log('linestring')
-            coordinate = selectedFeature2.getGeometry().getCoordinateAt(0.5);
-          }
-          else{
-            coordinate = selectedFeature2.getGeometry().getCoordinates();
-          }
-          resultsOverlay.setPosition(coordinate);
-          this.setState({popover: true});
+      clusterSelectClick.map(function(item, count){
+        console.log(item);
+        if(item !== 'line'){
+          item.on('select', function(e) {
+            console.log(e.selected);
+            var selectedFeatures = e.selected;
+            this.setState({resultFeature: selectedFeatures});
+            console.log(selectedFeatures);
+            if(selectedFeatures[0]){
+              var coordinate;
+              coordinate = selectedFeatures[0].getGeometry().getCoordinates();
+              resultsOverlay.setPosition(coordinate);
+              this.setState({popover: true});
+            }
+            else{
+              console.log(e, 'nothing selected');
+              resultsOverlay.setPosition(undefined);
+              this.setState({popover: false});
+            }
+          }.bind(this))
         }
-        else{
-          console.log(e, 'nothing selected');
-          resultsOverlay.setPosition(undefined);
-          this.setState({popover: false});
-        }
-
       }.bind(this));
 
       selectHover.map(function(item, count){
