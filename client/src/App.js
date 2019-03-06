@@ -121,7 +121,7 @@ var selectDelete = new Select({
 });
 
 var clusterSelectHover =[];
-var clusterSelectClick  = [];
+var clusterSelectClick = null;
 
 var selectHover = [];
 var drawnFeatures = 0;
@@ -180,7 +180,7 @@ class App extends Component {
       mode: 'map',
       viewMap: true,
       featureData: null,
-      resultFeature: null,
+      selectedResultsFeatures: null
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -195,7 +195,7 @@ class App extends Component {
     this.switchLayer = this.switchLayer.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
     this.toggleDelete = this.toggleDelete.bind(this);
-
+    this.renderResultsPopover = this.renderResultsPopover.bind(this);
   }
 
   addInteraction(counter){
@@ -225,11 +225,9 @@ class App extends Component {
 
       map.removeInteraction(select);
       this.getResults();
-      clusterSelectClick.map(function(item, count){
-        if(item !== 'line'){
-          map.addInteraction(item);
-        }
-      });
+      if(clusterSelectClick !== null){
+        map.addInteraction(clusterSelectClick);
+      }
     }
     else{
       this.setState({
@@ -245,11 +243,9 @@ class App extends Component {
       map.addOverlay(overlay);
       map.removeOverlay(resultsOverlay);
       map.addInteraction(select);
-      clusterSelectClick.map(function(item, count){
-        if(item !== 'line'){
-          map.removeInteraction(item);
-        }
-      })   ;
+      if(clusterSelectClick !== null){
+        map.removeInteraction(clusterSelectClick);
+      }
       this.getInput();
     }
   }
@@ -328,17 +324,16 @@ class App extends Component {
       this.setState({featureData: response.data.data[0]});
       var features = response.data.data[0];
       features.map(function(feature, count){
-        console.log(feature);
         if(feature.line){
           return turnLineIntoArrayOfPoints(feature.line);
         }
         else{
           this.state.features.map(function(featureLayer,count){
             if(feature.name === featureLayer.name){
-              var pointFeature = new Feature(new Point(fromLonLat([feature.point.coordinates[0],feature.point.coordinates[1]])));
-              pointFeature.setId(feature.id);
-              pointFeature.setProperties({name: feature.name, date: feature.date, comment: feature.comment});
-              return resultsSourceArray[count].addFeature(pointFeature);
+              var resultsFeature = new Feature(new Point(fromLonLat([feature.point.coordinates[0],feature.point.coordinates[1]])));
+              resultsFeature.setId(feature.id);
+              resultsFeature.setProperties({name: feature.name, date: feature.date, comment: feature.comment});
+              return resultsSourceArray[count].addFeature(resultsFeature);
             }
             else{
               return null;
@@ -468,13 +463,14 @@ class App extends Component {
   }
 
   renderResultsPopover(){
-    var selectedFeatures = this.state.resultFeature;
-    if(selectedFeatures !== null){
-      selectedFeatures.map(function(feature, count){
-        var properties = feature.getProperties();
-        console.log(properties);
-      })
-      return(<div>results popover</div>)
+    var features = this.state.selectedResultsFeatures;
+    if(features !== null){
+      var properties = features[0].getProperties()
+      console.log(properties.features[0].getProperties().comment);
+      return(<div>{properties.features[0].getProperties().comment}</div>)
+    }
+    else{
+      return (<div></div>)
     }
 
   }
@@ -569,7 +565,8 @@ class App extends Component {
         resultsLayerArray.push(new Heatmap({
           source: resultsSourceArray[count],
           renderMode: 'image',
-          shadow: 1000
+          shadow: 1000,
+          properties:{line: true}
         }));
         drawInteraction.push(
           new Draw({
@@ -606,7 +603,6 @@ class App extends Component {
           layers: [layerArray[count+1]]
         }));
         clusterSelectHover.push('line');
-        clusterSelectClick.push('line');
       }
       else{
         layerArray.push(new VectorLayer({
@@ -753,13 +749,6 @@ class App extends Component {
             return style;
           }
         }));
-        clusterSelectClick.push(new Select({
-          condition: click,
-          layers: [resultsLayerArray[count]],
-          style: new Style({
-            stroke: null
-          })
-        }))
       };
       modify.push(new Modify({
         source: sourceArray[count],
@@ -882,27 +871,36 @@ class App extends Component {
         }
       }.bind(this));
 
-      clusterSelectClick.map(function(item, count){
-        console.log(item);
-        if(item !== 'line'){
-          item.on('select', function(e) {
-            console.log(e.selected);
-            var selectedFeatures = e.selected;
-            this.setState({resultFeature: selectedFeatures});
-            console.log(selectedFeatures);
-            if(selectedFeatures[0]){
-              var coordinate;
-              coordinate = selectedFeatures[0].getGeometry().getCoordinates();
-              resultsOverlay.setPosition(coordinate);
-              this.setState({popover: true});
-            }
-            else{
-              console.log(e, 'nothing selected');
-              resultsOverlay.setPosition(undefined);
-              this.setState({popover: false});
-            }
-          }.bind(this))
+      var selectableLayers = [];
+      resultsLayerArray.map(function(layer){
+        if(layer.hasOwnProperty('clusters')){
+          selectableLayers.push(layer);
         }
+      });
+
+      clusterSelectClick = new Select({
+        condition: click,
+        layers: selectableLayers,
+        style: new Style({
+          stroke: null
+        })
+      });
+
+      clusterSelectClick.on('select', function(e) {
+        var selectedFeatures = e.selected;
+        if(selectedFeatures[0]){
+          this.setState({selectedResultsFeatures: selectedFeatures});
+          var coordinate;
+          coordinate = selectedFeatures[0].getGeometry().getCoordinates();
+          resultsOverlay.setPosition(coordinate);
+          this.setState({popover: true});
+        }
+        else{
+          console.log(e, 'nothing selected');
+          resultsOverlay.setPosition(undefined);
+          this.setState({popover: false});
+        }
+
       }.bind(this));
 
       selectHover.map(function(item, count){
