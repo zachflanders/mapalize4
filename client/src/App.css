@@ -68,14 +68,65 @@ div.ol-zoom {
   margin-top: 64px;
 }
 
-@media screen and (max-width: 500px) {
+.tabContainer{
+  height: 64px;
+}
+.tab{
+  height: 64px;
+}
+#menuButton {
+   display: none;
+ }
+
+ #fab-button{
+   display: none;
+ }
+
+
+
+@media screen and (max-width: 600px) {
+
+  #menuButton {
+     display: inline-flex;
+   }
   #menuTabs {
     width: 100%;
   }
-  #menuTitle{
-    padding-top:25px;
+  #toolbar{
+    padding-top:8px;
   }
   #sidebar{
-    margin-top: 126px;
+    margin-top: 104px;
+  }
+  .desktop{
+    display: none;
+  }
+  #map{
+    left: 0px;
+    top: 104px;
+  }
+  #cards{
+    position: absolute;
+    top: 104px;
+    bottom: 0px;
+    left: 0px;
+    right:0px;
+    z-index: 1200;
+    background-color: #fff;
+  }
+  .tabContainer{
+    height: auto;
+  }
+  .tab{
+    height: auto;
+  }
+  #fab-button{
+    display: inline-flex;
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    top: auto;
+    left: auto;
+    z-index: 1201;
   }
 }

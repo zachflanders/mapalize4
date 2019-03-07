@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 import MainDisplay from './main.js';
 import Sidebar from './sidebar.js';
+import Bottombar from './bottombar.js';
+
 
 import PlaceSVG from './assets/place.svg';
 
@@ -52,6 +54,11 @@ import Tab from '@material-ui/core/Tab';
 import EditIcon from '@material-ui/icons/Edit';
 import FireIcon from '@material-ui/icons/Whatshot';
 import BikeIcon from '@material-ui/icons/DirectionsBike';
+import MenuIcon from '@material-ui/icons/Menu';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+
+
 
 import TextField from '@material-ui/core/TextField';
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -180,7 +187,9 @@ class App extends Component {
       mode: 'map',
       viewMap: true,
       featureData: null,
-      selectedResultsFeatures: null
+      selectedResultsFeatures: null,
+      drawerOpen: false,
+      bottomDrawerOpen: false,
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -196,6 +205,9 @@ class App extends Component {
     this.toggleEdit = this.toggleEdit.bind(this);
     this.toggleDelete = this.toggleDelete.bind(this);
     this.renderResultsPopover = this.renderResultsPopover.bind(this);
+    this.toggleDrawer = this.toggleDrawer.bind(this);
+    this.toggleBottomDrawer = this.toggleBottomDrawer.bind(this);
+
   }
 
   addInteraction(counter){
@@ -206,6 +218,13 @@ class App extends Component {
       drawing: counter
     });
     document.getElementById('map').style.cursor = 'crosshair';
+  }
+
+  toggleDrawer = (open) => () => {
+    this.setState({drawerOpen: open});
+  }
+  toggleBottomDrawer = (open) => () => {
+    this.setState({bottomDrawerOpen: open});
   }
 
   switchView(event, value){
@@ -480,18 +499,27 @@ class App extends Component {
       <MuiThemeProvider theme={theme}>
         <div className="App">
           <AppBar position="fixed" style={{zIndex: 1201, flexWrap:'wrap', width:'100%' }}>
-            <Toolbar style={{flexWrap:'wrap'}}>
-              <Typography variant="h6" color="inherit" style={{flexGrow:2}} id='menuTitle'>
+            <Toolbar style={{flexWrap:'wrap'}} id='toolbar'>
+              <IconButton
+                onClick = {this.toggleDrawer(true)}
+                id='menuButton'
+                color="inherit"
+                aria-label="Menu"
+                style={{marginLeft: -12, marginRight: 20}}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography variant="h6" color="inherit" style={{flexGrow:2}} >
                 <BikeIcon style={{verticalAlign:'middle', marginBottom:'5px', height:'32px'}} />
                 &nbsp;&nbsp;{this.state.title}
               </Typography>
-              <Tabs value={this.state.view} style={{height:'64px'}} onChange = {this.switchView} variant='fullWidth' id='menuTabs'>
-                <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{height:'64px', flexGrow: 1}} />
+              <Tabs value={this.state.view} className='tabContainer' onChange = {this.switchView} variant='fullWidth' id='menuTabs'>
+                <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{flexGrow: 1}} className='tab' />
                 <Tab label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} style={{flexGrow: 1}} />
               </Tabs>
             </Toolbar>
           </AppBar>
-          <Drawer variant="permanent">
+          <Drawer variant="permanent" className='desktop'>
             <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>
               <Sidebar
                 view={this.state.view}
@@ -512,6 +540,64 @@ class App extends Component {
               />
             </div>
           </Drawer>
+          <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
+          <div
+            tabIndex={0}
+            role="button"
+            onClick={this.toggleDrawer(false)}
+            onKeyDown={this.toggleDrawer(false)}
+          >
+          <div style={{width: drawerWidth, padding:'15px'}} id='sidebarMobile'>
+            <Sidebar
+              view={this.state.view}
+              drawing={this.state.drawing}
+              editing={this.state.editing}
+              deleting = {this.state.deleting}
+              features = {this.state.features}
+              drawnFeatures = {drawnFeatures}
+              finishLine = {this.finishLine}
+              deleteLastPoint = {this.deleteLastPoint}
+              cancelEdit = {this.cancelEdit}
+              addInteraction = {this.addInteraction}
+              upload = {this.upload}
+              switchLayer={this.switchLayer}
+              changeMode = {this.changeMode}
+              toggleEdit =  {this.toggleEdit}
+              toggleDelete =  {this.toggleDelete}
+            />
+          </div>
+          </div>
+        </Drawer>
+        <Drawer anchor='bottom' open={this.state.bottomDrawerOpen} onClose={this.toggleBottomDrawer(false)}>
+        <div
+          tabIndex={0}
+          role="button"
+          onClick={this.toggleBottomDrawer(false)}
+          onKeyDown={this.toggleBottomDrawer(false)}
+        >
+        <div style={{padding:'15px'}} id='bottombarMobile'>
+          <Bottombar
+            view={this.state.view}
+            drawing={this.state.drawing}
+            editing={this.state.editing}
+            deleting = {this.state.deleting}
+            features = {this.state.features}
+            drawnFeatures = {drawnFeatures}
+            finishLine = {this.finishLine}
+            deleteLastPoint = {this.deleteLastPoint}
+            cancelEdit = {this.cancelEdit}
+            addInteraction = {this.addInteraction}
+            upload = {this.upload}
+            switchLayer={this.switchLayer}
+            changeMode = {this.changeMode}
+            toggleEdit =  {this.toggleEdit}
+            toggleDelete =  {this.toggleDelete}
+          />
+        </div>
+        </div>
+      </Drawer>
+          {(this.state.view === 0) ? <Fab onClick={this.toggleBottomDrawer(true)} color="secondary" aria-label="Add" id='fab-button'><AddIcon /></Fab> : '' }
+
           <MainDisplay mode={this.state.mode} data={this.state.featureData} />
           <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
           <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
