@@ -1,6 +1,7 @@
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
+const path = require('path');
 const Sequelize = require('sequelize');
 //const db   = require('./config/db');
 
