@@ -4,6 +4,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import LineIcon from '@material-ui/icons/Timeline';
 import Typography from '@material-ui/core/Typography';
+import PlaceIcon from '@material-ui/icons/Place';
+
 import 'ol/ol.css';
 import Map from 'ol/Map';
 import Point from 'ol/geom/Point';
@@ -45,13 +47,15 @@ class MapCard extends React.Component {
     super(props);
     this.state = {};
     this.componentDidMount = this.componentDidMount.bind(this);
+    this.componentDidUpdate = this.componentDidUpdate.bind(this);
+
   }
 
  render() {
    return (
      <Card style={{width:'100%'}}>
        <CardContent>
-            <LineIcon style={{color:this.props.data.color, verticalAlign:'middle'}}/> &nbsp;&nbsp; <strong>{this.props.data.name}</strong>
+            {((this.props.data.point === null)? <LineIcon style={{color:this.props.data.color, verticalAlign:'middle'}}/> : <PlaceIcon style={{color:this.props.data.color, verticalAlign:'middle'}}/>)} &nbsp;&nbsp; <strong>{this.props.data.name}</strong>
         </ CardContent>
          <div id={'cardmap-'+this.props.data.id} className='cardmap'></div>
          <CardContent>
@@ -63,6 +67,7 @@ class MapCard extends React.Component {
    );
  }
  componentDidMount(){
+   let color = this.props.data.color;
    var source = new VectorSource();
    var layer = new VectorLayer({
      source: source,
@@ -73,17 +78,16 @@ class MapCard extends React.Component {
          anchorYUnits: 'pixels',
          crossOrigin: 'anonymous',
          src: PlaceSVG,
-         color: '#000',
+         color: color,
          scale: 0.5
        })),
        stroke: new Stroke({
-         color: '#000',
+         color: color,
          width: 8
        })
      })
    });
 
-   console.log(this.props.data);
    cardmap[this.props.data.id] = new Map({
        target: 'cardmap-'+this.props.data.id,
        layers: [new TileLayer({
@@ -104,7 +108,6 @@ class MapCard extends React.Component {
        controls: []
      });
      if(this.props.data.point !== null){
-       console.log(this.props.data.point)
        source.addFeature(new Feature(new Point(fromLonLat(this.props.data.point.coordinates))))
      }
      else{
@@ -112,15 +115,16 @@ class MapCard extends React.Component {
        coords = this.props.data.line.coordinates.map(function(coord){
          return(fromLonLat(coord));
        });
-       console.log(coords);
        source.addFeature(new Feature(new LineString(coords)));
-       console.log(cardmap[this.props.data.id].getView());
        cardmap[this.props.data.id].getView().fit(source.getExtent());
        //cardmap[this.props.data.id].getView().fit(source.getExtent(), cardmap[this.props.data.id].getSize());
      }
 
 
 
+ }
+ componentDidUpdate(){
+   cardmap[this.props.data.id].updateSize();
  }
 }
 
@@ -137,6 +141,23 @@ class MainDisplay extends Component {
   }
 
   render() {
+    console.log(this.props);
+    let featureArrayWithColors = [];
+    if(this.props.data){
+      featureArrayWithColors = this.props.data.map(function(feature){
+        this.props.layers.map(function(layer){
+          if(feature.name === layer.name){
+            console.log('matched: ', feature);
+            feature.color = layer.color;
+            return(feature);
+          }
+        })
+      }.bind(this));
+      console.log(featureArrayWithColors);
+
+    }
+
+
     if(this.props.mode === 'map'){
       return (" ");
     }

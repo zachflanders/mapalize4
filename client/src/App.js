@@ -113,10 +113,7 @@ var resultsOverlay = new Overlay({
 });
 var select = new Select({
   condition: click,
-  layers: layerArray,
-  style: new Style({
-    stroke: null
-  })
+  layers: layerArray
 });
 var selectDelete = new Select({
   condition: click,
@@ -597,7 +594,7 @@ class App extends Component {
       </Drawer>
           {(this.state.view === 0) ? <Fab onClick={this.toggleBottomDrawer(true)} color="secondary" aria-label="Add" id='fab-button'><AddIcon /></Fab> : '' }
 
-          <MainDisplay mode={this.state.mode} data={this.state.featureData} />
+          <MainDisplay mode={this.state.mode} data={this.state.featureData} layers = {this.state.features} />
           <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
           <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
             <form onSubmit={this.saveComment}>
@@ -613,7 +610,7 @@ class App extends Component {
                 onChange = {this.updateComment}
               />
               <br />
-              <Button type='submit' variant='contained' color='primary' >Save</Button>
+              <Button type='submit' variant='contained' color='primary' >Close</Button>
             </form>
             <div className='arrow'></div>
           </Paper>
