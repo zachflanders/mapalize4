@@ -435,7 +435,6 @@ class App extends Component {
         }
       });
       map.addInteraction(select);
-
     }
   }
 
@@ -1017,14 +1016,8 @@ class App extends Component {
               }
             })
           )
-
         }
-
       });
-
-
-
-
     }
     componentDidUpdate(){
       map.updateSize();
