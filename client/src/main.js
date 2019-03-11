@@ -115,7 +115,7 @@ class MapCard extends React.Component {
        console.log(coords);
        source.addFeature(new Feature(new LineString(coords)));
        console.log(cardmap[this.props.data.id].getView());
-       cardmap[this.props.data.id].getView().fit(source.getExtent())
+       cardmap[this.props.data.id].getView().fit(source.getExtent());
        //cardmap[this.props.data.id].getView().fit(source.getExtent(), cardmap[this.props.data.id].getSize());
      }
 

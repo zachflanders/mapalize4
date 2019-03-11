@@ -3,7 +3,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const path = require('path');
 const Sequelize = require('sequelize');
-const db   = require('./config/db');
+const db   = require('./config/db') || undefined;
 
 // Set up the express app
 const app = express();
