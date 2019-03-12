@@ -141,19 +141,16 @@ class MainDisplay extends Component {
   }
 
   render() {
-    console.log(this.props);
     let featureArrayWithColors = [];
     if(this.props.data){
       featureArrayWithColors = this.props.data.map(function(feature){
         this.props.layers.map(function(layer){
           if(feature.name === layer.name){
-            console.log('matched: ', feature);
             feature.color = layer.color;
             return(feature);
           }
         })
       }.bind(this));
-      console.log(featureArrayWithColors);
 
     }
 

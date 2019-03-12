@@ -46,7 +46,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-
 import Drawer from '@material-ui/core/Drawer';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
@@ -57,6 +56,10 @@ import BikeIcon from '@material-ui/icons/DirectionsBike';
 import MenuIcon from '@material-ui/icons/Menu';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import Snackbar from '@material-ui/core/Snackbar';
+import DoneIcon from '@material-ui/icons/Done';
+
+
 
 
 
@@ -187,6 +190,7 @@ class App extends Component {
       selectedResultsFeatures: null,
       drawerOpen: false,
       bottomDrawerOpen: false,
+      uploadMessage: false,
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -204,6 +208,8 @@ class App extends Component {
     this.renderResultsPopover = this.renderResultsPopover.bind(this);
     this.toggleDrawer = this.toggleDrawer.bind(this);
     this.toggleBottomDrawer = this.toggleBottomDrawer.bind(this);
+    this.closeSnackbar = this.closeSnackbar.bind(this);
+
 
   }
 
@@ -229,10 +235,14 @@ class App extends Component {
       this.setState({
         view: 1
       });
+
       //map.addLayer(heatmapLayer);
       this.state.features.map(function(item, count){
-         return map.removeLayer(layerArray[count+1]);
-      });
+         return (
+           map.removeLayer(layerArray[count+1]),
+           this.cancelEdit(count)
+         )
+      }.bind(this));
       resultsLayerArray.map(function(item){
         return map.addLayer(item);
       });
@@ -307,8 +317,12 @@ class App extends Component {
       features: drawnFeatures
     })
     .then(function(response){
+      if(response.status === 200){
+        this.setState({uploadMessage: true});
+      }
       console.log(response);
-    });
+    }.bind(this));
+    this.setState({drawnFeatures: 0});
   }
 
   cancelEdit(counter){
@@ -490,6 +504,10 @@ class App extends Component {
 
   }
 
+  closeSnackbar(){
+    this.setState({uploadMessage: false});
+  }
+
   render() {
     return (
       <MuiThemeProvider theme={theme}>
@@ -618,6 +636,16 @@ class App extends Component {
             {this.renderResultsPopover()}
             <div className='arrow'></div>
           </Paper>
+          <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          open={this.state.uploadMessage}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id"><DoneIcon style={{verticalAlign:'middle'}} /> &nbsp;&nbsp;Upload Successful</span>}
+          autoHideDuration = {2000}
+          onClose = {this.closeSnackbar}
+        />
         </div>
       </MuiThemeProvider>
     );
