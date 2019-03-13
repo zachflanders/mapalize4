@@ -3,8 +3,6 @@ import './App.css';
 import MainDisplay from './main.js';
 import Sidebar from './sidebar.js';
 import Bottombar from './bottombar.js';
-
-
 import PlaceSVG from './assets/place.svg';
 
 //openlayers imports
@@ -37,9 +35,6 @@ import Cluster from 'ol/source/Cluster';
 import {defaults as defaultInteractions} from 'ol/interaction.js';
 import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
 
-
-
-
 //Material-ui imports
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -58,18 +53,12 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Snackbar from '@material-ui/core/Snackbar';
 import DoneIcon from '@material-ui/icons/Done';
-
-
-
-
-
 import TextField from '@material-ui/core/TextField';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import indigo from '@material-ui/core/colors/indigo';
 import teal from '@material-ui/core/colors/teal';
 import CancelIcon from '@material-ui/icons/Close';
-
 
 import turf from 'turf';
 import axios from 'axios';
@@ -85,7 +74,6 @@ const theme = createMuiTheme({
   }
 });
 const drawerWidth = '220px';
-
 
 //Defining Globals
 var sourceArray = [];
@@ -129,7 +117,6 @@ var selectDelete = new Select({
 
 var clusterSelectHover =[];
 var clusterSelectClick = null;
-
 var selectHover = [];
 var drawnFeatures = 0;
 var turnLineIntoArrayOfPoints = function(geoJSONLine){
@@ -145,6 +132,7 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine){
       }
     }
     return;
+    //refactor so that function returns the array instead of adding it to the map as a side effect.
   }
 };
 
@@ -209,8 +197,6 @@ class App extends Component {
     this.toggleDrawer = this.toggleDrawer.bind(this);
     this.toggleBottomDrawer = this.toggleBottomDrawer.bind(this);
     this.closeSnackbar = this.closeSnackbar.bind(this);
-
-
   }
 
   addInteraction(counter){
@@ -226,6 +212,7 @@ class App extends Component {
   toggleDrawer = (open) => () => {
     this.setState({drawerOpen: open});
   }
+
   toggleBottomDrawer = (open) => () => {
     this.setState({bottomDrawerOpen: open});
   }
@@ -235,7 +222,6 @@ class App extends Component {
       this.setState({
         view: 1
       });
-
       //map.addLayer(heatmapLayer);
       this.state.features.map(function(item, count){
          return (
@@ -286,7 +272,6 @@ class App extends Component {
     }
     else{
       map.addLayer(resultsLayerArray[count]);
-
       var features = this.state.features;
       var feature = features[count];
       feature.viewResults= true;
@@ -395,7 +380,6 @@ class App extends Component {
           sourceArray[count].refresh()
         }
         else{
-          console.log(layerArray[count+1].getStyle().getImage().setOpacity(0.5));
           layerArray[count+1].getStyle().setImage(
             new Icon(({
               anchor: [0.5, 60],
@@ -414,7 +398,6 @@ class App extends Component {
             })
           );
           layerArray[count+1].getStyle().getImage().setOpacity(0.5);
-
           sourceArray[count].refresh()
           /*
           layerArray[count+1].getStyle().getImage().setImage(
@@ -426,7 +409,6 @@ class App extends Component {
             })
           );
           */
-
         }
       });
       map.removeInteraction(select);
@@ -438,10 +420,24 @@ class App extends Component {
       });
       this.state.features.map(function(item, count){
         map.addInteraction(selectHover[count]);
-
         if(item.type === 'line'){
           layerArray[count+1].getStyle().getStroke().setColor(chroma(item.color).alpha(1).rgba());
           layerArray[count+1].getStyle().getStroke().setLineDash([1]);
+          sourceArray[count].refresh()
+        }
+        else{
+          layerArray[count+1].getStyle().setImage(
+            new Icon(({
+              anchor: [0.5, 60],
+              anchorXUnits: 'fraction',
+              anchorYUnits: 'pixels',
+              crossOrigin: 'anonymous',
+              src: PlaceSVG,
+              color: chroma(item.color).alpha(1).rgba(),
+              scale: 0.5
+            }))
+          );
+          layerArray[count+1].getStyle().getImage().setOpacity(1);
           sourceArray[count].refresh()
         }
       });
@@ -628,7 +624,7 @@ class App extends Component {
                 onChange = {this.updateComment}
               />
               <br />
-              <Button type='submit' variant='contained' color='primary' >Close</Button>
+              <Button type='submit' color='primary' style={{zIndex:1200}} >Save and close</Button>
             </form>
             <div className='arrow'></div>
           </Paper>
@@ -637,15 +633,15 @@ class App extends Component {
             <div className='arrow'></div>
           </Paper>
           <Snackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          open={this.state.uploadMessage}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id"><DoneIcon style={{verticalAlign:'middle'}} /> &nbsp;&nbsp;Upload Successful</span>}
-          autoHideDuration = {2000}
-          onClose = {this.closeSnackbar}
-        />
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            open={this.state.uploadMessage}
+            ContentProps={{
+              'aria-describedby': 'message-id',
+            }}
+            message={<span id="message-id"><DoneIcon style={{verticalAlign:'middle'}} /> &nbsp;&nbsp;Upload Successful</span>}
+            autoHideDuration = {2000}
+            onClose = {this.closeSnackbar}
+            />
         </div>
       </MuiThemeProvider>
     );
@@ -799,7 +795,6 @@ class App extends Component {
                           color: item.color
                         })
                       }),
-
                     text: new Text({
                       text: size.toString(),
                       fill: new Fill({
@@ -807,7 +802,6 @@ class App extends Component {
                       })
                     })
                   })]
-
               }
               return style;
             }
@@ -875,11 +869,8 @@ class App extends Component {
           })
         })
       }));
-
-
     });
     this.getResults();
-
     var container = document.getElementById('popover');
     overlay.setElement(container);
     var container2 = document.getElementById('resultsPopover');
@@ -899,7 +890,6 @@ class App extends Component {
           new Zoom()
         ]
       });
-
       var resolution = map.getView().getResolution(),
       radiusSize = 12,
       blurSize = 64;
@@ -907,7 +897,6 @@ class App extends Component {
       var zoomBlur = blurSize/resolution;
       resultsLayerArray[0].setRadius(zoomRadius);
       resultsLayerArray[0].setBlur(zoomBlur);
-
       map.getView().on('change:resolution', function(evt){
           resolution = evt.target.get(evt.key);
           zoomRadius =  radiusSize/resolution;
@@ -915,8 +904,6 @@ class App extends Component {
          resultsLayerArray[0].setRadius(zoomRadius);
          resultsLayerArray[0].setBlur(zoomBlur);
       });
-
-
       select.on('select', function(e) {
         var selectedFeature2 = e.selected[0];
         if(selectedFeature2){
@@ -932,7 +919,6 @@ class App extends Component {
           else{
             coordinate = selectedFeature2.getGeometry().getCoordinates();
           }
-
           overlay.setPosition(coordinate);
           this.setState({popover: true});
         }
@@ -964,8 +950,6 @@ class App extends Component {
           this.cancelEdit(counter);
         }.bind(this));
       }.bind(this));
-
-
       selectDelete.on('select', function(e) {
         var selectedFeature = e.selected[0];
         console.log(selectDelete.getFeatures());
@@ -1026,8 +1010,6 @@ class App extends Component {
           })
         )
       });
-
-
       clusterSelectHover.map(function(item, count){
         if(item != 'line'){
           return(

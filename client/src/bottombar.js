@@ -163,7 +163,7 @@ class Bottombar extends Component {
                 <Button
                   onClick = {this.props.toggleEdit}
                   className='full-width-left'        >
-                  <CancelIcon /> &nbsp;&nbsp; Stop Editing
+                  <DoneIcon /> &nbsp;&nbsp; Finish Editing
                 </Button>
                 </div>
             </div>
@@ -180,7 +180,7 @@ class Bottombar extends Component {
                 <Button
                   onClick = {this.props.toggleDelete}
                   className='full-width-left'        >
-                  <CancelIcon /> &nbsp;&nbsp; Stop Deleting
+                  <DoneIcon /> &nbsp;&nbsp; Finish Deleting
                 </Button>
                 </div>
             </div>
