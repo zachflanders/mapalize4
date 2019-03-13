@@ -19,6 +19,7 @@
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-scripts": "2.1.2",
+    "tippy.js": "^4.1.0",
     "turf": "^3.0.14",
     "webpack": "^4.29.0",
     "webpack-cli": "^3.2.1"

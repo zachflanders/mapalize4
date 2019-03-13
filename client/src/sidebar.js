@@ -21,16 +21,14 @@ import LayersIcon from '@material-ui/icons/Layers';
 import MapIcon from '@material-ui/icons/Map';
 import CardsIcon from '@material-ui/icons/ViewModule';
 import ViewIcon from '@material-ui/icons/Visibility';
-
-
-
-
-
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
+
+import tippy from 'tippy.js';
+
 
 class Sidebar extends Component {
   constructor(props) {
@@ -96,7 +94,6 @@ class Sidebar extends Component {
       if(this.props.view === 0){
         if (this.props.drawing !== false) {
           var item = this.props.features[this.props.drawing];
-          console.log(item);
           if(item.type === 'line'){
             return (
                 <Paper >
@@ -132,7 +129,6 @@ class Sidebar extends Component {
             );
           }
           else{
-            console.log('edit point');
             return (
                 <Paper >
                 <div style={{padding:'8px'}}>
@@ -198,14 +194,18 @@ class Sidebar extends Component {
 
                 {this.props.features.map(function(item, counter){
                   return(
-                    <Tooltip title={item.prompt} placement='right' key={item.name}>
                       <Button
+                        key={item.name}
                         onClick = {((item.type === 'line') ? ()=>this.props.addInteraction(counter) : ()=>this.props.addInteraction(counter))}
-                        className='full-width-left'
+                        className='full-width-left featureButton'
+                        data-tippy-content={item.prompt}
+                        data-tippy-placement='right'
+                        data-tippy-boundary='window'
+                        data-tippy-arrow='true'
                       >
                         {((item.type === 'line') ? <LineIcon style={{color:item.color}} /> : <PointIcon style={{color:item.color}}/>)} <span style ={{paddingLeft:'10px'}}>{item.name}</span>
                       </Button>
-                    </Tooltip>
+
                   )
                 }.bind(this))}
                 </div>
@@ -278,6 +278,12 @@ class Sidebar extends Component {
           </div>
         )
       }
+  }
+  componentDidMount(){
+    tippy('.featureButton')
+  }
+  componentDidUpdate(){
+    tippy('.featureButton')
   }
 }
 export default Sidebar;

@@ -63,6 +63,8 @@ import CancelIcon from '@material-ui/icons/Close';
 import turf from 'turf';
 import axios from 'axios';
 import chroma from 'chroma-js';
+import tippy from 'tippy.js';
+
 
 const theme = createMuiTheme({
   palette: {
@@ -119,6 +121,8 @@ var clusterSelectHover =[];
 var clusterSelectClick = null;
 var selectHover = [];
 var drawnFeatures = 0;
+let mapTippy = null;
+let currentDrawnLine;
 var turnLineIntoArrayOfPoints = function(geoJSONLine){
   //if statement should check to make sure geoJSON line is valid
   if(true){
@@ -179,6 +183,7 @@ class App extends Component {
       drawerOpen: false,
       bottomDrawerOpen: false,
       uploadMessage: false,
+      lineDrawMessage: "Click to draw line"
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -200,6 +205,7 @@ class App extends Component {
   }
 
   addInteraction(counter){
+    console.log('add interaction');
     overlay.setPosition(undefined);
     map.removeInteraction(select);
     map.addInteraction(drawInteraction[counter]);
@@ -207,6 +213,31 @@ class App extends Component {
       drawing: counter
     });
     document.getElementById('map').style.cursor = 'crosshair';
+    const mapDiv = document.querySelector('#map')
+    mapTippy = tippy(mapDiv);
+    if(this.state.features[counter].type === 'line'){
+      mapTippy.set({
+        content: this.state.lineDrawMessage,
+        followCursor: true,
+        placement: 'right',
+        arrow: true,
+        distance: 20,
+        hideOnClick: false,
+        touch: false
+      });
+    }
+    else{
+      mapTippy.set({
+        content: "Click to place feature",
+        followCursor: true,
+        placement: 'right',
+        arrow: true,
+        distance: 20,
+        hideOnClick: false,
+        touch: false
+      });
+    }
+    mapTippy.enable();
   }
 
   toggleDrawer = (open) => () => {
@@ -317,11 +348,17 @@ class App extends Component {
     this.setState({
       drawing: false
     });
+    if(mapTippy){
+      mapTippy.destroy();
+    }
   }
 
   finishLine(counter){
     if(drawInteraction[counter]){
       drawInteraction[counter].finishDrawing();
+    }
+    if(mapTippy){
+      mapTippy.destroy();
     }
   }
 
@@ -647,6 +684,8 @@ class App extends Component {
     );
   }
   componentDidMount(){
+
+
     layerArray.push(new TileLayer({
       source: new TileWMS({
         url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
@@ -689,7 +728,8 @@ class App extends Component {
                   color: item.color
                 })
               })
-            })
+            }),
+            stopClick: true,
           })
         );
         selectHover.push(new Select({
@@ -931,6 +971,9 @@ class App extends Component {
 
       drawInteraction.map(function(item, counter){
         drawInteraction[counter].on('drawend', function(target){
+          if(mapTippy){
+            mapTippy.destroy();
+          }
           target.feature.setProperties({layerName: this.state.features[counter].name});
           this.setState({comment: ''});
           var coordinate;
@@ -948,6 +991,22 @@ class App extends Component {
           this.setState({targetFeatureId: target.feature.getId()});
           console.log(target.feature);
           this.cancelEdit(counter);
+        }.bind(this));
+        drawInteraction[counter].on('drawstart', function(e){
+          currentDrawnLine = e.feature;
+          currentDrawnLine.getGeometry().on('change', function(evt) {
+              var geom = evt.target.getCoordinates();
+              if(geom.length > 1 && geom.length < 3){
+                this.setState({lineDrawMessage: "Click to contine drawing line"});
+                mapTippy.setContent('Click to contine drawing line');
+              }
+              else if(geom.length > 2){
+                mapTippy.setContent('Click last point to finish line');
+
+                this.setState({lineDrawMessage: "Click last point to finish line"});
+              }
+              console.log(geom.length, this.state.lineDrawMessage);
+            }.bind(this));
         }.bind(this));
       }.bind(this));
       selectDelete.on('select', function(e) {
@@ -1025,6 +1084,9 @@ class App extends Component {
           )
         }
       });
+      drawInteraction[0].on('click', function(test){
+        console.log(test);
+      })
     }
     componentDidUpdate(){
       map.updateSize();
