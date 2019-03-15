@@ -1118,13 +1118,13 @@ class App extends Component {
         var selectedFeatures = e.selected;
         console.log(selectedFeatures);
         if(selectedFeatures[0]){
+          this.setState({resultClusterNumber: 0});
           selectedFeatures = e.selected[0].getProperties().features;
           this.setState({selectedResultsFeatures: selectedFeatures});
           var coordinate;
           coordinate = selectedFeatures[0].getGeometry().getCoordinates();
           resultsOverlay.setPosition(coordinate);
           this.setState({popover: true});
-          this.setState({resultClusterNumber: 0});
           console.log(document.getElementById('resultsPopover').offsetHeight);
           let height = document.getElementById('resultsPopover').offsetHeight
           resultsOverlay.setOffset([0,-(height)/2]);
