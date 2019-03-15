@@ -717,7 +717,7 @@ class App extends Component {
         </div>
         </div>
       </Drawer>
-          {(this.state.view === 0) ? <Fab onClick={this.toggleBottomDrawer(true)} color="secondary" aria-label="Add" id='fab-button'><AddIcon /></Fab> : '' }
+          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="secondary" aria-label="Add" id='fab-button'><AddIcon /></Fab> : '' }
 
           <MainDisplay mode={this.state.mode} data={this.state.featureData} layers = {this.state.features} />
           <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
