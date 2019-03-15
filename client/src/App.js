@@ -111,7 +111,8 @@ var resultsOverlay = new Overlay({
   autoPan: true,
   autoPanAnimation: {
     duration: 250
-  }
+  },
+  positioning: "bottom-center"
 });
 var select = new Select({
   condition: click,
@@ -547,7 +548,7 @@ class App extends Component {
             {feature.comment}
             <br />
             <div style={{textAlign:"center", marginBottom:'6px'}}>
-              {number+1} of {total} <Button onClick={()=>{this.setState({resultClusterNumber:number+1});console.log(this.state.resultClusterNumber);}}><RightIcon /></Button>
+              <Button disabled><LeftIcon /></Button> {number+1} of {total} <Button onClick={()=>{this.setState({resultClusterNumber:number+1});console.log(this.state.resultClusterNumber);}}><RightIcon /></Button>
             </div>
           </div>
         )
@@ -573,7 +574,7 @@ class App extends Component {
             {feature.comment}
             <br />
             <div style={{textAlign:"center", marginBottom:'6px'}}>
-              <Button onClick={()=>{this.setState({resultClusterNumber:number-1});console.log(this.state.resultClusterNumber);}}><LeftIcon /></Button> {number+1} of {total}
+              <Button onClick={()=>{this.setState({resultClusterNumber:number-1});console.log(this.state.resultClusterNumber);}}><LeftIcon /></Button> {number+1} of {total} <Button disabled><RightIcon /></Button>
             </div>
           </div>
         )
@@ -1124,6 +1125,9 @@ class App extends Component {
           resultsOverlay.setPosition(coordinate);
           this.setState({popover: true});
           this.setState({resultClusterNumber: 0});
+          console.log(document.getElementById('resultsPopover').offsetHeight);
+          let height = document.getElementById('resultsPopover').offsetHeight
+          resultsOverlay.setOffset([0,-(height)/2]);
         }
         else{
           console.log(e, 'nothing selected');
