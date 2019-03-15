@@ -40,6 +40,7 @@ div.ol-zoom {
   left: 50%;
   margin-left: -35px;
   bottom: -16px;
+  z-index: 1199;
 }
 
 .arrow:after {
@@ -53,6 +54,7 @@ div.ol-zoom {
   height: 25px;
   box-shadow: 4px 4px 5px -1px rgba(0,0,0,0.12);
   transform:      rotate(45deg);
+  z-index: 1199;
 }
 
 .full-width{

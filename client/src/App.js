@@ -59,12 +59,21 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import indigo from '@material-ui/core/colors/indigo';
 import teal from '@material-ui/core/colors/teal';
 import CancelIcon from '@material-ui/icons/Close';
+import LeftIcon from '@material-ui/icons/ChevronLeft';
+import RightIcon from '@material-ui/icons/ChevronRight';
+
 
 import turf from 'turf';
 import axios from 'axios';
 import chroma from 'chroma-js';
 import tippy from 'tippy.js';
+import * as moment from 'moment'
 
+const convertToClick = (e) => {
+  const evt = new MouseEvent('click', { bubbles: true })
+  evt.stopPropagation = () => {}
+  e.target.dispatchEvent(evt)
+}
 
 const theme = createMuiTheme({
   palette: {
@@ -183,7 +192,8 @@ class App extends Component {
       drawerOpen: false,
       bottomDrawerOpen: false,
       uploadMessage: false,
-      lineDrawMessage: "Click to draw line"
+      lineDrawMessage: "Click to draw line",
+      resultClusterNumber: 0
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -199,6 +209,8 @@ class App extends Component {
     this.toggleEdit = this.toggleEdit.bind(this);
     this.toggleDelete = this.toggleDelete.bind(this);
     this.renderResultsPopover = this.renderResultsPopover.bind(this);
+    this.renderResultsPopoverContent = this.renderResultsPopoverContent.bind(this);
+
     this.toggleDrawer = this.toggleDrawer.bind(this);
     this.toggleBottomDrawer = this.toggleBottomDrawer.bind(this);
     this.closeSnackbar = this.closeSnackbar.bind(this);
@@ -217,7 +229,7 @@ class App extends Component {
     mapTippy = tippy(mapDiv);
     if(this.state.features[counter].type === 'line'){
       mapTippy.set({
-        content: this.state.lineDrawMessage,
+        content: "Click to start drawing line",
         followCursor: true,
         placement: 'right',
         arrow: true,
@@ -524,12 +536,72 @@ class App extends Component {
     }
   }
 
+  renderResultsPopoverContent(features, number, total){
+    let feature = features[number].getProperties();
+    if(total>1){
+      if(number+1 <= total && number == 0){
+        return(
+          <div>
+            <strong>{feature.name}</strong>
+            <Typography color="textSecondary">{moment(feature.date).subtract(5,'hours').format('MMMM Do YYYY, h:mm a')}</Typography>
+            {feature.comment}
+            <br />
+            <div style={{textAlign:"center", marginBottom:'6px'}}>
+              {number+1} of {total} <Button onClick={()=>{this.setState({resultClusterNumber:number+1});console.log(this.state.resultClusterNumber);}}><RightIcon /></Button>
+            </div>
+          </div>
+        )
+      }
+      else if(number+1 < total && number > 0){
+        return(
+          <div>
+            <strong>{feature.name}</strong>
+            <Typography color="textSecondary">{moment(feature.date).subtract(5,'hours').format('MMMM Do YYYY, h:mm a')}</Typography>
+            {feature.comment}
+            <br />
+            <div style={{textAlign:"center", marginBottom:'6px'}}>
+              <Button onClick={()=>{this.setState({resultClusterNumber:number-1});console.log(this.state.resultClusterNumber);}}><LeftIcon /></Button> {number+1} of {total} <Button onClick={()=>{this.setState({resultClusterNumber:number+1});console.log(this.state.resultClusterNumber);}}><RightIcon /></Button>
+            </div>
+          </div>
+        )
+      }
+      else if(number+1 == total){
+        return(
+          <div>
+            <strong>{feature.name}</strong>
+            <Typography color="textSecondary">{moment(feature.date).subtract(5,'hours').format('MMMM Do YYYY, h:mm a')}</Typography>
+            {feature.comment}
+            <br />
+            <div style={{textAlign:"center", marginBottom:'6px'}}>
+              <Button onClick={()=>{this.setState({resultClusterNumber:number-1});console.log(this.state.resultClusterNumber);}}><LeftIcon /></Button> {number+1} of {total}
+            </div>
+          </div>
+        )
+      }
+    }
+    else{
+      return(
+        <div>
+          <strong>{feature.name}</strong>
+          <Typography color="textSecondary">{moment(feature.date).subtract(5,'hours').format('MMMM Do YYYY, h:mm a')}</Typography>
+          {feature.comment}
+        </div>
+      )
+    }
+
+  }
+
   renderResultsPopover(){
     var features = this.state.selectedResultsFeatures;
+    let total;
     if(features !== null){
-      var properties = features[0].getProperties()
-      console.log(properties.features[0].getProperties().comment);
-      return(<div>{properties.features[0].getProperties().comment}</div>)
+      total = features.length;
+      let currentFeature = this.state.resultClusterNumber;
+      console.log(currentFeature);
+      var feature = features[currentFeature].getProperties()
+      return(
+        this.renderResultsPopoverContent(features, this.state.resultClusterNumber, total)
+      )
     }
     else{
       return (<div></div>)
@@ -585,6 +657,7 @@ class App extends Component {
                 toggleEdit =  {this.toggleEdit}
                 toggleDelete =  {this.toggleDelete}
               />
+              <Button onClick={()=>{console.log('hello')}}><RightIcon /></Button>
             </div>
           </Drawer>
           <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
@@ -665,7 +738,7 @@ class App extends Component {
             </form>
             <div className='arrow'></div>
           </Paper>
-          <Paper id='resultsPopover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-75px'}}>
+          <Paper id='resultsPopover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-75px'}} onMouseUp={convertToClick}>
             {this.renderResultsPopover()}
             <div className='arrow'></div>
           </Paper>
@@ -998,7 +1071,7 @@ class App extends Component {
               var geom = evt.target.getCoordinates();
               if(geom.length > 1 && geom.length < 3){
                 this.setState({lineDrawMessage: "Click to contine drawing line"});
-                mapTippy.setContent('Click to contine drawing line');
+                mapTippy.setContent('Click to continue drawing line');
               }
               else if(geom.length > 2){
                 mapTippy.setContent('Click last point to finish line');
@@ -1040,13 +1113,17 @@ class App extends Component {
       });
 
       clusterSelectClick.on('select', function(e) {
+
         var selectedFeatures = e.selected;
+        console.log(selectedFeatures);
         if(selectedFeatures[0]){
+          selectedFeatures = e.selected[0].getProperties().features;
           this.setState({selectedResultsFeatures: selectedFeatures});
           var coordinate;
           coordinate = selectedFeatures[0].getGeometry().getCoordinates();
           resultsOverlay.setPosition(coordinate);
           this.setState({popover: true});
+          this.setState({resultClusterNumber: 0});
         }
         else{
           console.log(e, 'nothing selected');

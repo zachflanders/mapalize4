@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import Avatar from '@material-ui/core/Avatar';
+
 import CardContent from '@material-ui/core/CardContent';
 import LineIcon from '@material-ui/icons/Timeline';
 import Typography from '@material-ui/core/Typography';
@@ -38,6 +41,7 @@ import {defaults as defaultInteractions} from 'ol/interaction.js';
 import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
 
 import PlaceSVG from './assets/place.svg';
+import * as moment from 'moment'
 
 
 let cardmap = [];
@@ -54,9 +58,15 @@ class MapCard extends React.Component {
  render() {
    return (
      <Card style={{width:'100%'}}>
-       <CardContent>
-            {((this.props.data.point === null)? <LineIcon style={{color:this.props.data.color, verticalAlign:'middle'}}/> : <PlaceIcon style={{color:this.props.data.color, verticalAlign:'middle'}}/>)} &nbsp;&nbsp; <strong>{this.props.data.name}</strong>
-        </ CardContent>
+       <CardHeader
+            avatar={
+              <Avatar aria-label="Icon" style={{backgroundColor:"#fff"}}>
+                {((this.props.data.point === null)? <LineIcon style={{color:this.props.data.color, verticalAlign:'middle'}}/> : <PlaceIcon style={{color:this.props.data.color, verticalAlign:'middle'}}/>)}
+              </Avatar>
+            }
+            title= {<strong>{this.props.data.name}</strong>}
+            subheader={(this.props.data.date) ? moment(this.props.data.date).subtract(5,'hours').format('MMMM Do YYYY, h:mm a') : ''}
+          />
          <div id={'cardmap-'+this.props.data.id} className='cardmap'></div>
          <CardContent>
            <Typography component="p">
