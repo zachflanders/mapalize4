@@ -61,6 +61,8 @@ import teal from '@material-ui/core/colors/teal';
 import CancelIcon from '@material-ui/icons/Close';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
+import UploadIcon from '@material-ui/icons/CloudUpload';
+
 
 
 import turf from 'turf';
@@ -330,10 +332,10 @@ class App extends Component {
   upload(){
     overlay.setPosition(undefined);
     var writer = new GeoJSON();
-    var drawnFeatures = [];
+    var drawnFeaturesArray = [];
     layerArray.map(function(item, counter){
       if(counter > 0){
-        return drawnFeatures.push(writer.writeFeatures(item.getSource().getFeatures()));
+        return drawnFeaturesArray.push(writer.writeFeatures(item.getSource().getFeatures()));
       }
       else{
         return null;
@@ -343,7 +345,7 @@ class App extends Component {
       return item.clear();
     });
     axios.post('/api/addLines', {
-      features: drawnFeatures
+      features: drawnFeaturesArray
     })
     .then(function(response){
       if(response.status === 200){
@@ -351,7 +353,7 @@ class App extends Component {
       }
       console.log(response);
     }.bind(this));
-    this.setState({drawnFeatures: 0});
+    drawnFeatures = 0;
   }
 
   cancelEdit(counter){
@@ -717,7 +719,8 @@ class App extends Component {
         </div>
         </div>
       </Drawer>
-          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="secondary" aria-label="Add" id='fab-button'><AddIcon /></Fab> : '' }
+          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : '' }
+          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && drawnFeatures > 0) ? <Fab onClick={this.upload} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : '' }
 
           <MainDisplay mode={this.state.mode} data={this.state.featureData} layers = {this.state.features} />
           <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>

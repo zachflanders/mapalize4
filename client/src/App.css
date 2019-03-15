@@ -122,10 +122,19 @@ div.ol-zoom {
   .tab{
     height: auto;
   }
-  #fab-button{
+  #add-button{
     display: inline-flex;
     position: absolute;
     bottom: 16px;
+    right: 16px;
+    top: auto;
+    left: auto;
+    z-index: 1201;
+  }
+  #upload-button{
+    display: inline-flex;
+    position: absolute;
+    bottom: 88px;
     right: 16px;
     top: auto;
     left: auto;
