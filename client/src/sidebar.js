@@ -230,7 +230,7 @@ class Sidebar extends Component {
                 disabled = {(this.props.drawnFeatures > 0)? false: true}
                 variant='contained'
                 color='primary'
-                onClick = {this.props.upload}
+                onClick = {()=>this.props.openUploadDialog(true)}
                 className = 'full-width'
               >
                 <UploadIcon /> &nbsp;&nbsp; Upload

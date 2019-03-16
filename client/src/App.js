@@ -62,6 +62,11 @@ import CancelIcon from '@material-ui/icons/Close';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import UploadIcon from '@material-ui/icons/CloudUpload';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 
 
@@ -196,7 +201,8 @@ class App extends Component {
       bottomDrawerOpen: false,
       uploadMessage: false,
       lineDrawMessage: "Click to draw line",
-      resultClusterNumber: 0
+      resultClusterNumber: 0,
+      uploadDialog: false
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -217,6 +223,14 @@ class App extends Component {
     this.toggleDrawer = this.toggleDrawer.bind(this);
     this.toggleBottomDrawer = this.toggleBottomDrawer.bind(this);
     this.closeSnackbar = this.closeSnackbar.bind(this);
+    this.openUploadDialog = this.openUploadDialog.bind(this);
+
+  }
+
+  openUploadDialog(open){
+    this.setState({
+      uploadDialog: open
+    });
   }
 
   addInteraction(counter){
@@ -331,6 +345,7 @@ class App extends Component {
 
   upload(){
     overlay.setPosition(undefined);
+    this.openUploadDialog(false)
     var writer = new GeoJSON();
     var drawnFeaturesArray = [];
     layerArray.map(function(item, counter){
@@ -654,13 +669,12 @@ class App extends Component {
                 deleteLastPoint = {this.deleteLastPoint}
                 cancelEdit = {this.cancelEdit}
                 addInteraction = {this.addInteraction}
-                upload = {this.upload}
+                openUploadDialog = {this.openUploadDialog}
                 switchLayer={this.switchLayer}
                 changeMode = {this.changeMode}
                 toggleEdit =  {this.toggleEdit}
                 toggleDelete =  {this.toggleDelete}
               />
-              <Button onClick={()=>{console.log('hello')}}><RightIcon /></Button>
             </div>
           </Drawer>
           <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
@@ -682,7 +696,7 @@ class App extends Component {
               deleteLastPoint = {this.deleteLastPoint}
               cancelEdit = {this.cancelEdit}
               addInteraction = {this.addInteraction}
-              upload = {this.upload}
+              openUploadDialog = {this.openUploadDialog}
               switchLayer={this.switchLayer}
               changeMode = {this.changeMode}
               toggleEdit =  {this.toggleEdit}
@@ -710,7 +724,7 @@ class App extends Component {
             deleteLastPoint = {this.deleteLastPoint}
             cancelEdit = {this.cancelEdit}
             addInteraction = {this.addInteraction}
-            upload = {this.upload}
+            openUploadDialog = {this.openUploadDialog}
             switchLayer={this.switchLayer}
             changeMode = {this.changeMode}
             toggleEdit =  {this.toggleEdit}
@@ -720,7 +734,7 @@ class App extends Component {
         </div>
       </Drawer>
           {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : '' }
-          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && drawnFeatures > 0) ? <Fab onClick={this.upload} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : '' }
+          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && drawnFeatures > 0) ? <Fab onClick={()=>this.openUploadDialog(true)} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : '' }
 
           <MainDisplay mode={this.state.mode} data={this.state.featureData} layers = {this.state.features} />
           <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
@@ -756,6 +770,25 @@ class App extends Component {
             autoHideDuration = {2000}
             onClose = {this.closeSnackbar}
             />
+            <Dialog
+              open={this.state.uploadDialog}
+              onClose={this.handleClose}
+            >
+              <DialogTitle>{"Upload Features?"}</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Do you want to upload {drawnFeatures} features to the map?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={()=>{this.openUploadDialog(false)}} color="primary">
+                  <CancelIcon /> Cancel
+                </Button>
+                <Button onClick={this.upload} color="primary" autoFocus>
+                  <UploadIcon /> &nbsp; Upload
+                </Button>
+              </DialogActions>
+            </Dialog>
         </div>
       </MuiThemeProvider>
     );
@@ -879,7 +912,7 @@ class App extends Component {
           new AnimatedCluster({
             source: new Cluster({
               source: resultsSourceArray[count],
-              distance: 40
+              distance: 80
             }),
             animationDuration: 500,
             style: function(feature){
