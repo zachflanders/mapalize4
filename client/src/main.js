@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
+import PropTypes from 'prop-types';
+
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import Avatar from '@material-ui/core/Avatar';
@@ -8,6 +10,10 @@ import CardContent from '@material-ui/core/CardContent';
 import LineIcon from '@material-ui/icons/Timeline';
 import Typography from '@material-ui/core/Typography';
 import PlaceIcon from '@material-ui/icons/Place';
+import LeftIcon from '@material-ui/icons/ChevronLeft';
+import RightIcon from '@material-ui/icons/ChevronRight';
+import Button from '@material-ui/core/Button';
+
 
 import 'ol/ol.css';
 import Map from 'ol/Map';
@@ -46,6 +52,8 @@ import * as moment from 'moment'
 
 let cardmap = [];
 
+
+
 class MapCard extends React.Component {
   constructor(props) {
     super(props);
@@ -54,6 +62,8 @@ class MapCard extends React.Component {
     this.componentDidUpdate = this.componentDidUpdate.bind(this);
 
   }
+
+
 
  render() {
    return (
@@ -77,6 +87,7 @@ class MapCard extends React.Component {
    );
  }
  componentDidMount(){
+   console.log(this.props.data);
    let color = this.props.data.color;
    var source = new VectorSource();
    var layer = new VectorLayer({
@@ -138,19 +149,34 @@ class MapCard extends React.Component {
  }
 }
 
-
-class MainDisplay extends Component {
+class Paginate extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      currentPage: 1
+    };
     this.renderMapCard = this.renderMapCard.bind(this);
+    this.nextPage = this.nextPage.bind(this);
+    this.prevPage = this.prevPage.bind(this);
+
+
   }
+
+  nextPage(){
+    this.setState({currentPage:this.state.currentPage+1});
+  }
+
+  prevPage(){
+    this.setState({currentPage:this.state.currentPage-1});
+
+  }
+
 
   renderMapCard(item){
     return <MapCard data={item} />
   }
 
-  render() {
+  render(){
     let featureArrayWithColors = [];
     if(this.props.data){
       featureArrayWithColors = this.props.data.map(function(feature){
@@ -163,8 +189,52 @@ class MainDisplay extends Component {
       }.bind(this));
 
     }
+    let features = this.props.data
+    let numberOfItems = features.length;
+    let itemsPerPage = 30;
+    let totalPages = Math.ceil(numberOfItems/itemsPerPage);
+    let cards = features.map(function(item, count){
+      if(count < (itemsPerPage*this.state.currentPage) && (this.state.currentPage===1 || count >= (itemsPerPage*this.state.currentPage-itemsPerPage*(this.state.currentPage-1)))){
+        return(
+          <div key={item.id} style={{width:'300px', flex:'1 auto', margin:'8px'}}>{this.renderMapCard(item)}</div>
+        )
+      }
+    }.bind(this))
 
 
+    return(
+      <div>
+        <div style={{display:'flex', flexFlow:'row wrap', padding:'8px'}}>{cards}</div>
+        <div style={{textAlign:"center"}}>
+          <Button
+            disabled={(this.state.currentPage === 1)?true:false}
+            onClick = {this.prevPage}
+          >
+            <LeftIcon />
+          </Button>
+          Page {this.state.currentPage} of {totalPages}
+          <Button
+            disabled={(this.state.currentPage === totalPages)?true:false}
+            onClick = {this.nextPage}
+          >
+            <RightIcon />
+          </Button>
+        </div>
+        <br />
+      </div>
+    )
+  }
+}
+
+class MainDisplay extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+
+
+  render() {
     if(this.props.mode === 'map'){
       return (" ");
     }
@@ -172,12 +242,16 @@ class MainDisplay extends Component {
       var features = this.props.data.map(function(item) {
         console.log(item);
         return (
-          <div key={item.id} style={{width:'300px', flex:'1 auto', margin:'8px'}}>{this.renderMapCard(item)}</div>
+          <div />
+          //<div key={item.id} style={{width:'300px', flex:'1 auto', margin:'8px'}}>{this.renderMapCard(item)}</div>
         );
       }.bind(this));
       return (
-          <div id='cards' style={{display:'flex', flexFlow:'row wrap', padding:'8px'}}>
-            {features}
+          <div id='cards'>
+            <Paginate
+              data={this.props.data}
+              layers = {this.props.layers}
+              />
           </div>
       );
     }

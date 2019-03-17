@@ -1158,7 +1158,7 @@ class App extends Component {
           selectedFeatures = e.selected[0].getProperties().features;
           this.setState({selectedResultsFeatures: selectedFeatures});
           var coordinate;
-          coordinate = selectedFeatures[0].getGeometry().getCoordinates();
+          coordinate = e.selected[0].getGeometry().getCoordinates();
           resultsOverlay.setPosition(coordinate);
           this.setState({popover: true});
           console.log(document.getElementById('resultsPopover').offsetHeight);
