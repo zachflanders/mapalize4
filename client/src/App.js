@@ -347,7 +347,8 @@ class App extends Component {
   }
 
   getInput(){
-    this.changeMode('map');
+    map.setTarget('map');
+    this.setState({viewMap: true});
   }
 
   upload(){
@@ -768,7 +769,7 @@ class App extends Component {
 
 
 
-          <MainDisplay mode={this.state.mode} data={this.state.featureData} layers = {this.state.features} />
+          <MainDisplay mode={this.state.mode} view={this.state.view} data={this.state.featureData} layers = {this.state.features} />
           <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
           <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
             <form onSubmit={this.saveComment}>
