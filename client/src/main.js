@@ -164,11 +164,12 @@ class Paginate extends React.Component {
 
   nextPage(){
     this.setState({currentPage:this.state.currentPage+1});
+    window.scrollTo(0,0);
   }
 
   prevPage(){
     this.setState({currentPage:this.state.currentPage-1});
-
+    window.scrollTo(0,0);
   }
 
 
