@@ -19,6 +19,7 @@
     "prop-types": "^15.7.2",
     "rbush": "^2.0.2",
     "react": "^16.7.0",
+    "react-app-polyfill": "^0.2.2",
     "react-dom": "^16.7.0",
     "react-masonry-component": "^6.2.1",
     "react-scripts": "2.1.2",

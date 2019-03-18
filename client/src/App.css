@@ -78,10 +78,15 @@ div.ol-zoom {
    display: none;
  }
 
- #fab-button{
+ #add-button{
    display: none;
  }
-
+ #cardswitcher{
+   display: none;
+ }
+ #mapswitcher{
+   display: none;
+ }
  .resultCard{
    width: 33.3%;
 }
@@ -134,6 +139,24 @@ div.ol-zoom {
   #add-button{
     display: inline-flex;
     position: absolute;
+    bottom: 16px;
+    right: 16px;
+    top: auto;
+    left: auto;
+    z-index: 1201;
+  }
+  #cardswitcher{
+    display: inline-flex;
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    top: auto;
+    left: auto;
+    z-index: 1201;
+  }
+  #mapswitcher{
+    display: inline-flex;
+    position: fixed;
     bottom: 16px;
     right: 16px;
     top: auto;

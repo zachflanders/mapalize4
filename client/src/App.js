@@ -59,6 +59,10 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import indigo from '@material-ui/core/colors/indigo';
 import teal from '@material-ui/core/colors/teal';
 import CancelIcon from '@material-ui/icons/Close';
+import CardsIcon from '@material-ui/icons/ViewModule';
+import MapIcon from '@material-ui/icons/Map';
+
+
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import UploadIcon from '@material-ui/icons/CloudUpload';
@@ -67,6 +71,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Grow from '@material-ui/core/Grow';
+
 
 
 
@@ -657,7 +663,7 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={theme}>
         <div className="App">
-          <AppBar position="fixed" style={{zIndex: 1201, flexWrap:'wrap', width:'100%' }}>
+          <AppBar position="fixed" style={{zIndex: 1202, flexWrap:'wrap', width:'100%' }}>
             <Toolbar style={{flexWrap:'wrap'}} id='toolbar'>
               <IconButton
                 onClick = {this.toggleDrawer(true)}
@@ -755,8 +761,12 @@ class App extends Component {
         </div>
         </div>
       </Drawer>
-          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : '' }
-          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && drawnFeatures > 0) ? <Fab onClick={()=>this.openUploadDialog(true)} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : '' }
+          <Grow in={true}>{(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : <div /> }</Grow>
+          <Grow in={true}>{(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && drawnFeatures > 0) ? <Fab onClick={()=>this.openUploadDialog(true)} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : <div /> }</Grow>
+          <Grow in={true}>{(this.state.view === 1 && this.state.mode === 'map'  ) ? <Fab onClick={()=>this.changeMode('cards')} color="primary" id='cardswitcher'><CardsIcon /></Fab> : <div /> }</Grow>
+          <Grow in={true}>{(this.state.view === 1 && this.state.mode === 'cards'  ) ? <Fab onClick={()=>this.changeMode('map')} color="primary" id='mapswitcher'><MapIcon /></Fab> : <div /> }</Grow>
+
+
 
           <MainDisplay mode={this.state.mode} data={this.state.featureData} layers = {this.state.features} />
           <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
