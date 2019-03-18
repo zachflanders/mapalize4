@@ -32,7 +32,6 @@ import Feature from 'ol/Feature';
 import Select from 'ol/interaction/Select.js';
 import {click, pointerMove} from 'ol/events/condition.js';
 import Cluster from 'ol/source/Cluster';
-import {defaults as defaultInteractions} from 'ol/interaction.js';
 import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
 
 //Material-ui imports
@@ -61,8 +60,6 @@ import teal from '@material-ui/core/colors/teal';
 import CancelIcon from '@material-ui/icons/Close';
 import CardsIcon from '@material-ui/icons/ViewModule';
 import MapIcon from '@material-ui/icons/Map';
-
-
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import UploadIcon from '@material-ui/icons/CloudUpload';
@@ -72,9 +69,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grow from '@material-ui/core/Grow';
-
-
-
 
 import turf from 'turf';
 import axios from 'axios';
@@ -106,14 +100,7 @@ var resultsSourceArray = [];
 var resultsLayerArray = [];
 var map = {};
 var drawInteraction = [];
-var snap;
 var modify = [];
-var pointSource = new VectorSource();
-var heatmapLayer = new Heatmap({
-  source: pointSource,
-  renderMode: 'image',
-  shadow: 1000
-});
 var overlay = new Overlay({
   autoPan: true,
   autoPanAnimation: {
@@ -139,10 +126,7 @@ var selectDelete = new Select({
     image: null
   })
 });
-
-var clusterSelectHover =[];
 var clusterSelectClick = null;
-var selectHover = [];
 var drawnFeatures = 0;
 let mapTippy = null;
 let currentDrawnLine;
@@ -226,12 +210,10 @@ class App extends Component {
     this.toggleDelete = this.toggleDelete.bind(this);
     this.renderResultsPopover = this.renderResultsPopover.bind(this);
     this.renderResultsPopoverContent = this.renderResultsPopoverContent.bind(this);
-
     this.toggleDrawer = this.toggleDrawer.bind(this);
     this.toggleBottomDrawer = this.toggleBottomDrawer.bind(this);
     this.closeSnackbar = this.closeSnackbar.bind(this);
     this.openUploadDialog = this.openUploadDialog.bind(this);
-
   }
 
   openUploadDialog(open){
@@ -330,17 +312,15 @@ class App extends Component {
   }
 
   switchLayer(count){
-    if(this.state.features[count].viewResults === true){
+    let features = this.state.features;
+    let feature = features[count];
+    if(features[count].viewResults === true){
       map.removeLayer(resultsLayerArray[count]);
-      var features = this.state.features;
-      var feature = features[count];
       feature.viewResults= false;
       this.setState({features:features});
     }
     else{
       map.addLayer(resultsLayerArray[count]);
-      var features = this.state.features;
-      var feature = features[count];
       feature.viewResults= true;
       this.setState({features:features});
     }
@@ -428,7 +408,6 @@ class App extends Component {
   getResults(){
     axios.get('/api/results')
     .then(function(response){
-      pointSource.clear();
       resultsSourceArray.map(function(item){
         return item.clear();
       });
@@ -468,7 +447,6 @@ class App extends Component {
       });
       this.state.features.map(function(item, count){
         console.log(item, count);
-        map.removeInteraction(selectHover[count]);
         if(item.type === 'line'){
           console.log(layerArray[count+1].getStyle());
           layerArray[count+1].getStyle().getStroke().setColor(chroma(item.color).alpha(0.6).rgba());
@@ -515,7 +493,6 @@ class App extends Component {
         return map.removeInteraction(layer);
       });
       this.state.features.map(function(item, count){
-        map.addInteraction(selectHover[count]);
         if(item.type === 'line'){
           layerArray[count+1].getStyle().getStroke().setColor(chroma(item.color).alpha(1).rgba());
           layerArray[count+1].getStyle().getStroke().setLineDash([1]);
@@ -875,23 +852,6 @@ class App extends Component {
             stopClick: true,
           })
         );
-        selectHover.push(new Select({
-          condition: pointerMove,
-          style: new Style({
-            stroke: new Stroke({
-              color: item.color,
-              width: 8
-            }),
-            image: new CircleStyle({
-              radius: 6,
-              fill: new Fill({
-                color: item.color
-              })
-            })
-          }),
-          layers: [layerArray[count+1]]
-        }));
-        clusterSelectHover.push('line');
       }
       else{
         layerArray.push(new VectorLayer({
@@ -926,21 +886,6 @@ class App extends Component {
             })
           })
         );
-        selectHover.push(new Select({
-          condition: pointerMove,
-          style: new Style({
-            image: new Icon(({
-              anchor: [0.5, 60],
-              anchorXUnits: 'fraction',
-              anchorYUnits: 'pixels',
-              crossOrigin: 'anonymous',
-              src: PlaceSVG,
-              color: item.color,
-              scale: 0.5
-            }))
-          }),
-          layers: [layerArray[count+1]]
-        }));
         resultsLayerArray.push(
           new AnimatedCluster({
             source: new Cluster({
@@ -990,52 +935,6 @@ class App extends Component {
             }
           })
         );
-        clusterSelectHover.push(new Select({
-          condition: pointerMove,
-          layers: [resultsLayerArray[count]],
-          style: function(feature){
-            var size = feature.get('features').length;
-            var style;
-            if(size < 2){
-              style = [new Style({
-                image: new Icon(({
-                  anchor: [0.5, 60],
-                  anchorXUnits: 'fraction',
-                  anchorYUnits: 'pixels',
-                  crossOrigin: 'anonymous',
-                  src: PlaceSVG,
-                  color: item.color,
-                  scale: 0.5
-                }))
-              })]
-            }
-            else{
-              style =
-                [new Style({
-                  image:
-                    new CircleStyle({
-                      radius: 16,
-                      stroke: new Stroke({
-                        color:chroma(item.color).alpha(0.6).rgba(),
-                        width: 6
-                      }),
-                      fill: new Fill({
-                        color: item.color
-                      })
-                    }),
-
-                  text: new Text({
-                    text: size.toString(),
-                    fill: new Fill({
-                      color: '#fff'
-                    })
-                  })
-                })]
-
-            }
-            return style;
-          }
-        }));
       };
       modify.push(new Modify({
         source: sourceArray[count],
@@ -1062,7 +961,6 @@ class App extends Component {
         target: 'map',
         layers: layerArray,
         overlays: [overlay, resultsOverlay],
-        //interactions: defaultInteractions().extend(clusterSelectHover),
         view: new View({
           center: fromLonLat([-94.573, 39.143]),
           zoom: 14,
@@ -1072,6 +970,11 @@ class App extends Component {
         controls: [
           new Zoom()
         ]
+      });
+      map.on('pointermove', function(e) {
+        var pixel = map.getEventPixel(e.originalEvent);
+        var hit = map.hasFeatureAtPixel(pixel);
+        document.getElementById(map.getTarget()).style.cursor = hit ? 'pointer' : '';
       });
       var resolution = map.getView().getResolution(),
       radiusSize = 12,
@@ -1160,7 +1063,6 @@ class App extends Component {
             if(layer.hasFeature(selectedFeature)){
               layer.removeFeature(selectedFeature);
               drawnFeatures--;
-              selectHover[count].getFeatures().clear();
               document.getElementById('map').style.cursor = 'default';
             }
           })
@@ -1206,34 +1108,6 @@ class App extends Component {
 
       }.bind(this));
 
-      selectHover.map(function(item, count){
-        return(
-          map.addInteraction(item),
-          item.on('select', function(e) {
-            if(e.selected.length > 0){
-              document.getElementById('map').style.cursor = 'pointer';
-            }
-            else{
-              document.getElementById('map').style.cursor = 'default';
-            }
-          })
-        )
-      });
-      clusterSelectHover.map(function(item, count){
-        if(item != 'line'){
-          return(
-            map.addInteraction(item),
-            item.on('select', function(e) {
-              if(e.selected.length > 0){
-                document.getElementById('map').style.cursor = 'pointer';
-              }
-              else{
-                document.getElementById('map').style.cursor = 'default';
-              }
-            })
-          )
-        }
-      });
       drawInteraction[0].on('click', function(test){
         console.log(test);
       })
