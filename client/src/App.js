@@ -199,7 +199,8 @@ class App extends Component {
       selectedResultsFeatures: null,
       drawerOpen: false,
       bottomDrawerOpen: false,
-      uploadMessage: false,
+      uploadMessage: '',
+      uploadMessageDisplay: false,
       lineDrawMessage: "Click to draw line",
       resultClusterNumber: 0,
       uploadDialog: false
@@ -356,19 +357,40 @@ class App extends Component {
         return null;
       }
     });
-    sourceArray.map(function(item, count){
-      return item.clear();
+    layerArray.map(function(layer, count){
+      if(count>0){
+        map.removeLayer(layer);
+      }
     });
     axios.post('/api/addLines', {
       features: drawnFeaturesArray
     })
     .then(function(response){
       if(response.status === 200){
-        this.setState({uploadMessage: true});
+        this.setState({uploadMessage: <span><DoneIcon style={{verticalAlign:'middle'}} /> Upload Successful</span>});
+        this.setState({uploadMessageDisplay: true});
+        sourceArray.map(function(item, count){
+          return item.clear();
+        });
+        drawnFeatures = 0;
+        layerArray.map(function(layer, count){
+          if(count>0){
+            map.addLayer(layer);
+          }
+        });
+      }
+      else{
+        this.setState({uploadMessage: <span><CancelIcon style={{verticalAlign:'middle'}} /> Oops. Something went wrong.</span>});
+        this.setState({uploadMessageDisplay: true});
+        layerArray.map(function(layer, count){
+          if(count>0){
+            map.addLayer(layer);
+          }
+        });
       }
       console.log(response);
     }.bind(this));
-    drawnFeatures = 0;
+
   }
 
   cancelEdit(counter){
@@ -628,7 +650,7 @@ class App extends Component {
   }
 
   closeSnackbar(){
-    this.setState({uploadMessage: false});
+    this.setState({uploadMessageDisplay: false});
   }
 
   render() {
@@ -762,11 +784,11 @@ class App extends Component {
           </Paper>
           <Snackbar
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            open={this.state.uploadMessage}
+            open={this.state.uploadMessageDisplay}
             ContentProps={{
               'aria-describedby': 'message-id',
             }}
-            message={<span id="message-id"><DoneIcon style={{verticalAlign:'middle'}} /> &nbsp;&nbsp;Upload Successful</span>}
+            message={<span id="message-id">{this.state.uploadMessage}</span>}
             autoHideDuration = {2000}
             onClose = {this.closeSnackbar}
             />
