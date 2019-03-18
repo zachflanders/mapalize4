@@ -82,7 +82,20 @@ div.ol-zoom {
    display: none;
  }
 
+ .resultCard{
+   width: 33.3%;
+}
 
+@media screen and (min-width: 900px) and (max-width: 1200px) {
+  .resultCard{
+    width: 50%;
+ }
+}
+@media screen and (max-width: 900px) {
+  .resultCard{
+    width: 100%;
+ }
+}
 
 @media screen and (max-width: 600px) {
 

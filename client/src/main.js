@@ -47,7 +47,9 @@ import {defaults as defaultInteractions} from 'ol/interaction.js';
 import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
 
 import PlaceSVG from './assets/place.svg';
-import * as moment from 'moment'
+import * as moment from 'moment';
+import Masonry from 'react-masonry-component';
+
 
 
 let cardmap = [];
@@ -67,7 +69,7 @@ class MapCard extends React.Component {
 
  render() {
    return (
-     <Card style={{width:'100%'}}>
+     <Card style={{margin:'8px'}}>
        <CardHeader
             avatar={
               <Avatar aria-label="Icon" style={{backgroundColor:"#fff"}}>
@@ -197,7 +199,7 @@ class Paginate extends React.Component {
     let cards = features.map(function(item, count){
       if(count < (itemsPerPage*this.state.currentPage) && (this.state.currentPage===1 || count >= (itemsPerPage*this.state.currentPage-itemsPerPage*(this.state.currentPage-1)))){
         return(
-          <div key={item.id} style={{width:'300px', flex:'1 auto', margin:'8px'}}>{this.renderMapCard(item)}</div>
+          <div key={item.id} className='resultCard' style={{flex:'1 auto', margin:'0px'}}>{this.renderMapCard(item)}</div>
         )
       }
     }.bind(this))
@@ -205,7 +207,10 @@ class Paginate extends React.Component {
 
     return(
       <div>
-        <div style={{display:'flex', flexFlow:'row wrap', padding:'8px'}}>{cards}</div>
+        <Masonry
+          style={{display:'flex', flexFlow:'row wrap', paddingTop:'8px', margin:'8px'}}
+          options={{transitionDuration: 0}}
+        >{cards}</Masonry>
         <div style={{textAlign:"center"}}>
           <Button
             disabled={(this.state.currentPage === 1)?true:false}
