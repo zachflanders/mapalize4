@@ -298,17 +298,22 @@ class App extends Component {
         view: 1
       });
       this.state.features.map(function(item, count){
-         return (
-           map.removeLayer(layerArray[count]),
-           this.cancelEdit(count)
-         )
+        if(item.viewResults === true){
+          return (
+            map.addLayer(resultsLayerArray[count]),
+            map.removeLayer(layerArray[count]),
+            this.cancelEdit(count)
+          )
+        }
+        else{
+          return (
+            map.removeLayer(layerArray[count]),
+            this.cancelEdit(count)
+          )
+        }
       }.bind(this));
-      resultsLayerArray.map(function(item){
-        return map.addLayer(item);
-      });
       map.removeOverlay(overlay);
       map.addOverlay(resultsOverlay);
-
       map.removeInteraction(select);
       this.getResults();
       if(clusterSelectClick !== null){
@@ -321,10 +326,15 @@ class App extends Component {
       })
       //map.removeLayer(heatmapLayer);
       this.state.features.map(function(item, count){
-        return map.addLayer(layerArray[count]);
-      });
-      resultsLayerArray.map(function(item){
-        return map.removeLayer(item);
+        if(item.viewResults === true){
+          return(
+            map.removeLayer(resultsLayerArray[count]),
+            map.addLayer(layerArray[count])
+          )
+        }
+        else{
+          return map.addLayer(layerArray[count]);
+        }
       });
       map.addOverlay(overlay);
       map.removeOverlay(resultsOverlay);

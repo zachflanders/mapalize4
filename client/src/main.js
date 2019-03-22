@@ -89,7 +89,6 @@ class MapCard extends React.Component {
    );
  }
  componentDidMount(){
-   console.log(this.props.data);
    let color = this.props.data.color;
    var source = new VectorSource();
    var layer = new VectorLayer({
@@ -186,18 +185,23 @@ class Paginate extends React.Component {
         this.props.layers.map(function(layer){
           if(feature.name === layer.name){
             feature.color = layer.color;
+            feature.viewResults = layer.viewResults;
             return(feature);
           }
         })
       }.bind(this));
 
     }
-    let features = this.props.data
+    let features = this.props.data;
+    let sortedFeatures = features.sort(function(a,b){
+      return(new Date(b.date)-new Date(a.date))
+    });
+    console.log(sortedFeatures);
     let numberOfItems = features.length;
     let itemsPerPage = 30;
     let totalPages = Math.ceil(numberOfItems/itemsPerPage);
-    let cards = features.map(function(item, count){
-      if(count < (itemsPerPage*this.state.currentPage) && (this.state.currentPage===1 || count >= (itemsPerPage*this.state.currentPage-itemsPerPage*(this.state.currentPage-1)))){
+    let cards = sortedFeatures.map(function(item, count){
+      if(item.viewResults === true && count < (itemsPerPage*this.state.currentPage) && (this.state.currentPage===1 || count >= (itemsPerPage*this.state.currentPage-itemsPerPage*(this.state.currentPage-1)))){
         return(
           <div key={item.id} className='resultCard' style={{flex:'1 auto', margin:'0px'}}>{this.renderMapCard(item)}</div>
         )
@@ -246,7 +250,6 @@ class MainDisplay extends Component {
     }
     else{
       var features = this.props.data.map(function(item) {
-        console.log(item);
         return (
           <div />
           //<div key={item.id} style={{width:'300px', flex:'1 auto', margin:'8px'}}>{this.renderMapCard(item)}</div>
