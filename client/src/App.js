@@ -96,6 +96,7 @@ const drawerWidth = '220px';
 //Defining Globals
 var sourceArray = [];
 var layerArray = [];
+var basemapLayers = [];
 var resultsSourceArray = [];
 var resultsLayerArray = [];
 var map = {};
@@ -116,8 +117,33 @@ var resultsOverlay = new Overlay({
 });
 var select = new Select({
   condition: click,
-  layers: layerArray
+  layers: layerArray.concat(resultsLayerArray)
 });
+let addSelectionListener = function(){
+  var collection = select.getFeatures();
+  collection.forEach(function(feature){
+  feature.setStyle(new Style({
+      stroke: new Stroke({
+        color: '#000',
+        width: 8
+      })
+    }));
+  });
+}
+/*
+let removeSelectionListener = function(){
+  var collection = vectorLayer.getSource().getFeatures();
+  collection.forEach(function(feature){
+  feature.setStyle(new Style({
+      stroke: new Stroke({
+        color: '#fff',
+        width: 8
+      })
+    }));
+  });
+}
+*/
+
 var selectDelete = new Select({
   condition: click,
   layers: layerArray,
@@ -271,10 +297,9 @@ class App extends Component {
       this.setState({
         view: 1
       });
-      //map.addLayer(heatmapLayer);
       this.state.features.map(function(item, count){
          return (
-           map.removeLayer(layerArray[count+1]),
+           map.removeLayer(layerArray[count]),
            this.cancelEdit(count)
          )
       }.bind(this));
@@ -296,7 +321,7 @@ class App extends Component {
       })
       //map.removeLayer(heatmapLayer);
       this.state.features.map(function(item, count){
-        return map.addLayer(layerArray[count+1]);
+        return map.addLayer(layerArray[count]);
       });
       resultsLayerArray.map(function(item){
         return map.removeLayer(item);
@@ -337,17 +362,10 @@ class App extends Component {
     var writer = new GeoJSON();
     var drawnFeaturesArray = [];
     layerArray.map(function(item, counter){
-      if(counter > 0){
-        return drawnFeaturesArray.push(writer.writeFeatures(item.getSource().getFeatures()));
-      }
-      else{
-        return null;
-      }
+      return drawnFeaturesArray.push(writer.writeFeatures(item.getSource().getFeatures()));
     });
     layerArray.map(function(layer, count){
-      if(count>0){
         map.removeLayer(layer);
-      }
     });
     axios.post('/api/addLines', {
       features: drawnFeaturesArray
@@ -361,18 +379,14 @@ class App extends Component {
         });
         drawnFeatures = 0;
         layerArray.map(function(layer, count){
-          if(count>0){
-            map.addLayer(layer);
-          }
+          map.addLayer(layer);
         });
       }
       else{
         this.setState({uploadMessage: <span><CancelIcon style={{verticalAlign:'middle'}} /> Oops. Something went wrong.</span>});
         this.setState({uploadMessageDisplay: true});
         layerArray.map(function(layer, count){
-          if(count>0){
-            map.addLayer(layer);
-          }
+          map.addLayer(layer);
         });
       }
       console.log(response);
@@ -422,7 +436,7 @@ class App extends Component {
             if(feature.name === featureLayer.name){
               var resultsFeature = new Feature(new Point(fromLonLat([feature.point.coordinates[0],feature.point.coordinates[1]])));
               resultsFeature.setId(feature.id);
-              resultsFeature.setProperties({name: feature.name, date: feature.date, comment: feature.comment});
+              resultsFeature.setProperties({name: feature.name, date: feature.date, comment: feature.comment, layerColor:featureLayer.color});
               return resultsSourceArray[count].addFeature(resultsFeature);
             }
             else{
@@ -448,13 +462,13 @@ class App extends Component {
       this.state.features.map(function(item, count){
         console.log(item, count);
         if(item.type === 'line'){
-          console.log(layerArray[count+1].getStyle());
-          layerArray[count+1].getStyle().getStroke().setColor(chroma(item.color).alpha(0.6).rgba());
-          layerArray[count+1].getStyle().getStroke().setLineDash([12,12,12,12]);
+          console.log(layerArray[count].getStyle());
+          layerArray[count].getStyle().getStroke().setColor(chroma(item.color).alpha(0.6).rgba());
+          layerArray[count].getStyle().getStroke().setLineDash([12,12,12,12]);
           sourceArray[count].refresh()
         }
         else{
-          layerArray[count+1].getStyle().setImage(
+          layerArray[count].getStyle().setImage(
             new Icon(({
               anchor: [0.5, 60],
               anchorXUnits: 'fraction',
@@ -471,7 +485,7 @@ class App extends Component {
               })
             })
           );
-          layerArray[count+1].getStyle().getImage().setOpacity(0.5);
+          layerArray[count].getStyle().getImage().setOpacity(0.5);
           sourceArray[count].refresh()
           /*
           layerArray[count+1].getStyle().getImage().setImage(
@@ -494,12 +508,12 @@ class App extends Component {
       });
       this.state.features.map(function(item, count){
         if(item.type === 'line'){
-          layerArray[count+1].getStyle().getStroke().setColor(chroma(item.color).alpha(1).rgba());
-          layerArray[count+1].getStyle().getStroke().setLineDash([1]);
+          layerArray[count].getStyle().getStroke().setColor(chroma(item.color).alpha(1).rgba());
+          layerArray[count].getStyle().getStroke().setLineDash([1]);
           sourceArray[count].refresh()
         }
         else{
-          layerArray[count+1].getStyle().setImage(
+          layerArray[count].getStyle().setImage(
             new Icon(({
               anchor: [0.5, 60],
               anchorXUnits: 'fraction',
@@ -510,7 +524,7 @@ class App extends Component {
               scale: 0.5
             }))
           );
-          layerArray[count+1].getStyle().getImage().setOpacity(1);
+          layerArray[count].getStyle().getImage().setOpacity(1);
           sourceArray[count].refresh()
         }
       });
@@ -806,7 +820,7 @@ class App extends Component {
   componentDidMount(){
 
 
-    layerArray.push(new TileLayer({
+    basemapLayers.push(new TileLayer({
       source: new TileWMS({
         url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
         params: {'LAYERS': 'Mapalize:OSM-KC-ROADS', 'TILED': true},
@@ -959,7 +973,7 @@ class App extends Component {
     resultsOverlay.setElement(container2);
     map = new Map({
         target: 'map',
-        layers: layerArray,
+        layers: basemapLayers.concat(layerArray),
         overlays: [overlay, resultsOverlay],
         view: new View({
           center: fromLonLat([-94.573, 39.143]),
@@ -990,7 +1004,46 @@ class App extends Component {
          resultsLayerArray[0].setRadius(zoomRadius);
          resultsLayerArray[0].setBlur(zoomBlur);
       });
+      var collection = select.getFeatures();
+      collection.on('add', function(e){
+        console.log(e.element.getGeometry().getType());
+        if(e.element.getGeometry().getType() === 'LineString'){
+          e.element.setStyle(new Style({
+              stroke: new Stroke({
+                color: e.element.getProperties().layerColor,
+                width: 8
+              })
+            }));
+        }
+        else if(e.element.getGeometry().getType() === 'Point'){
+          e.element.setStyle(new Style({
+            image: new Icon(({
+              anchor: [0.5, 60],
+              anchorXUnits: 'fraction',
+              anchorYUnits: 'pixels',
+              crossOrigin: 'anonymous',
+              src: PlaceSVG,
+              color: e.element.getProperties().layerColor,
+              scale: 0.5
+            }))
+          }));
+        }
+      });
+      collection.on('remove', function(e){
+        console.log(e.element.getProperties().layerColor);
+        if(e.element.getGeometry().getType() === 'LineString'){
+          e.element.setStyle(new Style({
+              stroke: new Stroke({
+                color: e.element.getProperties().layerColor,
+                width: 8
+              })
+            }));
+        }
+      });
+
+
       select.on('select', function(e) {
+        console.log(e);
         var selectedFeature2 = e.selected[0];
         if(selectedFeature2){
           this.setState({targetFeatureId: e.selected[0].getId()});
@@ -1020,7 +1073,7 @@ class App extends Component {
           if(mapTippy){
             mapTippy.destroy();
           }
-          target.feature.setProperties({layerName: this.state.features[counter].name});
+          target.feature.setProperties({layerName: this.state.features[counter].name, layerColor: this.state.features[counter].color});
           this.setState({comment: ''});
           var coordinate;
           if(this.state.features[counter].type === 'line'){
@@ -1079,9 +1132,47 @@ class App extends Component {
       clusterSelectClick = new Select({
         condition: click,
         layers: selectableLayers,
-        style: new Style({
-          stroke: null
-        })
+        style: function(feature){
+          let color = feature.getProperties().features[0].getProperties().layerColor;
+          var size = feature.get('features').length;
+          var style;
+          if(size < 2){
+            style = [new Style({
+              image: new Icon(({
+                anchor: [0.5, 60],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'pixels',
+                crossOrigin: 'anonymous',
+                src: PlaceSVG,
+                color: color,
+                scale: 0.5
+              }))
+            })]
+          }
+          else{
+            style =
+              [new Style({
+                image:
+                  new CircleStyle({
+                    radius: 16,
+                    stroke: new Stroke({
+                      color:chroma(color).alpha(0.6).rgba(),
+                      width: 6
+                    }),
+                    fill: new Fill({
+                      color: color
+                    })
+                  }),
+                text: new Text({
+                  text: size.toString(),
+                  fill: new Fill({
+                    color: '#fff'
+                  })
+                })
+              })]
+          }
+          return style;
+        }
       });
 
       clusterSelectClick.on('select', function(e) {
