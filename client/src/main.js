@@ -194,9 +194,16 @@ class Paginate extends React.Component {
     }
     let features = this.props.data;
     let sortedFeatures = features.sort(function(a,b){
-      return(new Date(b.date)-new Date(a.date))
-    });
-    console.log(sortedFeatures);
+      if(this.props.cardSortState === 'newest'){
+        return(new Date(b.date)-new Date(a.date))
+      }
+      else if(this.props.cardSortState === 'oldest'){
+        return(new Date(a.date)-new Date(b.date))
+      }
+      else{
+        return(new Date(b.date)-new Date(a.date))
+      }
+    }.bind(this));
     let numberOfItems = features.length;
     let itemsPerPage = 30;
     let totalPages = Math.ceil(numberOfItems/itemsPerPage);
@@ -249,17 +256,13 @@ class MainDisplay extends Component {
       return (" ");
     }
     else{
-      var features = this.props.data.map(function(item) {
-        return (
-          <div />
-          //<div key={item.id} style={{width:'300px', flex:'1 auto', margin:'8px'}}>{this.renderMapCard(item)}</div>
-        );
-      }.bind(this));
+
       return (
           <div id='cards'>
             <Paginate
               data={this.props.data}
               layers = {this.props.layers}
+              cardSortState = {this.props.cardSortState}
               />
           </div>
       );

@@ -117,7 +117,7 @@ var resultsOverlay = new Overlay({
 });
 var select = new Select({
   condition: click,
-  layers: layerArray.concat(resultsLayerArray)
+  layers: layerArray
 });
 let addSelectionListener = function(){
   var collection = select.getFeatures();
@@ -219,7 +219,8 @@ class App extends Component {
       uploadMessageDisplay: false,
       lineDrawMessage: "Click to draw line",
       resultClusterNumber: 0,
-      uploadDialog: false
+      uploadDialog: false,
+      cardSortState: 'newest'
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -240,12 +241,16 @@ class App extends Component {
     this.toggleBottomDrawer = this.toggleBottomDrawer.bind(this);
     this.closeSnackbar = this.closeSnackbar.bind(this);
     this.openUploadDialog = this.openUploadDialog.bind(this);
+    this.sortCards = this.sortCards.bind(this);
   }
 
   openUploadDialog(open){
     this.setState({
       uploadDialog: open
     });
+  }
+  sortCards(sort){
+    this.setState({cardSortState: sort})
   }
 
   addInteraction(counter){
@@ -690,6 +695,9 @@ class App extends Component {
             <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>
               <Sidebar
                 view={this.state.view}
+                mode={this.state.mode}
+                cardSortState = {this.state.cardSortState}
+                sortCards = {this.sortCards}
                 drawing={this.state.drawing}
                 editing={this.state.editing}
                 deleting = {this.state.deleting}
@@ -717,6 +725,9 @@ class App extends Component {
           <div style={{width: drawerWidth, padding:'15px'}} id='sidebarMobile'>
             <Sidebar
               view={this.state.view}
+              mode={this.state.mode}
+              cardSortState = {this.state.cardSortState}
+              sortCards = {this.sortCards}
               drawing={this.state.drawing}
               editing={this.state.editing}
               deleting = {this.state.deleting}
@@ -745,6 +756,9 @@ class App extends Component {
         <div style={{padding:'15px'}} id='bottombarMobile'>
           <Bottombar
             view={this.state.view}
+            mode={this.state.mode}
+            cardSortState = {this.state.cardSortState}
+            sortCards = {this.sortCards}
             drawing={this.state.drawing}
             editing={this.state.editing}
             deleting = {this.state.deleting}
@@ -770,7 +784,13 @@ class App extends Component {
 
 
 
-          <MainDisplay mode={this.state.mode} view={this.state.view} data={this.state.featureData} layers = {this.state.features} />
+          <MainDisplay
+            mode={this.state.mode}
+            view={this.state.view}
+            data={this.state.featureData}
+            layers = {this.state.features}
+            cardSortState = {this.state.cardSortState}
+            />
           <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
           <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
             <form onSubmit={this.saveComment}>

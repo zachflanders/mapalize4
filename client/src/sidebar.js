@@ -4,7 +4,6 @@ import './App.css';
 //Material-ui imports
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
-
 import Paper from '@material-ui/core/Paper';
 import EditIcon from '@material-ui/icons/Edit';
 import LineIcon from '@material-ui/icons/Timeline';
@@ -26,6 +25,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import SortIcon from '@material-ui/icons/Sort';
+
 
 import tippy from 'tippy.js';
 
@@ -239,6 +240,45 @@ class Sidebar extends Component {
           )
         }
       }
+      else if(this.props.view === 1 && this.props.mode==='map'){
+        return(
+          <div>
+          <Paper>
+            <div style={{padding:'8px'}}>
+              <ViewIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>View Results As</strong>
+            </div>
+            <Divider />
+            <div style={{padding:'8px'}}>
+
+              <Button
+              onClick = {() => this.props.changeMode('map')}
+                className='full-width-left'
+                size='small'
+              >
+                <MapIcon /> &nbsp;&nbsp; Map
+              </Button>
+              <br />
+              <Button
+                onClick = {() => this.props.changeMode('cards')}
+                className='full-width-left'
+                size='small'  >
+                  <CardsIcon /> &nbsp;&nbsp; Cards
+              </Button>
+              </div>
+          </Paper>
+          <br />
+          <Paper>
+            <div style={{padding:'8px'}}>
+              <LayersIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>View Layers</strong>
+            </div>
+            <Divider />
+            <div style={{padding:'8px 8px 8px 12px'}}>
+              {this.renderResultsLayerList()}
+            </div>
+          </Paper>
+          </div>
+        )
+      }
       else{
         return(
           <div>
@@ -262,6 +302,30 @@ class Sidebar extends Component {
                 className='full-width-left'
                 size='small'  >
                   <CardsIcon /> &nbsp;&nbsp; Cards
+              </Button>
+              </div>
+          </Paper>
+          <br />
+          <Paper>
+            <div style={{padding:'8px'}}>
+              <SortIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>Sort Results</strong>
+            </div>
+            <Divider />
+            <div style={{padding:'8px'}}>
+
+              <Button
+              onClick = {() => this.props.sortCards('newest')}
+                className='full-width-left'
+                size='small'
+              >
+                Newest First
+              </Button>
+              <br />
+              <Button
+                onClick = {() => this.props.sortCards('oldest')}
+                className='full-width-left'
+                size='small'  >
+                  Oldest First
               </Button>
               </div>
           </Paper>
