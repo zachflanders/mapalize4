@@ -469,6 +469,7 @@ class App extends Component {
 
   toggleEdit(){
     overlay.setPosition(undefined);
+    map.removeInteraction(select);
     if(this.state.editing === false){
       this.setState({editing: true});
       modify.map(function(layer){
@@ -477,44 +478,41 @@ class App extends Component {
       this.state.features.map(function(item, count){
         console.log(item, count);
         if(item.type === 'line'){
-          console.log(layerArray[count].getStyle());
-          layerArray[count].getStyle().getStroke().setColor(chroma(item.color).alpha(0.6).rgba());
-          layerArray[count].getStyle().getStroke().setLineDash([12,12,12,12]);
+          console.log(layerArray[count]);
+          let collection = sourceArray[count].getFeatures();
+          collection.forEach(function(feature){
+          feature.setStyle(new Style({
+              stroke: new Stroke({
+                color: chroma(item.color).alpha(0.6).rgba(),
+                lineDash:[12,12,12,12],
+                width: 8
+              })
+            }));
+          });
+
           sourceArray[count].refresh()
         }
         else{
-          layerArray[count].getStyle().setImage(
-            new Icon(({
-              anchor: [0.5, 60],
-              anchorXUnits: 'fraction',
-              anchorYUnits: 'pixels',
-              crossOrigin: 'anonymous',
-              src: PlaceSVG,
-              color: chroma(item.color).alpha(0.6).rgba(),
-              scale: 0.5
-            })),
-            new CircleStyle({
-              radius: 6,
-              fill: new Fill({
-                color: item.color
+
+          let collection = sourceArray[count].getFeatures();
+          collection.forEach(function(feature){
+          feature.setStyle(new Style({
+              image: new Icon({
+                anchor: [0.5, 60],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'pixels',
+                crossOrigin: 'anonymous',
+                src: PlaceSVG,
+                color: chroma(item.color).alpha(0.6).rgba(),
+                scale: 0.5
               })
-            })
-          );
-          layerArray[count].getStyle().getImage().setOpacity(0.5);
+            }));
+            feature.getStyle().getImage().setOpacity(0.5)
+          });
           sourceArray[count].refresh()
-          /*
-          layerArray[count+1].getStyle().getImage().setImage(
-            new CircleStyle({
-              radius: 6,
-              fill: new Fill({
-                color: item.color
-              })
-            })
-          );
-          */
         }
       });
-      map.removeInteraction(select);
+
     }
     else{
       this.setState({editing: false});
@@ -523,23 +521,36 @@ class App extends Component {
       });
       this.state.features.map(function(item, count){
         if(item.type === 'line'){
-          layerArray[count].getStyle().getStroke().setColor(chroma(item.color).alpha(1).rgba());
-          layerArray[count].getStyle().getStroke().setLineDash([1]);
+          let collection = sourceArray[count].getFeatures();
+          collection.forEach(function(feature){
+          feature.setStyle(new Style({
+              stroke: new Stroke({
+                color: chroma(item.color).alpha(1).rgba(),
+                lineDash:[1],
+                width: 8
+              })
+            }));
+          });
+
           sourceArray[count].refresh()
         }
         else{
-          layerArray[count].getStyle().setImage(
-            new Icon(({
-              anchor: [0.5, 60],
-              anchorXUnits: 'fraction',
-              anchorYUnits: 'pixels',
-              crossOrigin: 'anonymous',
-              src: PlaceSVG,
-              color: chroma(item.color).alpha(1).rgba(),
-              scale: 0.5
-            }))
-          );
-          layerArray[count].getStyle().getImage().setOpacity(1);
+          let collection = sourceArray[count].getFeatures();
+          collection.forEach(function(feature){
+          feature.setStyle(new Style({
+              image: new Icon({
+                anchor: [0.5, 60],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'pixels',
+                crossOrigin: 'anonymous',
+                src: PlaceSVG,
+                color: chroma(item.color).alpha(1).rgba(),
+                scale: 0.5
+              })
+            }));
+            feature.getStyle().getImage().setOpacity(1);
+          });
+
           sourceArray[count].refresh()
         }
       });
@@ -1060,15 +1071,8 @@ class App extends Component {
         }
       });
       collection.on('remove', function(e){
-        console.log(e.element.getProperties().layerColor);
-        if(e.element.getGeometry().getType() === 'LineString'){
-          e.element.setStyle(new Style({
-              stroke: new Stroke({
-                color: e.element.getProperties().layerColor,
-                width: 8
-              })
-            }));
-        }
+
+
       });
 
 
