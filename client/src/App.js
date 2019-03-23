@@ -1023,7 +1023,9 @@ class App extends Component {
           minZoom: 12
         }),
         controls: [
-          new Zoom()
+          new Zoom({
+            className: 'zoom-control'
+          })
         ]
       });
       map.on('pointermove', function(e) {
