@@ -1,10 +1,30 @@
 
+html{
+  height: 100%;
+}
+
+body{
+  height: 100%;
+}
+
+#root{
+  height: 100%;
+}
+
+.App{
+  position: relative;
+  height: auto;
+  height: 100%;
+  min-height:100%;
+}
+
 #map{
+  margin-top: 64px;
   position: absolute;
-  top: 64px;
+  top: 0px;
+  left: 251px;
+  right: 0px;
   bottom: 0px;
-  left: 250px;
-  right:0px;
   background-color: #f5f5f5;
   z-index: 0;
 
@@ -80,7 +100,7 @@ div.ol-zoom {
 }
 .full-width-left {
   width:100%;
-  text-align: left;
+  text-align: left !important;
   justify-content: normal !important;
 }
 
@@ -140,8 +160,8 @@ div.ol-zoom {
     display: none;
   }
   #map{
+    top:40px;
     left: 0px;
-    top: 104px;
   }
   #cards{
     position: relative;

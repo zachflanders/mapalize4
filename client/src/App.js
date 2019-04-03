@@ -854,6 +854,7 @@ class App extends Component {
                 </Button>
               </DialogActions>
             </Dialog>
+            <img src={PlaceSVG} style={{display:"none"}} />
         </div>
       </MuiThemeProvider>
     );
