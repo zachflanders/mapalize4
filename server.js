@@ -3,7 +3,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const path = require('path');
 const Sequelize = require('sequelize');
-//const db   = require('./config/db');
+const db   = require('./config/db');
 
 
 // Set up the express app
@@ -39,7 +39,6 @@ sequelize
   .authenticate()
   .then(() => {
     console.log('Connection has been established successfully.');
-
   })
   .catch(err => {
     console.error('Unable to connect to the database:', err);

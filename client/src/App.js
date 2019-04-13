@@ -437,6 +437,7 @@ class App extends Component {
   getResults(){
     axios.get('/api/results')
     .then(function(response){
+      console.log(response);
       resultsSourceArray.map(function(item){
         return item.clear();
       });
@@ -865,7 +866,7 @@ class App extends Component {
     basemapLayers.push(new TileLayer({
       source: new TileWMS({
         url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-        params: {'LAYERS': 'Mapalize:OSM-KC-ROADS', 'TILED': true},
+        params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
         serverType: 'geoserver',
         transition: 0
       })
