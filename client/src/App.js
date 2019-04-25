@@ -490,7 +490,7 @@ class App extends Component {
           collection.forEach(function(feature){
           feature.setStyle(new Style({
               stroke: new Stroke({
-                color: chroma(item.color).alpha(0.6).rgba(),
+                color: item.color,
                 lineDash:[12,12,12,12],
                 width: 8
               })
@@ -510,7 +510,7 @@ class App extends Component {
                 anchorYUnits: 'pixels',
                 crossOrigin: 'anonymous',
                 src: PlacePNG,
-                color: chroma(item.color).alpha(0.6).rgba(),
+                color: item.color,
                 scale: pngScale
               })
             }));
@@ -532,7 +532,7 @@ class App extends Component {
           collection.forEach(function(feature){
           feature.setStyle(new Style({
               stroke: new Stroke({
-                color: chroma(item.color).alpha(1).rgba(),
+                color: item.color,
                 lineDash:[1],
                 width: 8
               })
@@ -551,7 +551,7 @@ class App extends Component {
                 anchorYUnits: 'pixels',
                 crossOrigin: 'anonymous',
                 src: PlacePNG,
-                color: chroma(item.color).alpha(1).rgba(),
+                color: item.color,
                 scale: pngScale
               })
             }));
@@ -979,7 +979,7 @@ class App extends Component {
                       new CircleStyle({
                         radius: 16,
                         stroke: new Stroke({
-                          color:chroma(item.color).alpha(0.6).rgba(),
+                          color:item.color,
                           width: 6
                         }),
                         fill: new Fill({
@@ -1200,7 +1200,7 @@ class App extends Component {
                   new CircleStyle({
                     radius: 16,
                     stroke: new Stroke({
-                      color:chroma(color).alpha(0.6).rgba(),
+                      color:color,
                       width: 6
                     }),
                     fill: new Fill({
