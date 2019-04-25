@@ -4,6 +4,8 @@ import MainDisplay from './main.js';
 import Sidebar from './sidebar.js';
 import Bottombar from './bottombar.js';
 import PlaceSVG from './assets/place.svg';
+import PlacePNG from './assets/place.png';
+
 
 //openlayers imports
 import 'ol/ol.css';
@@ -74,7 +76,11 @@ import turf from 'turf';
 import axios from 'axios';
 import chroma from 'chroma-js';
 import tippy from 'tippy.js';
-import * as moment from 'moment'
+import * as moment from 'moment';
+
+const pngScale =0.18;
+const pngAnchor = [0.5, 200];
+
 
 const convertToClick = (e) => {
   const evt = new MouseEvent('click', { bubbles: true })
@@ -499,13 +505,13 @@ class App extends Component {
           collection.forEach(function(feature){
           feature.setStyle(new Style({
               image: new Icon({
-                anchor: [0.5, 60],
+                anchor: pngAnchor,
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'pixels',
                 crossOrigin: 'anonymous',
-                src: PlaceSVG,
+                src: PlacePNG,
                 color: chroma(item.color).alpha(0.6).rgba(),
-                scale: 0.5
+                scale: pngScale
               })
             }));
             feature.getStyle().getImage().setOpacity(0.5)
@@ -540,13 +546,13 @@ class App extends Component {
           collection.forEach(function(feature){
           feature.setStyle(new Style({
               image: new Icon({
-                anchor: [0.5, 60],
+                anchor: pngAnchor,
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'pixels',
                 crossOrigin: 'anonymous',
-                src: PlaceSVG,
+                src: PlacePNG,
                 color: chroma(item.color).alpha(1).rgba(),
-                scale: 0.5
+                scale: pngScale
               })
             }));
             feature.getStyle().getImage().setOpacity(1);
@@ -855,7 +861,7 @@ class App extends Component {
                 </Button>
               </DialogActions>
             </Dialog>
-            <img src={PlaceSVG} style={{display:"none"}} />
+            <img src={PlacePNG} style={{display:"none"}} />
         </div>
       </MuiThemeProvider>
     );
@@ -915,13 +921,13 @@ class App extends Component {
           source: sourceArray[count],
           style: new Style({
             image: new Icon(({
-              anchor: [0.5, 60],
+              anchor: pngAnchor,
               anchorXUnits: 'fraction',
               anchorYUnits: 'pixels',
               crossOrigin: 'anonymous',
-              src: PlaceSVG,
+              src: PlacePNG,
               color: item.color,
-              scale: 0.5
+              scale: pngScale
             }))
           })
         }));
@@ -932,13 +938,13 @@ class App extends Component {
             type: 'Point',
             style: new Style({
               image: new Icon(({
-                anchor: [0.5, 60],
+                anchor: pngAnchor,
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'pixels',
                 crossOrigin: 'anonymous',
-                src: PlaceSVG,
+                src: PlacePNG,
                 color: item.color,
-                scale: 0.5
+                scale: pngScale
               }))
             })
           })
@@ -956,13 +962,13 @@ class App extends Component {
               if(size < 2){
                 style = [new Style({
                   image: new Icon(({
-                    anchor: [0.5, 60],
+                    anchor: pngAnchor,
                     anchorXUnits: 'fraction',
                     anchorYUnits: 'pixels',
                     crossOrigin: 'anonymous',
-                    src: PlaceSVG,
+                    src: PlacePNG,
                     color: item.color,
-                    scale: 0.5
+                    scale: pngScale
                   }))
                 })]
               }
@@ -1063,13 +1069,13 @@ class App extends Component {
         else if(e.element.getGeometry().getType() === 'Point'){
           e.element.setStyle(new Style({
             image: new Icon(({
-              anchor: [0.5, 60],
+              anchor: pngAnchor,
               anchorXUnits: 'fraction',
               anchorYUnits: 'pixels',
               crossOrigin: 'anonymous',
-              src: PlaceSVG,
+              src: PlacePNG,
               color: e.element.getProperties().layerColor,
-              scale: 0.5
+              scale: pngScale
             }))
           }));
         }
@@ -1177,13 +1183,13 @@ class App extends Component {
           if(size < 2){
             style = [new Style({
               image: new Icon(({
-                anchor: [0.5, 60],
+                anchor: pngAnchor,
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'pixels',
                 crossOrigin: 'anonymous',
-                src: PlaceSVG,
+                src: PlacePNG,
                 color: color,
-                scale: 0.5
+                scale: pngScale
               }))
             })]
           }
