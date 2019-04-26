@@ -809,7 +809,7 @@ class App extends Component {
             layers = {this.state.features}
             cardSortState = {this.state.cardSortState}
             />
-          <div id='map' className={this.state.viewMap ? '' : 'hidden'}></div>
+          <div id='map' style={this.state.viewMap ? {display:'block'} : {display:'none'}}></div>
           <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
             <form onSubmit={this.saveComment}>
               <TextField
