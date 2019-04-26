@@ -47,13 +47,16 @@ import {defaults as defaultInteractions} from 'ol/interaction.js';
 import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
 
 import PlaceSVG from './assets/place.svg';
+import PlacePNG from './assets/place.png';
+
 import * as moment from 'moment';
 import Masonry from 'react-masonry-component';
 
 
 
 let cardmap = [];
-
+const pngScale =0.18;
+const pngAnchor = [0.5, 200];
 
 
 class MapCard extends React.Component {
@@ -95,13 +98,13 @@ class MapCard extends React.Component {
      source: source,
      style: new Style({
        image: new Icon(({
-         anchor: [0.5, 60],
+         anchor: pngAnchor,
          anchorXUnits: 'fraction',
          anchorYUnits: 'pixels',
          crossOrigin: 'anonymous',
-         src: PlaceSVG,
+         src: PlacePNG,
          color: color,
-         scale: 0.5
+         scale: pngScale
        })),
        stroke: new Stroke({
          color: color,
@@ -192,7 +195,13 @@ class Paginate extends React.Component {
       }.bind(this));
 
     }
-    let features = this.props.data;
+    let features;
+    if (this.props.data){
+      features = this.props.data;
+    }
+    else{
+      features = {};
+    }
     let sortedFeatures = features.sort(function(a,b){
       if(this.props.cardSortState === 'newest'){
         return(new Date(b.date)-new Date(a.date))

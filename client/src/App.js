@@ -979,7 +979,7 @@ class App extends Component {
                       new CircleStyle({
                         radius: 16,
                         stroke: new Stroke({
-                          color:item.color,
+                          color:chroma(item.color).alpha(0.5).rgba(),
                           width: 6
                         }),
                         fill: new Fill({
@@ -1093,7 +1093,16 @@ class App extends Component {
           this.setState({targetFeatureId: e.selected[0].getId()});
           console.log(e.selected[0].getProperties())
           console.log(e.selected[0].getProperties().geometry);
-          this.setState({comment: selectedFeature2.getProperties().comment});
+          if(!selectedFeature2.getProperties().comment){
+            console.log('no comment');
+            this.setState({comment: ''});
+
+          }
+          else{
+            console.log('comment');
+            this.setState({comment: selectedFeature2.getProperties().comment});
+
+          }
           var coordinate;
           if(e.selected[0].getGeometry().getType() === 'LineString'){
             console.log('linestring')
@@ -1154,7 +1163,7 @@ class App extends Component {
       }.bind(this));
       selectDelete.on('select', function(e) {
         var selectedFeature = e.selected[0];
-        console.log(selectDelete.getFeatures());
+        selectDelete.getFeatures().clear();
         if(selectedFeature){
           sourceArray.map(function(layer, count){
             if(layer.hasFeature(selectedFeature)){
