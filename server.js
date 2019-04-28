@@ -12,17 +12,6 @@ dotenv.config()
 
 //bring in routes
 const featureRoutes = require("./routes/feature");
-app.get('/', (req, res)=>{
-  fs.readFile('docs/apiDocs.json', (err, data)=>{
-    if(err){
-      return res.status(400).json({
-        error: err
-      })
-    }
-    const docs = JSON.parse(data);
-    return res.json(docs);
-  })
-})
 
 //Middleware
 // Log requests to the console
