@@ -1,0 +1,5 @@
+{
+  "/features/": "get all features",
+  "/features/add":"add features"
+
+}

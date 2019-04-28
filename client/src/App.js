@@ -388,7 +388,7 @@ class App extends Component {
     layerArray.map(function(layer, count){
         map.removeLayer(layer);
     });
-    axios.post('/api/addLines', {
+    axios.post('/api/features/add', {
       features: drawnFeaturesArray
     })
     .then(function(response){
@@ -441,14 +441,14 @@ class App extends Component {
   }
 
   getResults(){
-    axios.get('/api/results')
+    axios.get('/api/features')
     .then(function(response){
       console.log(response);
       resultsSourceArray.map(function(item){
         return item.clear();
       });
-      this.setState({featureData: response.data.data[0]});
-      var features = response.data.data[0];
+      this.setState({featureData: response.data.features});
+      var features = response.data.features;
       features.map(function(feature, count){
         if(feature.line){
           return turnLineIntoArrayOfPoints(feature.line);
