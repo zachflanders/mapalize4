@@ -29,6 +29,24 @@ body{
   z-index: 0;
 
 }
+#basemapsFab{
+  position: absolute;
+  top: 150px;
+  left: auto;
+  right: 13px;
+  bottom: auto;
+  background-color: #ffffff;
+  z-index: 1300;
+  width: 36px;
+  height: 30px !important;
+  box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 3px 1px -2px rgba(0,0,0,0.12);
+
+}
+
+.compactList{
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
 
 .zoom-control{
     top: 16px;
@@ -143,6 +161,20 @@ div.ol-zoom {
 }
 
 @media screen and (max-width: 600px) {
+
+  #basemapsFab{
+    position: absolute;
+    top: 190px;
+    left: auto;
+    right: 13px;
+    bottom: auto;
+    background-color: #ffffff;
+    z-index: 1300;
+    width: 36px;
+    height: 30px !important;
+    box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 3px 1px -2px rgba(0,0,0,0.12);
+
+  }
 
   #menuButton {
      display: inline-flex;

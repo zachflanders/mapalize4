@@ -26,6 +26,7 @@ import {fromLonLat} from 'ol/proj';
 import {transform} from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
+import TileImage from 'ol/source/TileImage';
 import View from 'ol/View';
 import Zoom from 'ol/control/Zoom';
 import Heatmap from 'ol/layer/Heatmap';
@@ -35,6 +36,7 @@ import Select from 'ol/interaction/Select.js';
 import {click, pointerMove} from 'ol/events/condition.js';
 import Cluster from 'ol/source/Cluster';
 import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
+import XYZ from 'ol/source/XYZ';
 
 //Material-ui imports
 import AppBar from '@material-ui/core/AppBar';
@@ -71,6 +73,12 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grow from '@material-ui/core/Grow';
+import LayersIcon from '@material-ui/icons/Layers';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import ListSubheader from '@material-ui/core/ListSubheader';
+
+
 
 import turf from 'turf';
 import axios from 'axios';
@@ -226,7 +234,8 @@ class App extends Component {
       lineDrawMessage: "Click to draw line",
       resultClusterNumber: 0,
       uploadDialog: false,
-      cardSortState: 'newest'
+      cardSortState: 'newest',
+      basemapMenuAnchorEl: null,
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -248,6 +257,7 @@ class App extends Component {
     this.closeSnackbar = this.closeSnackbar.bind(this);
     this.openUploadDialog = this.openUploadDialog.bind(this);
     this.sortCards = this.sortCards.bind(this);
+    this.setBasemap = this.setBasemap.bind(this);
   }
 
   openUploadDialog(open){
@@ -662,6 +672,14 @@ class App extends Component {
 
   }
 
+  openBasemapMenu = event => {
+    this.setState({ basemapMenuAnchorEl: event.currentTarget });
+  };
+
+  closeBasemapMenu = () => {
+    this.setState({ basemapMenuAnchorEl: null });
+  };
+
   renderResultsPopover(){
     var features = this.state.selectedResultsFeatures;
     let total;
@@ -684,7 +702,33 @@ class App extends Component {
     this.setState({uploadMessageDisplay: false});
   }
 
+  setBasemap(type){
+    console.log('change basemap');
+    if(type==='aerial'){
+      console.log(map.getLayers());
+      let basemap=new TileLayer({ source: new XYZ({ url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}' }) });
+      map.getLayers().setAt(0, basemap)
+    }
+    else if(type==='lightmap'){
+      console.log(map.getLayers());
+      let basemap=new TileLayer({
+        source: new TileWMS({
+          url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
+          params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
+          serverType: 'geoserver',
+          transition: 0
+        })
+      });
+      map.getLayers().setAt(0, basemap)
+
+
+    }
+    this.closeBasemapMenu();
+  }
+
   render() {
+    const { basemapMenuAnchorEl } = this.state;
+
     return (
       <MuiThemeProvider theme={theme}>
         <div className="App">
@@ -795,6 +839,23 @@ class App extends Component {
         </div>
         </div>
       </Drawer>
+        <Fab id='basemapsFab'
+          size='small'
+          style={this.state.viewMap ? {display:'flex'} : {display:'none'}}
+          onClick={this.openBasemapMenu}
+        >
+          <LayersIcon />
+        </Fab>
+        <Menu
+          id="simple-menu"
+          anchorEl={basemapMenuAnchorEl}
+          open={Boolean(basemapMenuAnchorEl)}
+          onClose={this.closeBasemapMenu}
+        >
+          <div style={{paddingTop:'0px',paddingBottom:'0px', paddingLeft:'16px',outline:'none'}}><Typography variant='overline' color='textSecondary'>Basemaps</Typography></div>
+          <MenuItem className='compactList' onClick={()=>this.setBasemap('lightmap')}>Light Basemap</MenuItem>
+          <MenuItem className='compactList' onClick={()=>this.setBasemap('aerial')}>Aerial Photo</MenuItem>
+        </Menu>
           <Grow in={true}>{(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : <div /> }</Grow>
           <Grow in={true}>{(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && drawnFeatures > 0) ? <Fab onClick={()=>this.openUploadDialog(true)} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : <div /> }</Grow>
           <Grow in={true}>{(this.state.view === 1 && this.state.mode === 'map'  ) ? <Fab onClick={()=>this.changeMode('cards')} color="primary" id='cardswitcher'><CardsIcon /></Fab> : <div /> }</Grow>
