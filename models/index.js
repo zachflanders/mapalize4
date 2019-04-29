@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
 const dotenv = require("dotenv");
 const FeatureModel = require('./feature');
+const UserModel = require('./user');
+
 
 dotenv.config()
 //Connect to Database
@@ -20,6 +22,8 @@ const sequelize = new Sequelize(process.env.DATABASE , process.env.USERNAME, pro
 });
 
 const Feature = FeatureModel(sequelize, Sequelize);
+const User = UserModel(sequelize, Sequelize);
+
 
 sequelize
   .authenticate()
@@ -30,5 +34,10 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
+  sequelize.sync()
+  .then(() => {
+    console.log(`Database & tables created!`)
+  })
 
-  module.exports = {Feature};
+
+  module.exports = {Feature, User};

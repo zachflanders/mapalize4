@@ -1,5 +1,6 @@
 {
-  "/features/": "get all features",
-  "/features/add":"add features"
+  "/api/features": "get all features",
+  "/api/features/add":"add features",
+  "/api/signup":"signup"
 
 }
