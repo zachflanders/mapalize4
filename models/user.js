@@ -30,6 +30,10 @@ module.exports = (sequelize, type) => {
     salt:{
       type: type.STRING,
     },
+    role:{
+      type: type.STRING,
+      defaultValue: 'User'
+    },
     created:{
       type: type.DATE,
       defaultValue: type.NOW

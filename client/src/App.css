@@ -7,6 +7,20 @@ body{
   height: 100%;
 }
 
+.centered{
+  margin-left: auto;
+  margin-right: auto;
+}
+.padded{
+  padding: 16px;
+}
+
+.container{
+  margin-left: 24px;
+  margin-right: 24px;
+}
+
+
 #root{
   height: 100%;
 }

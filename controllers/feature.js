@@ -1,6 +1,16 @@
 const {Feature}  = require('../models');
 const proj4 = require('proj4');
 
+exports.getFeatureById = (req, res) =>{
+  console.log('getting feature: ', req.params.featureId);
+  let id=req.params.featureId;
+  Feature.find({where:{id:id}})
+  .then(feature =>{
+    res.json({feature});
+  })
+  .catch(err => console.log(err));
+}
+
 exports.getFeatures = (req, res) =>{
   const features = Feature.findAll()
     .then(features => {
@@ -34,7 +44,6 @@ exports.createFeatures = (req, res) =>{
           let newCoords= proj4('EPSG:3857','EPSG:4326',feature.geometry.coordinates);
           feature.geometry.coordinates = newCoords;
           feature.geometry.crs = { type: 'name', properties: { name: 'EPSG:4326'}};
-          console.log(feature);
           featureArray.push({
             name:feature.properties.layerName,
             comment: feature.properties.comment,

@@ -5,7 +5,8 @@ const {User}  = require('../models');
 const _ = require('lodash')
 
 exports.signup = async (req, res) => {
-  const userExists = await User.findOne({email:req.body.email});
+  const userExists = await User.findOne({where:{email:req.body.email}});
+  console.log(userExists);
   if(userExists) return res.status(403).json({
     error: "Email is taken!"
   });
@@ -34,14 +35,14 @@ exports.signin = (req, res) => {
       });
     }
     //generate a token with user id and secret
-    const token = jwt.sign({_id: user._id}, process.env.JWT_SECRET);
+    const token = jwt.sign({id: user.id}, process.env.JWT_SECRET);
 
     //persist the token as 't' in cookie with expiry date
     res.cookie("t", token, {expire: new Date() + 9999});
 
     // return response with user and token to frontend client
-    const {_id, name, email} = user;
-    return res.json({token, user:{_id, email, name}});
+    const {id, name, email, role} = user;
+    return res.json({token, user:{id, email, name, role}});
   });
 }
 exports.signout = (req, res) => {

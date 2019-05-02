@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
 import './App.css';
+import {logout, isMod} from './auth'
+
 import PropTypes from 'prop-types';
+import _ from 'lodash';
+import {Link} from 'react-router-dom'
+
 
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import Avatar from '@material-ui/core/Avatar';
 
 import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardContent';
+
 import LineIcon from '@material-ui/icons/Timeline';
 import Typography from '@material-ui/core/Typography';
 import PlaceIcon from '@material-ui/icons/Place';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import Button from '@material-ui/core/Button';
+import EditIcon from '@material-ui/icons/Edit';
+
 
 
 import 'ol/ol.css';
@@ -86,8 +95,15 @@ class MapCard extends React.Component {
          <CardContent>
            <Typography component="p">
              {this.props.data.comment}
-           </Typography>
-         </CardContent>
+            </Typography>
+        </CardContent>{isMod() && (
+          <Link to={'/moderate/'+this.props.data.id} style={{textDecoration:'none'}}>
+            <CardActions style={{padding:'8px 8px'}}>
+              <Button size="small"><EditIcon /> &nbsp;&nbsp;Moderate</Button>
+            </CardActions>
+          </Link>
+        )}
+
      </Card>
    );
  }
@@ -202,27 +218,34 @@ class Paginate extends React.Component {
     else{
       features = {};
     }
-    let sortedFeatures = features.sort(function(a,b){
-      if(this.props.cardSortState === 'newest'){
-        return(new Date(b.date)-new Date(a.date))
-      }
-      else if(this.props.cardSortState === 'oldest'){
-        return(new Date(a.date)-new Date(b.date))
-      }
-      else{
-        return(new Date(b.date)-new Date(a.date))
-      }
-    }.bind(this));
+    let sortedFeatures
+    if(!_.isEmpty(features)){
+      sortedFeatures = features.sort(function(a,b){
+        if(this.props.cardSortState === 'newest'){
+          return(new Date(b.date)-new Date(a.date))
+        }
+        else if(this.props.cardSortState === 'oldest'){
+          return(new Date(a.date)-new Date(b.date))
+        }
+        else{
+          return(new Date(b.date)-new Date(a.date))
+        }
+      }.bind(this));
+    }
     let numberOfItems = features.length;
     let itemsPerPage = 30;
     let totalPages = Math.ceil(numberOfItems/itemsPerPage);
-    let cards = sortedFeatures.map(function(item, count){
-      if(item.viewResults === true && count < (itemsPerPage*this.state.currentPage) && (this.state.currentPage===1 || count >= (itemsPerPage*this.state.currentPage-itemsPerPage*(this.state.currentPage-1)))){
-        return(
-          <div key={item.id} className='resultCard' style={{flex:'1 auto', margin:'0px'}}>{this.renderMapCard(item)}</div>
-        )
-      }
-    }.bind(this))
+    let cards;
+    if(!_.isEmpty(sortedFeatures)){
+      cards = sortedFeatures.map(function(item, count){
+        if(item.viewResults === true && count < (itemsPerPage*this.state.currentPage) && (this.state.currentPage===1 || count >= (itemsPerPage*this.state.currentPage-itemsPerPage*(this.state.currentPage-1)))){
+          return(
+            <div key={item.id} className='resultCard' style={{flex:'1 auto', margin:'0px'}}>{this.renderMapCard(item)}</div>
+          )
+        }
+      }.bind(this))
+    }
+
 
 
     return(

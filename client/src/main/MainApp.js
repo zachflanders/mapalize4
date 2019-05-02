@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import './App.css';
-import MainDisplay from './main.js';
-import Sidebar from './sidebar.js';
-import Bottombar from './bottombar.js';
-import PlaceSVG from './assets/place.svg';
-import PlacePNG from './assets/place.png';
+import '../App.css';
+import MainDisplay from '../main.js';
+import Sidebar from '../sidebar.js';
+import Bottombar from '../bottombar.js';
+import PlaceSVG from '../assets/place.svg';
+import PlacePNG from '../assets/place.png';
+import {logout, isAuthenticated} from '../auth'
+
 
 
 //openlayers imports
@@ -96,15 +98,6 @@ const convertToClick = (e) => {
   e.target.dispatchEvent(evt)
 }
 
-const theme = createMuiTheme({
-  palette: {
-    primary: indigo,
-    secondary: teal
-  },
-  typography: {
-    useNextVariants: true,
-  }
-});
 const drawerWidth = '220px';
 
 //Defining Globals
@@ -187,7 +180,7 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine){
   }
 };
 
-class App extends Component {
+class MainApp extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -728,12 +721,14 @@ class App extends Component {
 
   render() {
     const { basemapMenuAnchorEl } = this.state;
+    const { classes, history } = this.props;
+
 
     return (
-      <MuiThemeProvider theme={theme}>
         <div className="App">
           <AppBar position="fixed" style={{zIndex: 1202, flexWrap:'wrap', width:'100%' }}>
             <Toolbar style={{flexWrap:'wrap'}} id='toolbar'>
+
               <IconButton
                 onClick = {this.toggleDrawer(true)}
                 id='menuButton'
@@ -775,6 +770,20 @@ class App extends Component {
                 toggleEdit =  {this.toggleEdit}
                 toggleDelete =  {this.toggleDelete}
               />
+              {isAuthenticated() && (
+                <>
+                <br/>
+                <div style={{display:'flex', flexDirection: 'row'}}>
+                <Typography variant='caption' color='textSecondary' style={{padding:'8px', flexGrow:1}}>
+                  Logged in as:
+                  <br /> {isAuthenticated().user.name}
+                </Typography>
+                  <div style={{paddingTop:'10px'}}>
+                    <Button size='small' onClick={()=>logout(()=>{history.push('/')})}>Logout</Button>
+                  </div>
+                </div>
+                </>
+              )}
             </div>
           </Drawer>
           <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
@@ -856,10 +865,10 @@ class App extends Component {
           <MenuItem className='compactList' onClick={()=>this.setBasemap('lightmap')}>Light Basemap</MenuItem>
           <MenuItem className='compactList' onClick={()=>this.setBasemap('aerial')}>Aerial Photo</MenuItem>
         </Menu>
-          <Grow in={true}>{(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : <div /> }</Grow>
-          <Grow in={true}>{(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && drawnFeatures > 0) ? <Fab onClick={()=>this.openUploadDialog(true)} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : <div /> }</Grow>
-          <Grow in={true}>{(this.state.view === 1 && this.state.mode === 'map'  ) ? <Fab onClick={()=>this.changeMode('cards')} color="primary" id='cardswitcher'><CardsIcon /></Fab> : <div /> }</Grow>
-          <Grow in={true}>{(this.state.view === 1 && this.state.mode === 'cards'  ) ? <Fab onClick={()=>this.changeMode('map')} color="primary" id='mapswitcher'><MapIcon /></Fab> : <div /> }</Grow>
+          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : <div /> }
+          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && drawnFeatures > 0) ? <Fab onClick={()=>this.openUploadDialog(true)} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : <div /> }
+          {(this.state.view === 1 && this.state.mode === 'map'  ) ? <Fab onClick={()=>this.changeMode('cards')} color="primary" id='cardswitcher'><CardsIcon /></Fab> : <div /> }
+          {(this.state.view === 1 && this.state.mode === 'cards'  ) ? <Fab onClick={()=>this.changeMode('map')} color="primary" id='mapswitcher'><MapIcon /></Fab> : <div /> }
 
 
 
@@ -924,7 +933,6 @@ class App extends Component {
             </Dialog>
             <img src={PlacePNG} style={{display:"none"}} />
         </div>
-      </MuiThemeProvider>
     );
   }
   componentDidMount(){
@@ -1321,4 +1329,4 @@ class App extends Component {
       map.updateSize();
     }
 }
-export default App;
+export default MainApp;
