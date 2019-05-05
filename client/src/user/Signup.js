@@ -101,7 +101,7 @@ class Signup extends Component {
         value={password}
         />
         <ReCAPTCHA
-            sitekey="6LdZOxsUAAAAAOyifxHMM8Tk_62p0_tw97oAnZuJ"
+            sitekey="6LcU2KEUAAAAALFj6WH7NEUha5mKflKr4SAeElrJ"
             onChange={this.handleCaptchaResponseChange}
         />
         <br />
