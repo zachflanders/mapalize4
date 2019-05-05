@@ -1,5 +1,14 @@
 const {Feature}  = require('../models');
 const proj4 = require('proj4');
+const _ = require('lodash');
+
+
+exports.featureById = (req, res, next, id) =>{
+  Feature.find({where:{id:id}})
+  .then( feature =>{
+    req.feature = feature;
+    next()
+  })}
 
 exports.getFeatureById = (req, res) =>{
   console.log('getting feature: ', req.params.featureId);
@@ -57,4 +66,44 @@ exports.createFeatures = (req, res) =>{
       message: results
     })});
 
+};
+
+exports.updateFeature = (req, res, next) =>{
+  let feature = req.body.feature;
+  let id=req.params.featureId;
+  let putFeature = {};
+  console.log('feature: ',feature);
+  let newCoords = [];
+  if(feature.geometry.type === 'LineString'){
+    feature.geometry.coordinates.forEach(function(coord){
+      newCoords.push(proj4('EPSG:3857','EPSG:4326',coord))
+    });
+    feature.geometry.coordinates = newCoords;
+    feature.geometry.crs = { type: 'name', properties: { name: 'EPSG:4326'}};
+    feature.name = feature.properties.layerName;
+    feature.comment = feature.properties.comment;
+    feature.line = feature.geometry;
+    console.log(feature);
+    Feature.update({
+      name: feature.name,
+      comment: feature.comment,
+      line: feature.line
+
+    },
+    {where: {id:id}})
+  }
+  else{
+    let newCoords= proj4('EPSG:3857','EPSG:4326',feature.geometry.coordinates);
+    feature.geometry.coordinates = newCoords;
+    feature.geometry.crs = { type: 'name', properties: { name: 'EPSG:4326'}};
+    feature.name = feature.properties.layerName;
+    feature.comment= feature.properties.comment;
+    feature.point= feature.geometry;
+    Feature.update({
+      name: feature.name,
+      comment: feature.comment,
+      point: feature.point
+    },
+    {where: {id:id}})
+  }
 };

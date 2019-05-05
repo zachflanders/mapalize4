@@ -8,6 +8,8 @@ import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import {Link, Redirect} from 'react-router-dom'
 import {signin, authenticate} from '../auth'
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 
 const styles = theme => ({
@@ -26,7 +28,8 @@ class Signin extends Component {
       password:'',
       error: '',
       redirectToReferer: false,
-      loading: false
+      loading: false,
+      recaptcha: false
     }
   }
 
@@ -80,6 +83,11 @@ class Signin extends Component {
         onChange={this.handleChange("password")}
         value={password}
         />
+        <ReCAPTCHA
+            sitekey="6LdZOxsUAAAAAOyifxHMM8Tk_62p0_tw97oAnZuJ"
+            onChange={()=>{this.setState({recaptcha:true})}}
+        />
+        <br />
     <Button
       onClick={this.clickSubmit}
       variant='contained'
@@ -111,6 +119,12 @@ class Signin extends Component {
         />
       </div>
     );
+  }
+  onloadCallback() {
+    console.log("grecaptcha is ready!");
+  };
+  componentDidMount(){
+    this.onloadCallback()
   }
 }
 Signin.propTypes = {

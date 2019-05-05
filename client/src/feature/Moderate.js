@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import {isAuthenticated, isMod} from '../auth'
 import  './Moderate.css';
+import PlacePNG from '../assets/place.png';
+
 
 
 import 'ol/ol.css';
@@ -45,9 +47,44 @@ import red from '@material-ui/core/colors/red';
 
 
 
-
+const pngScale =0.18;
+const pngAnchor = [0.5, 200];
 
 let map = {};
+let source = new VectorSource();
+let layer = new VectorLayer({
+  source: source,
+  style: new Style({
+    stroke: new Stroke({
+      width: 8
+    }),
+    image: new Icon({
+      anchor: pngAnchor,
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'pixels',
+      crossOrigin: 'anonymous',
+      color: '#000000',
+      src: PlacePNG,
+      scale: pngScale
+    })
+  })
+});
+let view = new View({});
+let modify = new Modify({
+  source: source,
+  style: new Style({
+    image: new CircleStyle({
+      radius: 6,
+      fill: new Fill({
+        color: '#fff'
+      }),
+      stroke: new Stroke({
+        width: 1,
+        color: '#000'
+      })
+    })
+  })
+});
 
 
 class Moderate extends Component {
@@ -58,47 +95,38 @@ class Moderate extends Component {
       featureComment: '',
     }
     this.handleChange = this.handleChange.bind(this);
+    this.saveFeature = this.saveFeature.bind(this);
+
+
   }
 
   componentDidMount(){
-    let source = new VectorSource();
-    let layer = new VectorLayer({
-      source: source,
-      style: new Style({
-        stroke: new Stroke({
-          width: 8
-        })
-      })
-    });
-    let view = new View({});
-    let modify = new Modify({
-      source: source,
-      style: new Style({
-        image: new CircleStyle({
-          radius: 6,
-          fill: new Fill({
-            color: '#fff'
-          }),
-          stroke: new Stroke({
-            width: 1,
-            color: '#000'
-          })
-        })
-      })
-    });
+
     isMod();
     const featureId = this.props.match.params.featureId;
+
     axios.get(`/api/feature/${featureId}`)
     .then(res=>{
       console.log(res);
       this.setState({feature: res.data.feature});
       this.setState({featureComment: res.data.feature.comment})
-      let coords = [];
-      coords = res.data.feature.line.coordinates.map(function(coord){
-        return(fromLonLat(coord));
-      });
-      source.addFeature(new Feature(new LineString(coords)));
-      view.fit(layer.getSource().getExtent());
+      if(res.data.feature.line){
+        let coords = [];
+        coords = res.data.feature.line.coordinates.map(function(coord){
+          return(fromLonLat(coord));
+        });
+        source.addFeature(new Feature(new LineString(coords)));
+        view.fit(layer.getSource().getExtent());
+      }
+      else{
+        let coords = [];
+        coords = fromLonLat(res.data.feature.point.coordinates);
+        source.addFeature(new Feature(new Point(coords)));
+        view.setCenter(coords);
+        view.setZoom(20);
+      }
+
+
     });
     let basemapLayers =new TileLayer({
       source: new TileWMS({
@@ -123,17 +151,40 @@ class Moderate extends Component {
   }
 
   handleChange(event){
-
     this.setState({ featureComment: event.target.value});
   };
+
+  saveFeature = event =>{
+    event.preventDefault();
+    map.removeInteraction(modify);
+    source.refresh();
+    const token = isAuthenticated().token
+    const featureId = this.props.match.params.featureId;
+    let writer = new GeoJSON();
+    let editFeature = JSON.parse(writer.writeFeatures(layer.getSource().getFeatures()));
+    let feature = editFeature.features[0];
+    feature.properties = {};
+    feature.properties.comment = this.state.featureComment;
+    feature.properties.layerName = this.state.feature.name;
+    console.log(feature);
+    axios.put(`/api/feature/${featureId}`,
+      {feature: feature},
+      {headers:{
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`
+      }}
+    )
+  }
 
   render() {
 
     return(
       <div>
+      <h1 style={{marginLeft:'20px'}}>Moderate</h1>
+
         <Card id='edit-feature-card'>
           <CardContent>
-          <h1>Moderate</h1>
+
           <h2>{this.state.feature.name}</h2>
           <Typography variant='caption' color='textSecondary' >Edit Feature</Typography>
           <div id='mod-map'></div>
@@ -148,7 +199,7 @@ class Moderate extends Component {
               margin="normal"
               style={{width:'100%'}}
             />
-            <Button variant='contained'>Save</Button>
+            <Button variant='contained' onClick={this.saveFeature}>Save</Button>
             <br/>
             <br/><Button variant='contained' style={{backgroundColor:red[500], color:'#ffffff'}}>Delete</Button>
             </form>

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const expressJwt = require('express-jwt');
-const {User}  = require('../models');
+const {User, Feature}  = require('../models');
 const _ = require('lodash')
 
 exports.signup = async (req, res) => {
@@ -51,7 +51,27 @@ exports.signout = (req, res) => {
 }
 
 exports.requireSignin = expressJwt({
-  //if the toke is valid, express jwt appends the verified users id in an auth key ot the request object
+  //if the token is valid, express jwt appends the verified users id in an auth key to the request object
   secret: process.env.JWT_SECRET,
   userProperty: "auth"
-})
+});
+
+exports.isMod = (req, res, next) =>{
+  User.find({where:{id:req.auth.id}}).then((user, err)=>{
+    if(err || !user){
+      return res.status(400).json({
+        error: "User not found."
+      })
+    }
+    req.profile = user.dataValues // adds profile object in req with user info
+    if(user.dataValues.role != 'admin' && user.dataValues.role != 'mod'){
+      return res.json({
+        message: "nope."
+      });
+    }
+    if(user.dataValues.role === 'admin' || user.dataValues.role === 'mod'){
+      next();
+    }
+
+  })
+};

@@ -8,6 +8,8 @@ import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import {Link} from 'react-router-dom'
 import {signup} from '../auth';
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 
 const styles = theme => ({
@@ -54,7 +56,8 @@ class Signup extends Component {
           name: '',
           email: '',
           password: '',
-          open: true
+          open: true,
+          recaptcha: false
         })
       }
     });
@@ -87,6 +90,11 @@ class Signup extends Component {
         onChange={this.handleChange("password")}
         value={password}
         />
+        <ReCAPTCHA
+            sitekey="6LdZOxsUAAAAAOyifxHMM8Tk_62p0_tw97oAnZuJ"
+            onChange={()=>{this.setState({recaptcha:true})}}
+        />
+        <br />
     <Button
       onClick={this.clickSubmit}
       variant='contained'
