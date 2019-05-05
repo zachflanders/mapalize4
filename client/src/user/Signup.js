@@ -28,8 +28,11 @@ class Signup extends Component {
       email: '',
       password:'',
       error: '',
-      open: false
+      open: false,
+      recaptcha: false
     }
+    this.handleCaptchaResponseChange = this.handleCaptchaResponseChange.bind(this);
+
   }
 
   handleChange = (name) => (event) => {
@@ -43,7 +46,8 @@ class Signup extends Component {
     const user = {
       name,
       email,
-      password
+      password,
+      recaptcha
     };
     signup(user)
     .then(data =>{
@@ -63,6 +67,12 @@ class Signup extends Component {
     });
 
   };
+
+  handleCaptchaResponseChange(response) {
+   this.setState({
+     recaptcha: response,
+   });
+ }
 
 
   signupForm = (name, email, password, classes) => (
@@ -92,7 +102,7 @@ class Signup extends Component {
         />
         <ReCAPTCHA
             sitekey="6LdZOxsUAAAAAOyifxHMM8Tk_62p0_tw97oAnZuJ"
-            onChange={()=>{this.setState({recaptcha:true})}}
+            onChange={this.handleCaptchaResponseChange}
         />
         <br />
     <Button
