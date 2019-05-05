@@ -42,7 +42,7 @@ class Signup extends Component {
 
   clickSubmit = event => {
     event.preventDefault();
-    const {name, email, password} = this.state;
+    const {name, email, password, recaptcha} = this.state;
     const user = {
       name,
       email,

@@ -41,11 +41,12 @@ class Signin extends Component {
   clickSubmit = event => {
     event.preventDefault();
     this.setState({loading: true});
-    const {name, email, password} = this.state;
+    const {name, email, password, recaptcha} = this.state;
     const user = {
       name,
       email,
-      password
+      password,
+      recaptcha
     };
     signin(user)
     .then(data =>{
