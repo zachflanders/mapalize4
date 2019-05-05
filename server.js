@@ -1,4 +1,5 @@
 const express = require('express');
+var cors = require('cors');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -12,11 +13,12 @@ var models = require('./models');
 // Set up the express app
 const app = express();
 dotenv.config()
+app.use(cors())
 
 //bring in routes
 const featureRoutes = require("./routes/feature");
 const authRoutes = require("./routes/auth");
-app.get(['/','/api'], (req, res)=>{
+app.get(['/api'], (req, res)=>{
   fs.readFile('docs/apiDocs.json', (err, data)=>{
     if(err){
       return res.status(400).json({
