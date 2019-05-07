@@ -8,8 +8,8 @@ import teal from '@material-ui/core/colors/teal';
 
 const theme = createMuiTheme({
   palette: {
-    primary: indigo,
-    secondary: teal
+    primary: {main:'#478D97' },
+    secondary: {main: '#E36C2F'}
   },
   typography: {
     useNextVariants: true,

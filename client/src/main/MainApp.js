@@ -5,7 +5,9 @@ import Sidebar from '../sidebar.js';
 import Bottombar from '../bottombar.js';
 import PlaceSVG from '../assets/place.svg';
 import PlacePNG from '../assets/place.png';
-import {logout, isAuthenticated} from '../auth'
+import {logout, isAuthenticated} from '../auth';
+import NkcLogo from '../assets/nkclogo.png';
+
 
 
 
@@ -229,6 +231,7 @@ class MainApp extends Component {
       uploadDialog: false,
       cardSortState: 'newest',
       basemapMenuAnchorEl: null,
+      showHelp: false
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -695,6 +698,13 @@ class MainApp extends Component {
     this.setState({uploadMessageDisplay: false});
   }
 
+  openHelp = () =>{
+    this.setState({showHelp: true});
+  }
+  closeHelp = () =>{
+    this.setState({showHelp: false});
+  }
+
   setBasemap(type){
     console.log('change basemap');
     if(type==='aerial'){
@@ -933,11 +943,30 @@ class MainApp extends Component {
                 </Button>
               </DialogActions>
             </Dialog>
+            <Dialog
+              open={this.state.showHelp}
+              onClose={this.closeHelp}
+            >
+              <DialogTitle><img src={NkcLogo} width='200'/></DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                <strong>We want your ideas to improve biking in North Kansas City.</strong><br />
+                The City of North Kansas City is planning for bicycles. Share where you would like to see bicycle improvements...
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.closeHelp} color="primary">
+                  <CancelIcon /> Close
+                </Button>
+              </DialogActions>
+            </Dialog>
             <img src={PlacePNG} style={{display:"none"}} />
         </div>
     );
   }
   componentDidMount(){
+
+    this.openHelp();
 
 
     basemapLayers.push(new TileLayer({
