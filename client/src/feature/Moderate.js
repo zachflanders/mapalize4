@@ -3,6 +3,9 @@ import axios from 'axios';
 import {isAuthenticated, isMod} from '../auth'
 import  './Moderate.css';
 import PlacePNG from '../assets/place.png';
+import {Link, Redirect} from 'react-router-dom';
+import Nav from '../components/Nav';
+
 
 
 
@@ -41,6 +44,12 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Snackbar from '@material-ui/core/Snackbar';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 import red from '@material-ui/core/colors/red';
 
@@ -93,6 +102,9 @@ class Moderate extends Component {
     this.state = {
       feature: {},
       featureComment: '',
+      showSnackbar: false,
+      snackMessage: '',
+      redirectToReferer: false
     }
     this.handleChange = this.handleChange.bind(this);
     this.saveFeature = this.saveFeature.bind(this);
@@ -101,6 +113,7 @@ class Moderate extends Component {
   }
 
   componentDidMount(){
+    source.clear()
 
     isMod();
     const featureId = this.props.match.params.featureId;
@@ -154,6 +167,18 @@ class Moderate extends Component {
     this.setState({ featureComment: event.target.value});
   };
 
+  openDialog = () =>{
+    this.setState({showDialog: true});
+  }
+
+  closeDialog = () => {
+    this.setState({showDialog: false});
+  }
+
+  closeSnackbar = () => {
+    this.setState({showSnackbar: false});
+  }
+
   saveFeature = event =>{
     event.preventDefault();
     map.removeInteraction(modify);
@@ -174,13 +199,40 @@ class Moderate extends Component {
         Authorization: `Bearer ${token}`
       }}
     )
+    .then(response=>{
+      this.setState({snackMessage: response.data.message || response.data.error});
+      this.setState({showSnackbar: true});
+      console.log(response);
+    });
+  }
+
+  deleteFeature = event =>{
+    event.preventDefault();
+    const token = isAuthenticated().token
+    const featureId = this.props.match.params.featureId;
+    axios.delete(`/api/feature/${featureId}`,
+      {headers:{
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`
+      }}
+    )
+    .then(()=>{
+      this.setState({snackMessage:'Feature Deleted.'});
+      this.setState({redirectToReferer: true});
+    })
   }
 
   render() {
+    const {redirectToReferer} = this.state;
+    if(redirectToReferer){
+      return <Redirect to='/' />
+    }
 
     return(
       <div>
-      <h1 style={{marginLeft:'20px'}}>Moderate</h1>
+      <Nav />
+      <div id='center-div'>
+      <h1 style={{marginLeft: '20px'}}>Moderate</h1>
 
         <Card id='edit-feature-card'>
           <CardContent>
@@ -201,10 +253,50 @@ class Moderate extends Component {
             />
             <Button variant='contained' onClick={this.saveFeature}>Save</Button>
             <br/>
-            <br/><Button variant='contained' style={{backgroundColor:red[500], color:'#ffffff'}}>Delete</Button>
+            <br/>
+            <Button
+              variant='contained'
+              style={{backgroundColor:red[500], color:'#ffffff'}}
+              onClick={this.openDialog}
+              >
+              Delete
+              </Button>
             </form>
             </CardContent>
             </Card>
+            <Snackbar
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              open={this.state.showSnackbar}
+              ContentProps={{
+                'aria-describedby': 'message-id',
+              }}
+              message={<span id="message-id">{this.state.snackMessage}</span>}
+              autoHideDuration = {2000}
+              onClose = {this.closeSnackbar}
+              />
+              <Dialog
+                open={this.state.showDialog}
+                onClose={this.closeDialog}
+              >
+                <DialogTitle>{"Delete Feature"}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    Are you sure you want to delete this feature? (This cannot be undone.)
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={this.deleteFeature}
+                    style={{backgroundColor:red[500], color:'#ffffff'}}
+                  >
+                    Delete
+                  </Button>
+                  <Button onClick={this.closeDialog}>
+                    Cancel
+                  </Button>
+                </DialogActions>
+              </Dialog>
+      </div>
       </div>
     );
   }

@@ -9,6 +9,8 @@ import Snackbar from '@material-ui/core/Snackbar';
 import {Link} from 'react-router-dom'
 import {signup} from '../auth';
 import ReCAPTCHA from "react-google-recaptcha";
+import Nav from '../components/Nav';
+
 
 
 
@@ -100,11 +102,7 @@ class Signup extends Component {
         onChange={this.handleChange("password")}
         value={password}
         />
-        <ReCAPTCHA
-            sitekey="6LcU2KEUAAAAALFj6WH7NEUha5mKflKr4SAeElrJ"
-            onChange={this.handleCaptchaResponseChange}
-        />
-        <br />
+
     <Button
       onClick={this.clickSubmit}
       variant='contained'
@@ -119,7 +117,8 @@ class Signup extends Component {
     const {name, email, password, error} = this.state;
     return(
       <div>
-        <h1 className='centered' style={{width:'350px'}}>Mapalize</h1>
+        <Nav />
+        <div style={{marginTop:'84px'}}>
         <Paper className='centered padded' style={{width:'350px'}}>
           <Typography variant="h5" component="h2" style={{textAlign:'center'}}>Create Account</Typography>
           {this.signupForm(name, email, password, classes)}
@@ -135,6 +134,7 @@ class Signup extends Component {
           open={this.state.open}
           message={'New account created.  Please login.'}
         />
+        </div>
       </div>
     );
   }

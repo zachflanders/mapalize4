@@ -3,13 +3,6 @@ const proj4 = require('proj4');
 const _ = require('lodash');
 
 
-exports.featureById = (req, res, next, id) =>{
-  Feature.find({where:{id:id}})
-  .then( feature =>{
-    req.feature = feature;
-    next()
-  })}
-
 exports.getFeatureById = (req, res) =>{
   console.log('getting feature: ', req.params.featureId);
   let id=req.params.featureId;
@@ -68,7 +61,7 @@ exports.createFeatures = (req, res) =>{
 
 };
 
-exports.updateFeature = (req, res, next) =>{
+exports.updateFeature = (req, res) =>{
   let feature = req.body.feature;
   let id=req.params.featureId;
   let putFeature = {};
@@ -91,6 +84,13 @@ exports.updateFeature = (req, res, next) =>{
 
     },
     {where: {id:id}})
+    .then((response, error) =>{
+      if(error){
+        return res.json({error: error})
+      }
+      return res.json({message: 'Feature successfully saved.'});
+
+    })
   }
   else{
     let newCoords= proj4('EPSG:3857','EPSG:4326',feature.geometry.coordinates);
@@ -105,5 +105,25 @@ exports.updateFeature = (req, res, next) =>{
       point: feature.point
     },
     {where: {id:id}})
+    .then((response, error) =>{
+      if(error){
+        return res.json({error: error})
+      }
+      return res.json({message: 'Feature successfully saved.'});
+
+    })
   }
 };
+
+exports.deleteFeature = (req, res) => {
+  console.log('delete feature');
+  let id=req.params.featureId;
+  Feature.destroy({where: {id:id}})
+  .then((response, error)=>{
+    if(error){
+      return res.json({error: error})
+    }
+    return res.json({message: 'Feature deleted.'});
+  })
+
+}

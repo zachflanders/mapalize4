@@ -705,12 +705,14 @@ class MainApp extends Component {
     else if(type==='lightmap'){
       console.log(map.getLayers());
       let basemap=new TileLayer({
+        //source: new XYZ({url: 'http://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'})
         source: new TileWMS({
           url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
           params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
           serverType: 'geoserver',
           transition: 0
         })
+
       });
       map.getLayers().setAt(0, basemap)
 

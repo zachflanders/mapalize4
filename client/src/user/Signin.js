@@ -9,6 +9,8 @@ import Snackbar from '@material-ui/core/Snackbar';
 import {Link, Redirect} from 'react-router-dom'
 import {signin, authenticate} from '../auth'
 import ReCAPTCHA from "react-google-recaptcha";
+import Nav from '../components/Nav';
+
 
 
 
@@ -84,11 +86,6 @@ class Signin extends Component {
         onChange={this.handleChange("password")}
         value={password}
         />
-        <ReCAPTCHA
-            sitekey="6LcU2KEUAAAAALFj6WH7NEUha5mKflKr4SAeElrJ"
-            onChange={()=>{this.setState({recaptcha:true})}}
-        />
-        <br />
     <Button
       onClick={this.clickSubmit}
       variant='contained'
@@ -106,7 +103,9 @@ class Signin extends Component {
     }
     return(
       <div>
-        <h1 className='centered' style={{width:'350px'}}>Mapalize</h1>
+        <Nav />
+        <div style={{marginTop:'84px'}}>
+
         <Paper className='centered padded' style={{width:'350px'}}>
           <Typography variant="h5" component="h2" style={{textAlign:'center'}}>Login</Typography>
           {loading ? <div style={{textAlign:'center'}}>Loading...</div> : ""}
@@ -118,6 +117,7 @@ class Signin extends Component {
           open={this.state.error}
           message={this.state.error}
         />
+        </div>
       </div>
     );
   }

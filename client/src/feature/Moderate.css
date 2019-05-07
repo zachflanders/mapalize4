@@ -4,11 +4,18 @@
   background-color: #f5f5f5;
 }
 
-#edit-feature-card{
+#center-div{
   width: 100%;
+  margin-top: 64px !important;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
   margin-top: 20px;
   margin-bottom: 20px;
+  padding-top: 20px;
+}
+
+#edit-feature-card{
+  margin-left: 20px;
+  margin-right: 20px;
 }
