@@ -1,3 +1,5 @@
+const dotenv = require("dotenv");
+
 exports.userSignupValidator = (req, res, next) => {
   //name is not null and between 4-10 characters
   req.check("name","Name is required").notEmpty();
@@ -16,6 +18,9 @@ exports.userSignupValidator = (req, res, next) => {
   .withMessage("Password must contain at least 6 characters")
   .matches(/\d/)
   .withMessage("Password must contain a number");
+  req.check("accessCode")
+  .equals(process.env.ACCESS_CODE)
+  .withMessage("Access code is not correct.")
 
   //check for errors
   const errors = req.validationErrors()

@@ -31,7 +31,8 @@ class Signup extends Component {
       password:'',
       error: '',
       open: false,
-      recaptcha: false
+      recaptcha: false,
+      accessCode: ''
     }
     this.handleCaptchaResponseChange = this.handleCaptchaResponseChange.bind(this);
 
@@ -44,12 +45,13 @@ class Signup extends Component {
 
   clickSubmit = event => {
     event.preventDefault();
-    const {name, email, password, recaptcha} = this.state;
+    const {name, email, password, recaptcha, accessCode} = this.state;
     const user = {
       name,
       email,
       password,
-      recaptcha
+      recaptcha,
+      accessCode
     };
     signup(user)
     .then(data =>{
@@ -63,7 +65,8 @@ class Signup extends Component {
           email: '',
           password: '',
           open: true,
-          recaptcha: false
+          recaptcha: false,
+          accessCode: ''
         })
       }
     });
@@ -77,7 +80,7 @@ class Signup extends Component {
  }
 
 
-  signupForm = (name, email, password, classes) => (
+  signupForm = (name, email, password, accessCode, classes) => (
     <form style={{textAlign:'center'}}>
       <TextField
         id="name"
@@ -102,6 +105,13 @@ class Signup extends Component {
         onChange={this.handleChange("password")}
         value={password}
         />
+        <TextField
+          id="code"
+          className={classes.textField}
+          label="Access Code"
+          onChange={this.handleChange("accessCode")}
+          value={accessCode}
+          />
 
     <Button
       onClick={this.clickSubmit}
@@ -114,14 +124,14 @@ class Signup extends Component {
 
   render() {
     const { classes } = this.props;
-    const {name, email, password, error} = this.state;
+    const {name, email, password, accessCode, error} = this.state;
     return(
       <div>
         <Nav />
         <div style={{marginTop:'84px'}}>
         <Paper className='centered padded' style={{width:'350px'}}>
           <Typography variant="h5" component="h2" style={{textAlign:'center'}}>Create Account</Typography>
-          {this.signupForm(name, email, password, classes)}
+          {this.signupForm(name, email, password, accessCode, classes)}
           <br />
           <Typography variant='caption' color='textSecondary' style={{textAlign:'center'}}>Already have an account? <Link to='/login' style={{color:"rgba(0, 0, 0, 0.54)"}}>Login</Link></Typography>
 

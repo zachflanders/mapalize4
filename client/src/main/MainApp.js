@@ -69,6 +69,8 @@ import CancelIcon from '@material-ui/icons/Close';
 import CardsIcon from '@material-ui/icons/ViewModule';
 import MapIcon from '@material-ui/icons/Map';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
+import HelpIcon from '@material-ui/icons/HelpOutline';
+
 import RightIcon from '@material-ui/icons/ChevronRight';
 import UploadIcon from '@material-ui/icons/CloudUpload';
 import Dialog from '@material-ui/core/Dialog';
@@ -761,6 +763,7 @@ class MainApp extends Component {
             </Toolbar>
           </AppBar>
           <Drawer variant="permanent" className='desktop'>
+
             <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>
               <Sidebar
                 view={this.state.view}
@@ -796,7 +799,11 @@ class MainApp extends Component {
                 </div>
                 </>
               )}
+              <Button size='small' onClick={this.openHelp} style={{position:'absolute', left:'15px', bottom:'15px'}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+
             </div>
+
+
           </Drawer>
           <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
           <div
@@ -827,6 +834,8 @@ class MainApp extends Component {
               toggleDelete =  {this.toggleDelete}
             />
           </div>
+          <Button size='small' onClick={this.openHelp} style={{position:'absolute', left:'15px', bottom:'15px'}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+
           </div>
         </Drawer>
         <Drawer anchor='bottom' open={this.state.bottomDrawerOpen} onClose={this.toggleBottomDrawer(false)}>
