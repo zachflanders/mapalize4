@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../App.css';
 import MainDisplay from '../main.js';
-import Sidebar from '../sidebar.js';
+import Sidebar from '../components/Sidebar.js';
 import Bottombar from '../bottombar.js';
 import PlaceSVG from '../assets/place.svg';
 import PlacePNG from '../assets/place.png';
@@ -40,7 +40,9 @@ import Select from 'ol/interaction/Select.js';
 import {click, pointerMove} from 'ol/events/condition.js';
 import Cluster from 'ol/source/Cluster';
 import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
+import ConvexHull from 'ol-ext/geom/ConvexHull';
 import XYZ from 'ol/source/XYZ';
+import Polygon from 'ol/geom/Polygon';
 
 //Material-ui imports
 import AppBar from '@material-ui/core/AppBar';
@@ -70,7 +72,9 @@ import CardsIcon from '@material-ui/icons/ViewModule';
 import MapIcon from '@material-ui/icons/Map';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import HelpIcon from '@material-ui/icons/HelpOutline';
-
+import LineIcon from '@material-ui/icons/Timeline';
+import PointIcon from '@material-ui/icons/AddLocation';
+import PlaceIcon from '@material-ui/icons/Place';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import UploadIcon from '@material-ui/icons/CloudUpload';
 import Dialog from '@material-ui/core/Dialog';
@@ -102,7 +106,7 @@ const convertToClick = (e) => {
   e.target.dispatchEvent(evt)
 }
 
-const drawerWidth = '220px';
+const drawerWidth = '280px';
 
 //Defining Globals
 var sourceArray = [];
@@ -110,9 +114,20 @@ var layerArray = [];
 var basemapLayers = [];
 var resultsSourceArray = [];
 var resultsLayerArray = [];
+let hover = [];
 var map = {};
 var drawInteraction = [];
 var modify = [];
+let convexVector = new VectorLayer({
+  source: new VectorSource(),
+  style: new Style({
+      stroke: new Stroke({
+        color: "#3399CC",
+        width: 2
+      })
+    })
+ })
+let hull;
 var overlay = new Overlay({
   autoPan: true,
   autoPanAnimation: {
@@ -167,15 +182,15 @@ var clusterSelectClick = null;
 var drawnFeatures = 0;
 let mapTippy = null;
 let currentDrawnLine;
-var turnLineIntoArrayOfPoints = function(geoJSONLine){
+var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
   //if statement should check to make sure geoJSON line is valid
   if(true){
     var length = turf.lineDistance(geoJSONLine, 'miles');
     for(var i=(Math.random()*(0.02)); i <= length; i=i+0.02){
       if(length > 0 ){
         var thisPoint = turf.along(geoJSONLine, i, 'miles');
-        if(resultsSourceArray[0]){
-          resultsSourceArray[0].addFeature(new Feature(new Point(transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
+        if(resultsSourceArray[count]){
+          resultsSourceArray[count].addFeature(new Feature(new Point(transform([thisPoint.geometry.coordinates[0],thisPoint.geometry.coordinates[1]], 'EPSG:4326', 'EPSG:3857'))));
         }
       }
     }
@@ -188,25 +203,44 @@ class MainApp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      title: 'NorthKC Bike Plan',
+      title: 'North Kansas City Bike Master Plan',
       lineName: 'Draw Line',
       features:[
         {
-          name:'Add Bike Infrastructure',
-          prompt:'Where would you bike if it was comfortable?',
+          id: 0,
+          name:'What Routes do you bike today?',
+          prompt:'Draw a route where you bike today.',
           type:'line',
-          color: '#00c853',
+          color: '#2ecc71',
           viewResults: true
         },
         {
-          name:'Add Bike Share',
+          id: 1,
+          name:'Where would you like to bike if it were safe and comfortable?',
+          prompt:'Draw a route where you would bike if it were safe and comfortable?',
+          type:'line',
+          color: '#3498db',
+          viewResults: true
+        },
+        {
+          id: 2,
+          name:'What destinations do you visit on your bike?',
           prompt:'Where would you want bike share?',
           type:'point',
-          color: '#2196f3',
+          color: '#27ae60',
           viewResults: true
         },
         {
-          name:'Unsafe Location',
+          id: 3,
+          name:'What desinations would you like to visit if you had a safe and comfortable route?',
+          prompt:'What locations feel unsafe or uncomfortable for biking?',
+          type:'point',
+          color: '#2980b9',
+          viewResults: true
+        },
+        {
+          id: 4,
+          name:'What locations feel unsafe or uncomfortable for biking?',
           prompt:'What locations feel unsafe or uncomfortable for biking?',
           type:'point',
           color: '#f44336',
@@ -317,6 +351,7 @@ class MainApp extends Component {
         view: 1
       });
       this.state.features.map(function(item, count){
+        console.log(item);
         if(item.viewResults === true){
           return (
             map.addLayer(resultsLayerArray[count]),
@@ -334,6 +369,9 @@ class MainApp extends Component {
       map.removeOverlay(overlay);
       map.addOverlay(resultsOverlay);
       map.removeInteraction(select);
+      hover.forEach((item)=>{
+        map.addInteraction(item);
+      })
       this.getResults();
       if(clusterSelectClick !== null){
         map.addInteraction(clusterSelectClick);
@@ -345,6 +383,7 @@ class MainApp extends Component {
       })
       //map.removeLayer(heatmapLayer);
       this.state.features.map(function(item, count){
+        console.log(item);
         if(item.viewResults === true){
           return(
             map.removeLayer(resultsLayerArray[count]),
@@ -455,11 +494,23 @@ class MainApp extends Component {
       resultsSourceArray.map(function(item){
         return item.clear();
       });
-      this.setState({featureData: response.data.features});
+      let filteredFeatures = [];
       var features = response.data.features;
-      features.map(function(feature, count){
+      features.map(function(feature){
+        this.state.features.map(function(featureLayer,count){
+          if(feature.name === featureLayer.name){
+            filteredFeatures.push(feature);
+          }
+        })
         if(feature.line){
-          return turnLineIntoArrayOfPoints(feature.line);
+          this.state.features.map(function(featureLayer,count){
+            if(feature.name === featureLayer.name){
+              return turnLineIntoArrayOfPoints(feature.line, count);
+            }
+            else{
+              return null;
+            }
+          })
         }
         else{
           this.state.features.map(function(featureLayer,count){
@@ -475,6 +526,8 @@ class MainApp extends Component {
           })
         }
       }.bind(this));
+      this.setState({featureData: filteredFeatures});
+
     }.bind(this));
   }
 
@@ -712,18 +765,39 @@ class MainApp extends Component {
     if(type==='aerial'){
       console.log(map.getLayers());
       let basemap=new TileLayer({ source: new XYZ({ url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}' }) });
+      console.log(map.getLayers());
       map.getLayers().setAt(0, basemap)
     }
     else if(type==='lightmap'){
       console.log(map.getLayers());
       let basemap=new TileLayer({
-        //source: new XYZ({url: 'http://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'})
+        //source: new XYZ({url: 'http://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'})
+
         source: new TileWMS({
           url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
           params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
           serverType: 'geoserver',
           transition: 0
         })
+
+
+      });
+      map.getLayers().setAt(0, basemap)
+
+
+    }
+    else if(type==='darkmap'){
+      console.log(map.getLayers());
+      let basemap=new TileLayer({
+        source: new XYZ({url: 'http://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'})
+        /*
+        source: new TileWMS({
+          url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
+          params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
+          serverType: 'geoserver',
+          transition: 0
+        })
+        */
 
       });
       map.getLayers().setAt(0, basemap)
@@ -799,7 +873,7 @@ class MainApp extends Component {
                 </div>
                 </>
               )}
-              <Button size='small' onClick={this.openHelp} style={{position:'absolute', left:'15px', bottom:'15px'}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+              <Button size='small' style={{marginTop:'10px'}} onClick={this.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
 
             </div>
 
@@ -871,7 +945,7 @@ class MainApp extends Component {
       </Drawer>
         <Fab id='basemapsFab'
           size='small'
-          style={this.state.viewMap ? {display:'flex'} : {display:'none'}}
+          style={this.state.mode==='map' ? {display:'flex'} : {display:'none'}}
           onClick={this.openBasemapMenu}
         >
           <LayersIcon />
@@ -884,6 +958,7 @@ class MainApp extends Component {
         >
           <div style={{paddingTop:'0px',paddingBottom:'0px', paddingLeft:'16px',outline:'none'}}><Typography variant='overline' color='textSecondary'>Basemaps</Typography></div>
           <MenuItem className='compactList' onClick={()=>this.setBasemap('lightmap')}>Light Basemap</MenuItem>
+          <MenuItem className='compactList' onClick={()=>this.setBasemap('darkmap')}>Dark Basemap</MenuItem>
           <MenuItem className='compactList' onClick={()=>this.setBasemap('aerial')}>Aerial Photo</MenuItem>
         </Menu>
           {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : <div /> }
@@ -959,9 +1034,9 @@ class MainApp extends Component {
               <DialogTitle><img src={NkcLogo} width='200'/></DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                <strong>We want your ideas to improve biking in North Kansas City.</strong><br />
-                The City of North Kansas City is planning for bicycles. Share where you would like to see bicycle improvements...
-                </DialogContentText>
+                <strong>Where would you like to bike in North Kansas City?.</strong><br />
+                North Kansas City is undertaking a Bike Master Plan in 2019 to coordinate projects and plan for a network that connects and serves all parts of the community.
+                We want to know where you want to bike in North Kansas City.  Draw a line (<LineIcon style={{height:'24px',verticalAlign:'middle' }} />) or drop a pin (<PlaceIcon style={{height:'24px', verticalAlign:'middle'}} />) to share routes and destinations where you might ride a bike.  You can also point out places you would like to ride but don't feel safe or comfortable for biking today.  Thank you for informing North Kansas City's Bike Master Plan!  To get involved and learn more about the Bike Master Plan, visit the <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>North Kansas City Bike Master Plan project page.</a>                </DialogContentText>
               </DialogContent>
               <DialogActions>
                 <Button onClick={this.closeHelp} color="primary">
@@ -974,10 +1049,8 @@ class MainApp extends Component {
     );
   }
   componentDidMount(){
-
     this.openHelp();
-
-
+    basemapLayers = [];
     basemapLayers.push(new TileLayer({
       source: new TileWMS({
         url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
@@ -999,11 +1072,13 @@ class MainApp extends Component {
               })
             })
         }));
+        let scale = chroma.scale([chroma(item.color).darken(1),chroma(item.color).brighten(3)]);
         resultsLayerArray.push(new Heatmap({
           source: resultsSourceArray[count],
           renderMode: 'image',
           shadow: 1000,
-          properties:{line: true}
+          properties:{line: true},
+          gradient:[scale(0), scale(0.25), scale(0.5), scale(0.75), scale(1)]
         }));
         drawInteraction.push(
           new Draw({
@@ -1107,6 +1182,55 @@ class MainApp extends Component {
             }
           })
         );
+
+        hover.push(
+          new Select({
+            condition:pointerMove,
+            layers: [resultsLayerArray[count]],
+            style:function(feature){
+              var size = feature.get('features').length;
+              var style;
+              if(size < 2){
+                style = [new Style({
+                  image: new Icon(({
+                    anchor: pngAnchor,
+                    anchorXUnits: 'fraction',
+                    anchorYUnits: 'pixels',
+                    crossOrigin: 'anonymous',
+                    src: PlacePNG,
+                    color: item.color,
+                    scale: pngScale
+                  }))
+                })]
+              }
+              else{
+                style =
+                  [new Style({
+                    image:
+                      new CircleStyle({
+                        radius: 16,
+                        stroke: new Stroke({
+                          color:chroma(item.color).alpha(0.5).rgba(),
+                          width: 6
+                        }),
+                        fill: new Fill({
+                          color: item.color
+                        })
+                      }),
+                    text: new Text({
+                      text: size.toString(),
+                      fill: new Fill({
+                        color: '#fff'
+                      })
+                    })
+                  })]
+              }
+              return style;
+            }
+
+          }));
+
+
       };
       modify.push(new Modify({
         source: sourceArray[count],
@@ -1145,6 +1269,10 @@ class MainApp extends Component {
           })
         ]
       });
+	    map.addLayer(convexVector);
+      hull = new Feature(new Polygon([[0,0]]));
+      convexVector.getSource().addFeature(hull);
+
       map.on('pointermove', function(e) {
         var pixel = map.getEventPixel(e.originalEvent);
         var hit = map.hasFeatureAtPixel(pixel);
@@ -1155,14 +1283,23 @@ class MainApp extends Component {
       blurSize = 64;
       var zoomRadius = radiusSize/resolution;
       var zoomBlur = blurSize/resolution;
-      resultsLayerArray[0].setRadius(zoomRadius);
-      resultsLayerArray[0].setBlur(zoomBlur);
+      resultsLayerArray.forEach(function(item){
+        if(item instanceof Heatmap){
+          item.setRadius(zoomRadius)
+          item.setBlur(zoomBlur);
+        };
+      });
+
       map.getView().on('change:resolution', function(evt){
           resolution = evt.target.get(evt.key);
           zoomRadius =  radiusSize/resolution;
           zoomBlur = blurSize/resolution;
-         resultsLayerArray[0].setRadius(zoomRadius);
-         resultsLayerArray[0].setBlur(zoomBlur);
+          resultsLayerArray.forEach(function(item){
+            if(item instanceof Heatmap){
+              item.setRadius(zoomRadius)
+              item.setBlur(zoomBlur);
+            };
+          });
       });
       var collection = select.getFeatures();
       collection.on('add', function(e){
@@ -1230,6 +1367,47 @@ class MainApp extends Component {
         }
       }.bind(this));
 
+      hover.map((item, count)=>{
+        item.on('select', function(e) {
+          console.log(e);
+          if(e.selected.length > 0){
+            let features = e.selected[0].get('features')
+            let coords = []
+            features.forEach((feature)=>{
+              coords.push(feature.getGeometry().getCoordinates());
+            })
+            console.log(ConvexHull(coords));
+            convexVector.getSource().addFeature( new Feature( new Polygon([ConvexHull(coords)]) ) );
+          }
+          else if(e.deselected.length > 0){
+            convexVector.getSource().clear()
+          }
+
+          /*
+          var h = e.feature.get("convexHull");
+      			if (!h)
+      			{	var cluster = e.feature.get("features");
+      				// calculate convex hull
+      				if (cluster && cluster.length)
+      				{	var c = [];
+      					for (var i=0, f; f = cluster[i]; i++)
+      					{	c.push(f.getGeometry().getCoordinates());
+      					}
+      					h = ol.coordinate.convexHull(c);
+      					e.feature.get("convexHull", h);
+      				}
+      			}
+      			vector.getSource().clear();
+      			if (h.length>2) vector.getSource().addFeature ( new ol.Feature( new ol.geom.Polygon([h]) ) );
+      		});
+      	hover.on("leave", function(e)
+      		{	vector.getSource().clear();
+              */
+      		});
+
+      })
+
+
       drawInteraction.map(function(item, counter){
         drawInteraction[counter].on('drawend', function(target){
           if(mapTippy){
@@ -1282,13 +1460,15 @@ class MainApp extends Component {
             }
           })
         }
-      }.bind(this));
+      });
 
       var selectableLayers = [];
       resultsLayerArray.map(function(layer){
-        if(layer.hasOwnProperty('clusters')){
+        if(layer instanceof AnimatedCluster){
+          console.log(layer);
           selectableLayers.push(layer);
         }
+        console.log(selectableLayers);
       });
 
       clusterSelectClick = new Select({

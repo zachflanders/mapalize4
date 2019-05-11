@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import './App.css';
+import '../App.css';
+import './sidebar.css';
+import chroma from 'chroma-js';
 
 
 //Material-ui imports
@@ -49,13 +51,15 @@ class Sidebar extends Component {
               <Checkbox
                 onChange={()=>this.props.switchLayer(count)}
                 checked={item.viewResults}
+                style={{paddingTop: '0px'}}
               />
             }
-            label= {<span><PlaceIcon style={{color:item.color, verticalAlign:'middle'}} />{item.name}</span>}
+            label= {<span className='sidebar-results-label-point'><PlaceIcon style={{color:item.color, verticalAlign:'middle', paddingRight:'6px'}} />{item.name}</span>}
           />
         );
       }
       else{
+        let scale = chroma.scale([chroma(item.color).darken(1),chroma(item.color).brighten(3)]);
         return (
           <FormControlLabel
             key = {count}
@@ -63,24 +67,30 @@ class Sidebar extends Component {
               <Checkbox
                 onChange={()=>this.props.switchLayer(count)}
                 checked={item.viewResults}
+                style={{paddingTop: '0px'}}
               />
             }
             label= {
-              <span>
-                <svg width="10" height="20" style={{verticalAlign:"middle"}} >
-                  <defs>
-                    <linearGradient id="grad1" x1="0%" y1="100%" x2="0%" y2="0%">
-                      <stop offset="0%" style={{stopColor:"blue",stopOpacity:".2"}} />
-                      <stop offset="25%" style={{stopColor:"cyan",stopOpacity:".4"}} />
-                      <stop offset="50%" style={{stopColor:"lime",stopOpacity:".6"}} />
-                      <stop offset="75%" style={{stopColor:"yellow",stopOpacity:".8"}} />
-                      <stop offset="100%" style={{stopColor:"red",stopOpacity:"1"}} />
-                    </linearGradient>
-                  </defs>
-                  <rect width="10" height="20" style={{fill:"url(#grad1)"}} />
-                </svg>
-                &nbsp;&nbsp;{item.name}
-              </span>}
+              <div style={{display: 'flex'}}>
+                <div>
+                  <svg width="18" height="30" style={{verticalAlign:"middle", paddingRight:'6px'}} >
+                    <defs>
+                      <linearGradient id={item.id} x1="0%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" style={{stopColor:scale(0),stopOpacity:"1"}} />
+                        <stop offset="25%" style={{stopColor:scale(0.25),stopOpacity:"1"}} />
+                        <stop offset="50%" style={{stopColor:scale(0.5),stopOpacity:"1"}} />
+                        <stop offset="75%" style={{stopColor:scale(0.75),stopOpacity:"1"}} />
+                        <stop offset="100%" style={{stopColor:scale(1),stopOpacity:"1"}} />
+                      </linearGradient>
+                    </defs>
+                    <rect width="5" height="30px" style={{fill:`url(#${item.id})`}} />
+                  </svg>
+                </div>
+                <div>
+                  {item.name}
+                </div>
+              </div>
+            }
           />
         );
       }

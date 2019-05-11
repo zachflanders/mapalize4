@@ -1,0 +1,11 @@
+.sidebar-results-label{
+  display: block;
+  padding-left: 24px ;
+  text-indent: -24px ;
+}
+
+.sidebar-results-label-point{
+  display: block;
+  padding-left: 24px ;
+  text-indent: -32px;
+}

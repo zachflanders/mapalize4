@@ -59,7 +59,7 @@ import red from '@material-ui/core/colors/red';
 const pngScale =0.18;
 const pngAnchor = [0.5, 200];
 
-let map = {};
+let modMap = {};
 let source = new VectorSource();
 let layer = new VectorLayer({
   source: source,
@@ -141,7 +141,7 @@ class Moderate extends Component {
 
 
     });
-    let basemapLayers =new TileLayer({
+    let modBasemapLayers =new TileLayer({
       source: new TileWMS({
         url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
         params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
@@ -149,9 +149,9 @@ class Moderate extends Component {
         transition: 0
       })
     });
-    map = new Map({
+    modMap = new Map({
         target: 'mod-map',
-        layers: [basemapLayers, layer],
+        layers: [modBasemapLayers, layer],
         //overlays: [overlay, resultsOverlay],
         view: view,
         controls: [
@@ -160,7 +160,7 @@ class Moderate extends Component {
           })
         ]
       });
-      map.addInteraction(modify);
+      modMap.addInteraction(modify);
   }
 
   handleChange(event){
@@ -181,7 +181,7 @@ class Moderate extends Component {
 
   saveFeature = event =>{
     event.preventDefault();
-    map.removeInteraction(modify);
+    modMap.removeInteraction(modify);
     source.refresh();
     const token = isAuthenticated().token
     const featureId = this.props.match.params.featureId;

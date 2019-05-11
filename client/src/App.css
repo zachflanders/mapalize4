@@ -36,7 +36,7 @@ body{
   margin-top: 64px;
   position: absolute;
   top: 0px;
-  left: 251px;
+  left: 311px;
   right: 0px;
   bottom: 0px;
   background-color: #f5f5f5;
@@ -92,7 +92,7 @@ body{
 #cards{
   position: relative;
   margin-top: 64px;
-  margin-left: 251px;
+  margin-left: 311px;
   z-index: 1200;
   background-color: #efefef;
 }
