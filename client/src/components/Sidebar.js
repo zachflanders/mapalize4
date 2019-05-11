@@ -59,7 +59,7 @@ class Sidebar extends Component {
         );
       }
       else{
-        let scale = chroma.scale([chroma(item.color).darken(1),chroma(item.color).brighten(3)]);
+        let scale = chroma.scale([chroma(item.color).brighten(3), chroma(item.color).darken(1)]);
         return (
           <FormControlLabel
             key = {count}
@@ -197,7 +197,7 @@ class Sidebar extends Component {
         else {
           return (
               <div>
-              <Paper>
+              <Paper className='createFeatures'>
                 <div style={{padding:'8px'}}>
                   <strong><AddIcon style={{verticalAlign:'middle'}} /> &nbsp; Create Features</strong>
                 </div>

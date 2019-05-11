@@ -7,7 +7,7 @@ import PlaceSVG from '../assets/place.svg';
 import PlacePNG from '../assets/place.png';
 import {logout, isAuthenticated} from '../auth';
 import NkcLogo from '../assets/nkclogo.png';
-
+import Shepherd from 'shepherd.js';
 
 
 
@@ -84,6 +84,8 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grow from '@material-ui/core/Grow';
 import LayersIcon from '@material-ui/icons/Layers';
+import PlayIcon from '@material-ui/icons/PlayArrow';
+
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListSubheader from '@material-ui/core/ListSubheader';
@@ -109,6 +111,12 @@ const convertToClick = (e) => {
 const drawerWidth = '280px';
 
 //Defining Globals
+let w = window,
+    d = document,
+    e = d.documentElement,
+    g = d.getElementsByTagName('body')[0],
+    x = w.innerWidth || e.clientWidth || g.clientWidth,
+    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 var sourceArray = [];
 var layerArray = [];
 var basemapLayers = [];
@@ -199,7 +207,10 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
   }
 };
 
+let colors=['#1b9e77','#7570b3', '#d95f02'];
+
 class MainApp extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -209,41 +220,41 @@ class MainApp extends Component {
         {
           id: 0,
           name:'What Routes do you bike today?',
-          prompt:'Draw a route where you bike today.',
+          prompt:'Click to start drawing a route.',
           type:'line',
-          color: '#2ecc71',
+          color: colors[0],
           viewResults: true
         },
         {
           id: 1,
           name:'Where would you like to bike if it were safe and comfortable?',
-          prompt:'Draw a route where you would bike if it were safe and comfortable?',
+          prompt:'Click to start drawing a route.',
           type:'line',
-          color: '#3498db',
+          color: colors[1],
           viewResults: true
         },
         {
           id: 2,
           name:'What destinations do you visit on your bike?',
-          prompt:'Where would you want bike share?',
+          prompt:'Click to start drawing a point.',
           type:'point',
-          color: '#27ae60',
+          color: (chroma(colors[0]).brighten()).toString(),
           viewResults: true
         },
         {
           id: 3,
           name:'What desinations would you like to visit if you had a safe and comfortable route?',
-          prompt:'What locations feel unsafe or uncomfortable for biking?',
+          prompt:'Click to start straing a point.',
           type:'point',
-          color: '#2980b9',
+          color: (chroma(colors[1]).brighten()).toString(),
           viewResults: true
         },
         {
           id: 4,
           name:'What locations feel unsafe or uncomfortable for biking?',
-          prompt:'What locations feel unsafe or uncomfortable for biking?',
+          prompt:'Click to start drawing a point.',
           type:'point',
-          color: '#f44336',
+          color: colors[2],
           viewResults: true
         }
       ],
@@ -310,31 +321,56 @@ class MainApp extends Component {
       drawing: counter
     });
     document.getElementById('map').style.cursor = 'crosshair';
-    const mapDiv = document.querySelector('#map')
-    mapTippy = tippy(mapDiv);
-    if(this.state.features[counter].type === 'line'){
-      mapTippy.set({
-        content: "Click to start drawing line",
-        followCursor: true,
-        placement: 'right',
-        arrow: true,
-        distance: 20,
-        hideOnClick: false,
-        touch: false
-      });
+    if(x>600){
+      let mapDiv = document.querySelector('#map');
+      mapTippy = tippy(mapDiv);
+      if(this.state.features[counter].type === 'line'){
+        mapTippy.set({
+          content: "Click to start drawing line",
+          followCursor: ()=>x>600 ? true : false,
+          placement: ()=>x>600 ? 'right' : 'top',
+          arrow: ()=>x>600 ? true : false,
+          distance: 20,
+          hideOnClick: false,
+          touch: true
+        });
+      }
+      else{
+        mapTippy.set({
+          content: "Click to place feature",
+          followCursor: true,
+          placement: 'right',
+          arrow: true,
+          distance: 20,
+          hideOnClick: false,
+          touch: false
+        });
+      }
+      mapTippy.enable();
     }
     else{
-      mapTippy.set({
-        content: "Click to place feature",
-        followCursor: true,
-        placement: 'right',
-        arrow: true,
-        distance: 20,
-        hideOnClick: false,
-        touch: false
-      });
+      console.log('mobile')
+      let mapDiv = document.querySelector('#tooltipAnchor');
+      mapTippy = tippy(mapDiv);
+      if(this.state.features[counter].type === 'line'){
+        mapTippy.set({
+          content: "Click to start drawing line",
+          placement: 'top',
+          hideOnClick: false,
+        });
+      }
+      else{
+        mapTippy.set({
+          content: "Click to place feature",
+          placement: 'top',
+          hideOnClick: false,
+        });
+      }
+      mapTippy.enable();
+      mapTippy.show()
     }
-    mapTippy.enable();
+
+
   }
 
   toggleDrawer = (open) => () => {
@@ -632,12 +668,25 @@ class MainApp extends Component {
       this.setState({deleting: true});
       map.removeInteraction(select);
       map.addInteraction(selectDelete);
+      const mapDiv = document.querySelector('#map')
+      mapTippy = tippy(mapDiv);
+      mapTippy.set({
+        content: "Click a feature to delete",
+        followCursor: true,
+        placement: 'right',
+        arrow: true,
+        distance: 20,
+        hideOnClick: false,
+        touch: false
+      });
+      mapTippy.enable();
 
     }
     else{
       this.setState({deleting: false});
       map.addInteraction(select);
       map.removeInteraction(selectDelete);
+      mapTippy.destroy();
     }
   }
 
@@ -786,25 +835,45 @@ class MainApp extends Component {
 
 
     }
+    /*
     else if(type==='darkmap'){
       console.log(map.getLayers());
       let basemap=new TileLayer({
         source: new XYZ({url: 'http://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'})
-        /*
+
         source: new TileWMS({
           url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
           params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
           serverType: 'geoserver',
           transition: 0
         })
-        */
+
 
       });
       map.getLayers().setAt(0, basemap)
 
 
     }
+    */
     this.closeBasemapMenu();
+  }
+
+  startTour(){
+    let tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        classes: '',
+        scrollTo: false
+      }
+    });
+
+    tour.addStep('example', {
+      title: 'Example Shepherd',
+      text: 'Creating a Shepherd is easy too! Just create ...',
+      attachTo: '.createFeatures',
+      advanceOn: '.docs-link click'
+    });
+
+    tour.start();
   }
 
   render() {
@@ -814,9 +883,11 @@ class MainApp extends Component {
 
     return (
         <div className="App">
-          <AppBar position="fixed" style={{zIndex: 1202, flexWrap:'wrap', width:'100%' }}>
-            <Toolbar style={{flexWrap:'wrap'}} id='toolbar'>
+          <AppBar position="fixed" style={{zIndex: 1202, flexWrap:'wrap', width:'100%', maxWidth: '100%'}}>
+            <Toolbar style={{flexWrap:'wrap', maxWidth: '100%'}} id='toolbar'>
 
+
+              <Typography variant="h6" color="inherit" style={{flexGrow:2,  maxWidth: '100%'}} noWrap >
               <IconButton
                 onClick = {this.toggleDrawer(true)}
                 id='menuButton'
@@ -826,7 +897,6 @@ class MainApp extends Component {
               >
                 <MenuIcon />
               </IconButton>
-              <Typography variant="h6" color="inherit" style={{flexGrow:2}} >
                 <BikeIcon style={{verticalAlign:'middle', marginBottom:'5px', height:'32px'}} />
                 &nbsp;&nbsp;{this.state.title}
               </Typography>
@@ -908,7 +978,7 @@ class MainApp extends Component {
               toggleDelete =  {this.toggleDelete}
             />
           </div>
-          <Button size='small' onClick={this.openHelp} style={{position:'absolute', left:'15px', bottom:'15px'}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+          <Button size='small' style={{marginTop:'10px'}} onClick={this.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
 
           </div>
         </Drawer>
@@ -958,7 +1028,6 @@ class MainApp extends Component {
         >
           <div style={{paddingTop:'0px',paddingBottom:'0px', paddingLeft:'16px',outline:'none'}}><Typography variant='overline' color='textSecondary'>Basemaps</Typography></div>
           <MenuItem className='compactList' onClick={()=>this.setBasemap('lightmap')}>Light Basemap</MenuItem>
-          <MenuItem className='compactList' onClick={()=>this.setBasemap('darkmap')}>Dark Basemap</MenuItem>
           <MenuItem className='compactList' onClick={()=>this.setBasemap('aerial')}>Aerial Photo</MenuItem>
         </Menu>
           {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : <div /> }
@@ -976,6 +1045,7 @@ class MainApp extends Component {
             cardSortState = {this.state.cardSortState}
             />
           <div id='map' style={this.state.viewMap ? {display:'block'} : {display:'none'}}></div>
+          <div style={{display:'block', position:'absolute', bottom:'0', width:'100%', height:'10px', zIndex:'2000'}} id='tooltipAnchor'></div>
           <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
             <form onSubmit={this.saveComment}>
               <TextField
@@ -1036,9 +1106,12 @@ class MainApp extends Component {
                 <DialogContentText id="alert-dialog-description">
                 <strong>Where would you like to bike in North Kansas City?.</strong><br />
                 North Kansas City is undertaking a Bike Master Plan in 2019 to coordinate projects and plan for a network that connects and serves all parts of the community.
-                We want to know where you want to bike in North Kansas City.  Draw a line (<LineIcon style={{height:'24px',verticalAlign:'middle' }} />) or drop a pin (<PlaceIcon style={{height:'24px', verticalAlign:'middle'}} />) to share routes and destinations where you might ride a bike.  You can also point out places you would like to ride but don't feel safe or comfortable for biking today.  Thank you for informing North Kansas City's Bike Master Plan!  To get involved and learn more about the Bike Master Plan, visit the <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>North Kansas City Bike Master Plan project page.</a>                </DialogContentText>
+                We want to know where you want to bike in North Kansas City.  Draw a line (<LineIcon style={{height:'24px',verticalAlign:'middle' }} />) or drop a pin (<PlaceIcon style={{height:'24px', verticalAlign:'middle'}} />) to share routes and destinations where you might ride a bike.  You can also point out places you would like to ride but don't feel safe or comfortable for biking today.  Thank you for informing North Kansas City's Bike Master Plan!  To get involved and learn more about the Bike Master Plan, visit the <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan' target="_blank">North Kansas City Bike Master Plan project page.</a>                </DialogContentText>
               </DialogContent>
               <DialogActions>
+                <Button variant='contained' onClick={()=>{this.closeHelp();}} color="primary">
+                  <PlayIcon /> Start Tour
+                </Button>
                 <Button onClick={this.closeHelp} color="primary">
                   <CancelIcon /> Close
                 </Button>
@@ -1072,7 +1145,7 @@ class MainApp extends Component {
               })
             })
         }));
-        let scale = chroma.scale([chroma(item.color).darken(1),chroma(item.color).brighten(3)]);
+        let scale = chroma.scale([chroma(item.color).brighten(3), chroma(item.color).darken(1)]);
         resultsLayerArray.push(new Heatmap({
           source: resultsSourceArray[count],
           renderMode: 'image',
