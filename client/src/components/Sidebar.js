@@ -31,7 +31,6 @@ import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import SortIcon from '@material-ui/icons/Sort';
 
 
-import tippy from 'tippy.js';
 
 
 class Sidebar extends Component {
@@ -197,7 +196,7 @@ class Sidebar extends Component {
         else {
           return (
               <div>
-              <Paper className='createFeatures'>
+              <Paper id='createFeaturesPanel'>
                 <div style={{padding:'8px'}}>
                   <strong><AddIcon style={{verticalAlign:'middle'}} /> &nbsp; Create Features</strong>
                 </div>
@@ -355,10 +354,10 @@ class Sidebar extends Component {
       }
   }
   componentDidMount(){
-    tippy('.featureButton')
-  }
+
+    }
+
   componentDidUpdate(){
-    tippy('.featureButton')
   }
 }
 export default Sidebar;

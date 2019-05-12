@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { renderToString } from 'react-dom/server'
+
 import '../App.css';
 import MainDisplay from '../main.js';
 import Sidebar from '../components/Sidebar.js';
@@ -8,6 +10,7 @@ import PlacePNG from '../assets/place.png';
 import {logout, isAuthenticated} from '../auth';
 import NkcLogo from '../assets/nkclogo.png';
 import Shepherd from 'shepherd.js';
+import 'shepherd.js/dist/css/shepherd-theme-default.css';
 
 
 
@@ -96,6 +99,8 @@ import turf from 'turf';
 import axios from 'axios';
 import chroma from 'chroma-js';
 import tippy from 'tippy.js';
+import Tippy from '@tippy.js/react'
+import './tippytheme.css';
 import * as moment from 'moment';
 
 const pngScale =0.18;
@@ -189,6 +194,7 @@ var selectDelete = new Select({
 var clusterSelectClick = null;
 var drawnFeatures = 0;
 let mapTippy = null;
+let tourTippy;
 let currentDrawnLine;
 var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
   //if statement should check to make sure geoJSON line is valid
@@ -278,7 +284,8 @@ class MainApp extends Component {
       uploadDialog: false,
       cardSortState: 'newest',
       basemapMenuAnchorEl: null,
-      showHelp: false
+      showHelp: false,
+      tour: false
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -327,9 +334,9 @@ class MainApp extends Component {
       if(this.state.features[counter].type === 'line'){
         mapTippy.set({
           content: "Click to start drawing line",
-          followCursor: ()=>x>600 ? true : false,
-          placement: ()=>x>600 ? 'right' : 'top',
-          arrow: ()=>x>600 ? true : false,
+          followCursor: true,
+          placement: 'right',
+          arrow: true,
           distance: 20,
           hideOnClick: false,
           touch: true
@@ -858,22 +865,48 @@ class MainApp extends Component {
     this.closeBasemapMenu();
   }
 
+  tippyContent = () => (
+      <Tippy content="Hello">
+        <Button>My button</Button>
+      </Tippy>
+    )
+  renderToString() {
+    return renderToString(
+      <div>
+      <div style={{textAlign:'left'}}>
+      <p>
+        First, click a button to draw a line or a route to answer questions about where you current bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.
+      </p>
+      </div>
+      <div style={{textAlign:'right'}}>
+      <Button variant='contained'>Next</Button> <Button><CancelIcon /> Close</Button>
+      </div>
+      </div>
+    )
+  }
+
   startTour(){
-    let tour = new Shepherd.Tour({
-      defaultStepOptions: {
-        classes: '',
-        scrollTo: false
-      }
-    });
+    if(x>600){
+      console.log('desktop');
+      this.setState({tour:true})
+      let tourDiv = document.querySelector('#createFeaturesPanel');
+      tourTippy = tippy(tourDiv);
+      tourTippy.set({
+          content: this.renderToString(),
+          trigger: 'click',
+          placement: 'right',
+          boundary: 'window',
+          theme: 'light-border',
+          arrow: true,
+          distance: 5,
+          hideOnClick: true,
+          interactive: true,
+          ignoreAttributes: true,
+          onHidden: ()=>{tourTippy.destroy(); this.setState({tour:false})}
+        });
+      tourTippy.show()
+    }
 
-    tour.addStep('example', {
-      title: 'Example Shepherd',
-      text: 'Creating a Shepherd is easy too! Just create ...',
-      attachTo: '.createFeatures',
-      advanceOn: '.docs-link click'
-    });
-
-    tour.start();
   }
 
   render() {
@@ -1109,7 +1142,7 @@ class MainApp extends Component {
                 We want to know where you want to bike in North Kansas City.  Draw a line (<LineIcon style={{height:'24px',verticalAlign:'middle' }} />) or drop a pin (<PlaceIcon style={{height:'24px', verticalAlign:'middle'}} />) to share routes and destinations where you might ride a bike.  You can also point out places you would like to ride but don't feel safe or comfortable for biking today.  Thank you for informing North Kansas City's Bike Master Plan!  To get involved and learn more about the Bike Master Plan, visit the <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan' target="_blank">North Kansas City Bike Master Plan project page.</a>                </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button variant='contained' onClick={()=>{this.closeHelp();}} color="primary">
+                <Button variant='contained' onClick={()=>{this.closeHelp();this.startTour();}} color="primary">
                   <PlayIcon /> Start Tour
                 </Button>
                 <Button onClick={this.closeHelp} color="primary">
@@ -1117,11 +1150,19 @@ class MainApp extends Component {
                 </Button>
               </DialogActions>
             </Dialog>
+            <template id="tour1">
+              <div>
+                <strong>First, click a button to draw a line or a route to answer questions about where you current bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.</strong>
+              </div>
+            </template>
             <img src={PlacePNG} style={{display:"none"}} />
+
         </div>
     );
   }
   componentDidMount(){
+
+    tippy('.featureButton');
     this.openHelp();
     basemapLayers = [];
     basemapLayers.push(new TileLayer({
