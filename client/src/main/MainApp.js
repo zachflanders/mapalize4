@@ -192,7 +192,6 @@ var selectDelete = new Select({
   })
 });
 var clusterSelectClick = null;
-var drawnFeatures = 0;
 let mapTippy = null;
 let tourTippy;
 let currentDrawnLine;
@@ -213,7 +212,7 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
   }
 };
 
-let colors=['#1b9e77','#7570b3', '#d95f02'];
+let colors=['#2ecc71', '#3498db', '#e74c3c'];
 
 class MainApp extends Component {
 
@@ -244,7 +243,7 @@ class MainApp extends Component {
           name:'What destinations do you visit on your bike?',
           prompt:'Click to start drawing a point.',
           type:'point',
-          color: (chroma(colors[0]).brighten()).toString(),
+          color: (chroma(colors[0]).darken(0.5)).toString(),
           viewResults: true
         },
         {
@@ -252,7 +251,7 @@ class MainApp extends Component {
           name:'What desinations would you like to visit if you had a safe and comfortable route?',
           prompt:'Click to start straing a point.',
           type:'point',
-          color: (chroma(colors[1]).brighten()).toString(),
+          color: (chroma(colors[1]).darken(0.5)).toString(),
           viewResults: true
         },
         {
@@ -285,7 +284,9 @@ class MainApp extends Component {
       cardSortState: 'newest',
       basemapMenuAnchorEl: null,
       showHelp: false,
-      tour: false
+      tour: false,
+      sidebarRefs: null,
+      drawnFeatures: 0
     };
     this.addInteraction = this.addInteraction.bind(this);
     this.upload = this.upload.bind(this);
@@ -308,6 +309,15 @@ class MainApp extends Component {
     this.openUploadDialog = this.openUploadDialog.bind(this);
     this.sortCards = this.sortCards.bind(this);
     this.setBasemap = this.setBasemap.bind(this);
+    this.getRefsFromChild = this.getRefsFromChild.bind(this);
+  }
+
+  getRefsFromChild(childRefs) {
+    // you can get your requested value here, you can either use state/props/ or whatever you like based on your need case by case
+    this.setState({
+      sidebarRefs: childRefs
+    });
+    console.log(this.state.myRequestedRefs); // this should have *info*, *contact* as keys
   }
 
   openUploadDialog(open){
@@ -488,7 +498,7 @@ class MainApp extends Component {
         sourceArray.map(function(item, count){
           return item.clear();
         });
-        drawnFeatures = 0;
+        this.setState({drawnFeatures: 0});
         layerArray.map(function(layer, count){
           map.addLayer(layer);
         });
@@ -870,43 +880,40 @@ class MainApp extends Component {
         <Button>My button</Button>
       </Tippy>
     )
-  renderToString() {
-    return renderToString(
-      <div>
-      <div style={{textAlign:'left'}}>
-      <p>
-        First, click a button to draw a line or a route to answer questions about where you current bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.
-      </p>
-      </div>
-      <div style={{textAlign:'right'}}>
-      <Button variant='contained'>Next</Button> <Button><CancelIcon /> Close</Button>
-      </div>
-      </div>
-    )
-  }
 
-  startTour(){
+  tour = (target, ref) => {
     if(x>600){
-      console.log('desktop');
-      this.setState({tour:true})
-      let tourDiv = document.querySelector('#createFeaturesPanel');
-      tourTippy = tippy(tourDiv);
-      tourTippy.set({
-          content: this.renderToString(),
-          trigger: 'click',
-          placement: 'right',
-          boundary: 'window',
-          theme: 'light-border',
-          arrow: true,
-          distance: 5,
-          hideOnClick: true,
-          interactive: true,
-          ignoreAttributes: true,
-          onHidden: ()=>{tourTippy.destroy(); this.setState({tour:false})}
-        });
-      tourTippy.show()
-    }
+        if(tourTippy){
+          tourTippy.destroy();
+        }
+        this.setState({tour:true})
+        let tourDiv = target;
+        console.log(tourDiv);
+        let content = ref;
+        content.style.display = 'block';
+        tourTippy = tippy(tourDiv);
+        console.log(tourTippy);
+        tourTippy.set({
+            content: content,
+            trigger: 'click',
+            placement: 'right',
+            boundary: 'window',
+            theme: 'light-border',
+            arrow: true,
+            distance: 5,
+            hideOnClick: true,
+            interactive: true,
+            ignoreAttributes: true,
+            onHidden: ()=>{
+              console.log('hidden')
+              tourTippy.destroy();
+              this.setState({tour:false});
 
+
+            }
+          });
+        tourTippy.show();
+    }
   }
 
   render() {
@@ -951,7 +958,7 @@ class MainApp extends Component {
                 editing={this.state.editing}
                 deleting = {this.state.deleting}
                 features = {this.state.features}
-                drawnFeatures = {drawnFeatures}
+                drawnFeatures = {this.state.drawnFeatures}
                 finishLine = {this.finishLine}
                 deleteLastPoint = {this.deleteLastPoint}
                 cancelEdit = {this.cancelEdit}
@@ -961,6 +968,8 @@ class MainApp extends Component {
                 changeMode = {this.changeMode}
                 toggleEdit =  {this.toggleEdit}
                 toggleDelete =  {this.toggleDelete}
+                passRefUpward={this.getRefsFromChild}
+                tour = {this.state.tour}
               />
               {isAuthenticated() && (
                 <>
@@ -999,7 +1008,7 @@ class MainApp extends Component {
               editing={this.state.editing}
               deleting = {this.state.deleting}
               features = {this.state.features}
-              drawnFeatures = {drawnFeatures}
+              drawnFeatures = {this.state.drawnFeatures}
               finishLine = {this.finishLine}
               deleteLastPoint = {this.deleteLastPoint}
               cancelEdit = {this.cancelEdit}
@@ -1009,6 +1018,8 @@ class MainApp extends Component {
               changeMode = {this.changeMode}
               toggleEdit =  {this.toggleEdit}
               toggleDelete =  {this.toggleDelete}
+              passRefUpward={this.getRefsFromChild}
+              tour = {this.state.tour}
             />
           </div>
           <Button size='small' style={{marginTop:'10px'}} onClick={this.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
@@ -1032,7 +1043,7 @@ class MainApp extends Component {
             editing={this.state.editing}
             deleting = {this.state.deleting}
             features = {this.state.features}
-            drawnFeatures = {drawnFeatures}
+            drawnFeatures = {this.state.drawnFeatures}
             finishLine = {this.finishLine}
             deleteLastPoint = {this.deleteLastPoint}
             cancelEdit = {this.cancelEdit}
@@ -1064,7 +1075,7 @@ class MainApp extends Component {
           <MenuItem className='compactList' onClick={()=>this.setBasemap('aerial')}>Aerial Photo</MenuItem>
         </Menu>
           {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : <div /> }
-          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && drawnFeatures > 0) ? <Fab onClick={()=>this.openUploadDialog(true)} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : <div /> }
+          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && this.state.drawnFeatures > 0) ? <Fab onClick={()=>this.openUploadDialog(true)} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : <div /> }
           {(this.state.view === 1 && this.state.mode === 'map'  ) ? <Fab onClick={()=>this.changeMode('cards')} color="primary" id='cardswitcher'><CardsIcon /></Fab> : <div /> }
           {(this.state.view === 1 && this.state.mode === 'cards'  ) ? <Fab onClick={()=>this.changeMode('map')} color="primary" id='mapswitcher'><MapIcon /></Fab> : <div /> }
 
@@ -1118,7 +1129,7 @@ class MainApp extends Component {
               <DialogTitle>{"Upload Features?"}</DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                  Do you want to upload {drawnFeatures} features to the map?
+                  Do you want to upload {this.state.drawnFeatures} features to the map?
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
@@ -1142,17 +1153,48 @@ class MainApp extends Component {
                 We want to know where you want to bike in North Kansas City.  Draw a line (<LineIcon style={{height:'24px',verticalAlign:'middle' }} />) or drop a pin (<PlaceIcon style={{height:'24px', verticalAlign:'middle'}} />) to share routes and destinations where you might ride a bike.  You can also point out places you would like to ride but don't feel safe or comfortable for biking today.  Thank you for informing North Kansas City's Bike Master Plan!  To get involved and learn more about the Bike Master Plan, visit the <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan' target="_blank">North Kansas City Bike Master Plan project page.</a>                </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button variant='contained' onClick={()=>{this.closeHelp();this.startTour();}} color="primary">
-                  <PlayIcon /> Start Tour
-                </Button>
                 <Button onClick={this.closeHelp} color="primary">
                   <CancelIcon /> Close
                 </Button>
+                <Button variant='contained' onClick={()=>{
+                  this.closeHelp();this.tour(document.querySelector('#createFeaturesPanel'), this.refs.tour1);
+
+                }} color="primary">
+                  <PlayIcon /> Start Tour
+                </Button>
               </DialogActions>
             </Dialog>
-            <template id="tour1">
-              <div>
-                <strong>First, click a button to draw a line or a route to answer questions about where you current bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.</strong>
+            <template id="tour1" ref='tour1'>
+              <div style={{textAlign:'left'}}>
+              <p>
+                First, click a button to draw a line or a route to answer questions about where you current bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.
+              </p>
+              </div>
+              <div style={{textAlign:'right'}}>
+              <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
+              <Button color='primary' variant='contained' onClick={()=>{this.tour(document.querySelector('#editPanel'), this.refs.tour2);}}><PlayIcon /> Next</Button>
+              </div>
+            </template>
+            <template id="tour2" ref='tour2'>
+              <div style={{textAlign:'left'}}>
+              <p>
+                After you create features you may edit or delete them using these tools.
+              </p>
+              </div>
+              <div style={{textAlign:'right'}}>
+              <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
+              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector('#uploadButton'), this.refs.tour3)}><PlayIcon /> Next</Button>
+              </div>
+            </template>
+            <template id="tour3" ref='tour3'>
+              <div style={{textAlign:'left'}}>
+              <p>
+                Upload your features to add them to the results map.
+              </p>
+              </div>
+              <div style={{textAlign:'right'}}>
+              <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
+              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector('#uploadButton'), this.refs.tour3)}><PlayIcon /> Next</Button>
               </div>
             </template>
             <img src={PlacePNG} style={{display:"none"}} />
@@ -1536,8 +1578,9 @@ class MainApp extends Component {
           else{
             coordinate = target.feature.getGeometry().getCoordinates();
           }
-          target.feature.setId(drawnFeatures);
-          drawnFeatures++;
+          target.feature.setId(this.state.drawnFeatures);
+          let numberofFeatures = this.state.drawnFeatures
+          this.setState({drawnFeatures: numberofFeatures+1})
           overlay.setPosition(coordinate);
           document.getElementById("commentArea").focus();
           this.setState({popover: true});
@@ -1569,12 +1612,13 @@ class MainApp extends Component {
           sourceArray.map(function(layer, count){
             if(layer.hasFeature(selectedFeature)){
               layer.removeFeature(selectedFeature);
-              drawnFeatures--;
+              let numberofFeatures = this.state.drawnFeatures
+              this.setState({drawnFeatures:numberofFeatures-1})
               document.getElementById('map').style.cursor = 'default';
             }
-          })
+          }.bind(this));
         }
-      });
+      }.bind(this));
 
       var selectableLayers = [];
       resultsLayerArray.map(function(layer){

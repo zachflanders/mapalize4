@@ -196,7 +196,7 @@ class Sidebar extends Component {
         else {
           return (
               <div>
-              <Paper id='createFeaturesPanel'>
+              <Paper id='createFeaturesPanel' ref='createFeaturesPanel'>
                 <div style={{padding:'8px'}}>
                   <strong><AddIcon style={{verticalAlign:'middle'}} /> &nbsp; Create Features</strong>
                 </div>
@@ -222,15 +222,15 @@ class Sidebar extends Component {
                 </div>
               </Paper>
               <br />
-              <Paper style={{padding:'8px'}}>
+              <Paper style={{padding:'8px'}} id='editPanel' ref='editPanel'>
               <Button
-                disabled = {(this.props.drawnFeatures > 0)? false: true}
+                disabled = {(this.props.tour === true || this.props.drawnFeatures > 0)? false: true}
                 onClick = {this.props.toggleEdit}
                 className='full-width-left'        >
                 <EditIcon /> &nbsp;&nbsp; Edit Features
               </Button>
               <Button
-                disabled = {(this.props.drawnFeatures > 0)? false: true}
+                disabled = {(this.props.tour === true || this.props.drawnFeatures > 0)? false: true}
                 onClick = {this.props.toggleDelete}
                 className='full-width-left'        >
                 <DeleteIcon /> &nbsp;&nbsp; Delete Features
@@ -238,13 +238,14 @@ class Sidebar extends Component {
               </Paper>
               <br />
               <Button
-                disabled = {(this.props.drawnFeatures > 0)? false: true}
+                disabled = {(this.props.tour === true || this.props.drawnFeatures > 0)? false: true}
                 variant='contained'
                 color='primary'
-                onClick = {()=>this.props.openUploadDialog(true)}
+                onClick = {()=>{if(this.props.drawnFeatures > 0){this.props.openUploadDialog(true)}}}
                 className = 'full-width'
+                id='uploadButton'
               >
-                <UploadIcon /> &nbsp;&nbsp; Upload
+                <UploadIcon /> &nbsp;&nbsp; Upload {this.props.tour}
               </Button>
               </div>
           )
@@ -354,10 +355,13 @@ class Sidebar extends Component {
       }
   }
   componentDidMount(){
+    console.log(this.props.tour);
+    this.props.passRefUpward(this.refs);
 
     }
 
   componentDidUpdate(){
+    console.log(this.props.tour);
   }
 }
 export default Sidebar;
