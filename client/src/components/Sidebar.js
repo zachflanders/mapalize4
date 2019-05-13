@@ -238,6 +238,7 @@ class Sidebar extends Component {
               </Paper>
               <br />
               <Button
+                ref='uploadButton'
                 disabled = {(this.props.tour === true || this.props.drawnFeatures > 0)? false: true}
                 variant='contained'
                 color='primary'

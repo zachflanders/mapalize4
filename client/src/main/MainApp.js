@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { renderToString } from 'react-dom/server'
+import ReactDOM from 'react-dom';
 
 import '../App.css';
 import MainDisplay from '../main.js';
@@ -214,6 +215,19 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
 
 let colors=['#2ecc71', '#3498db', '#e74c3c'];
 
+const UploadSnackbar = (props) =>(
+  ReactDOM.createPortal(<Snackbar
+    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+    open={props.uploadMessage}
+    ContentProps={{
+      'aria-describedby': 'message-id',
+    }}
+    message={<span id="message-id">{props.uploadMessage}</span>}
+    autoHideDuration = {2000}
+    onClose={()=>props.onClose()}
+    />, document.body)
+)
+
 class MainApp extends Component {
 
   constructor(props) {
@@ -310,6 +324,8 @@ class MainApp extends Component {
     this.sortCards = this.sortCards.bind(this);
     this.setBasemap = this.setBasemap.bind(this);
     this.getRefsFromChild = this.getRefsFromChild.bind(this);
+    this.setUploadMessage = this.setUploadMessage.bind(this);
+
   }
 
   getRefsFromChild(childRefs) {
@@ -477,6 +493,10 @@ class MainApp extends Component {
     this.setState({viewMap: true});
   }
 
+  setUploadMessage(message){
+    this.setState({uploadMessage:message});
+  }
+
   upload(){
     overlay.setPosition(undefined);
     this.openUploadDialog(false)
@@ -495,7 +515,8 @@ class MainApp extends Component {
       if(response.status === 200){
         console.log(this);
         let uploadMessage = <span><DoneIcon style={{verticalAlign:'middle'}} /> Upload Successful</span>
-        this.setState({uploadMessage: uploadMessage});
+        this.setUploadMessage(uploadMessage)
+        //this.setState({uploadMessage: uploadMessage});
         //this.setState({});
         sourceArray.map(function(item, count){
           return item.clear();
@@ -876,11 +897,8 @@ class MainApp extends Component {
     this.closeBasemapMenu();
   }
 
-  tippyContent = () => (
-      <Tippy content="Hello">
-        <Button>My button</Button>
-      </Tippy>
-    )
+
+
 
   tour = (target, ref) => {
     if(x>600){
@@ -888,12 +906,10 @@ class MainApp extends Component {
           tourTippy.destroy();
         }
         this.setState({tour:true})
-        let tourDiv = target;
-        console.log(tourDiv);
+
         let content = ref;
         content.style.display = 'block';
-        tourTippy = tippy(tourDiv);
-        console.log(tourTippy);
+        tourTippy = tippy(target);
         tourTippy.set({
             content: content,
             trigger: 'click',
@@ -909,8 +925,6 @@ class MainApp extends Component {
               console.log('hidden')
               tourTippy.destroy();
               this.setState({tour:false});
-
-
             }
           });
         tourTippy.show();
@@ -943,7 +957,7 @@ class MainApp extends Component {
               </Typography>
               <Tabs value={this.state.view} className='tabContainer' onChange = {this.switchView} variant='fullWidth' id='menuTabs'>
                 <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{flexGrow: 1}} className='tab' />
-                <Tab label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} style={{flexGrow: 1}} />
+                <Tab id='resultsTab' label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} style={{flexGrow: 1}} />
               </Tabs>
             </Toolbar>
           </AppBar>
@@ -1113,16 +1127,11 @@ class MainApp extends Component {
             {this.renderResultsPopover()}
             <div className='arrow'></div>
           </Paper>
-          <Snackbar
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            open={this.state.uploadMessage}
-            ContentProps={{
-              'aria-describedby': 'message-id',
-            }}
-            message={<span id="message-id">{this.state.uploadMessage}</span>}
-            autoHideDuration = {2000}
+          <UploadSnackbar
+            uploadMessage = {this.state.uploadMessage}
             onClose = {this.closeSnackbar}
-            />
+          />
+
             <Dialog
               open={this.state.uploadDialog}
               onClose={this.handleClose}
@@ -1158,7 +1167,7 @@ class MainApp extends Component {
                   <CancelIcon /> Close
                 </Button>
                 <Button variant='contained' onClick={()=>{
-                  this.closeHelp();/*this.tour(document.querySelector('#createFeaturesPanel'), this.refs.tour1);*/
+                  this.closeHelp();this.tour(document.querySelector("#createFeaturesPanel"), this.refs.tour1);
 
                 }} color="primary">
                   <PlayIcon /> Start Tour
@@ -1166,36 +1175,50 @@ class MainApp extends Component {
               </DialogActions>
             </Dialog>
             <template id="tour1" ref='tour1'>
-              <div style={{textAlign:'left'}}>
+              <div style={{textAlign:'left', padding:'10px'}}>
+              <Typography variant='h6'>Step 1 - Create Features</Typography>
               <p>
                 First, click a button to draw a line or a route to answer questions about where you current bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.
               </p>
               </div>
               <div style={{textAlign:'right'}}>
               <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
-              <Button color='primary' variant='contained' onClick={()=>{this.tour(document.querySelector('#editPanel'), this.refs.tour2);}}><PlayIcon /> Next</Button>
+              <Button color='primary' variant='contained' onClick={()=>{this.tour(document.querySelector("#editPanel"), this.refs.tour2);}}><PlayIcon /> Next</Button>
               </div>
             </template>
             <template id="tour2" ref='tour2'>
-              <div style={{textAlign:'left'}}>
+              <div style={{textAlign:'left', padding:'10px'}}>
+              <Typography variant='h6'>Step 2 - Edit Features (Optional)</Typography>
               <p>
                 After you create features you may edit or delete them using these tools.
               </p>
               </div>
               <div style={{textAlign:'right'}}>
               <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
-              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector('#uploadButton'), this.refs.tour3)}><PlayIcon /> Next</Button>
+              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector("#uploadButton"), this.refs.tour3)}><PlayIcon /> Next</Button>
               </div>
             </template>
             <template id="tour3" ref='tour3'>
-              <div style={{textAlign:'left'}}>
+              <div style={{textAlign:'left', padding:'10px'}}>
+              <Typography variant='h6'>Step 3 - Upload Features</Typography>
               <p>
                 Upload your features to add them to the results map.
               </p>
               </div>
               <div style={{textAlign:'right'}}>
               <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
-              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector('#uploadButton'), this.refs.tour3)}><PlayIcon /> Next</Button>
+              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector("#resultsTab"), this.refs.tour4)}><PlayIcon /> Next</Button>
+              </div>
+            </template>
+            <template id="tour4" ref='tour4'>
+              <div style={{textAlign:'left', padding:'10px'}}>
+              <Typography variant='h6'>Step 3 - View Results</Typography>
+              <p>
+                Click the Results tab to view everyone's results on the map.
+              </p>
+              </div>
+              <div style={{textAlign:'right'}}>
+              <Button color='primary' variant='contained' onClick={()=>{console.log('close');tourTippy.destroy()}}><DoneIcon /> Done</Button>&nbsp;
               </div>
             </template>
             <img src={PlacePNG} style={{display:"none"}} />
