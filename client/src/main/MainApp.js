@@ -276,7 +276,7 @@ class MainApp extends Component {
       selectedResultsFeatures: null,
       drawerOpen: false,
       bottomDrawerOpen: false,
-      uploadMessage: '',
+      uploadMessage: undefined,
       uploadMessageDisplay: false,
       lineDrawMessage: "Click to draw line",
       resultClusterNumber: 0,
@@ -493,8 +493,10 @@ class MainApp extends Component {
     })
     .then(function(response){
       if(response.status === 200){
-        this.setState({uploadMessage: <span><DoneIcon style={{verticalAlign:'middle'}} /> Upload Successful</span>});
-        this.setState({uploadMessageDisplay: true});
+        console.log(this);
+        let uploadMessage = <span><DoneIcon style={{verticalAlign:'middle'}} /> Upload Successful</span>
+        this.setState({uploadMessage: uploadMessage});
+        //this.setState({});
         sourceArray.map(function(item, count){
           return item.clear();
         });
@@ -505,7 +507,6 @@ class MainApp extends Component {
       }
       else{
         this.setState({uploadMessage: <span><CancelIcon style={{verticalAlign:'middle'}} /> Oops. Something went wrong.</span>});
-        this.setState({uploadMessageDisplay: true});
         layerArray.map(function(layer, count){
           map.addLayer(layer);
         });
@@ -816,7 +817,7 @@ class MainApp extends Component {
   }
 
   closeSnackbar(){
-    this.setState({uploadMessageDisplay: false});
+    this.setState({uploadMessage: undefined});
   }
 
   openHelp = () =>{
@@ -1114,7 +1115,7 @@ class MainApp extends Component {
           </Paper>
           <Snackbar
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            open={this.state.uploadMessageDisplay}
+            open={this.state.uploadMessage}
             ContentProps={{
               'aria-describedby': 'message-id',
             }}
@@ -1157,7 +1158,7 @@ class MainApp extends Component {
                   <CancelIcon /> Close
                 </Button>
                 <Button variant='contained' onClick={()=>{
-                  this.closeHelp();this.tour(document.querySelector('#createFeaturesPanel'), this.refs.tour1);
+                  this.closeHelp();/*this.tour(document.querySelector('#createFeaturesPanel'), this.refs.tour1);*/
 
                 }} color="primary">
                   <PlayIcon /> Start Tour
