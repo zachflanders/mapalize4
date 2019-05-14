@@ -900,7 +900,7 @@ class MainApp extends Component {
 
 
 
-  tour = (target, ref) => {
+  tour = (target, ref, placement) => {
     if(x>600){
         if(tourTippy){
           tourTippy.destroy();
@@ -913,7 +913,7 @@ class MainApp extends Component {
         tourTippy.set({
             content: content,
             trigger: 'click',
-            placement: 'right',
+            placement: placement,
             boundary: 'window',
             theme: 'light-border',
             arrow: true,
@@ -1167,7 +1167,7 @@ class MainApp extends Component {
                   <CancelIcon /> Close
                 </Button>
                 <Button variant='contained' onClick={()=>{
-                  this.closeHelp();this.tour(document.querySelector("#createFeaturesPanel"), this.refs.tour1);
+                  this.closeHelp();this.tour(document.querySelector("#createFeaturesPanel"), this.refs.tour1, 'right');
 
                 }} color="primary">
                   <PlayIcon /> Start Tour
@@ -1183,7 +1183,7 @@ class MainApp extends Component {
               </div>
               <div style={{textAlign:'right'}}>
               <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
-              <Button color='primary' variant='contained' onClick={()=>{this.tour(document.querySelector("#editPanel"), this.refs.tour2);}}><PlayIcon /> Next</Button>
+              <Button color='primary' variant='contained' onClick={()=>{this.tour(document.querySelector("#editPanel"), this.refs.tour2, 'right');}}><PlayIcon /> Next</Button>
               </div>
             </template>
             <template id="tour2" ref='tour2'>
@@ -1195,7 +1195,7 @@ class MainApp extends Component {
               </div>
               <div style={{textAlign:'right'}}>
               <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
-              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector("#uploadButton"), this.refs.tour3)}><PlayIcon /> Next</Button>
+              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector("#uploadButton"), this.refs.tour3, 'right')}><PlayIcon /> Next</Button>
               </div>
             </template>
             <template id="tour3" ref='tour3'>
@@ -1207,7 +1207,7 @@ class MainApp extends Component {
               </div>
               <div style={{textAlign:'right'}}>
               <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
-              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector("#resultsTab"), this.refs.tour4)}><PlayIcon /> Next</Button>
+              <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector("#resultsTab"), this.refs.tour4, 'bottom')}><PlayIcon /> Next</Button>
               </div>
             </template>
             <template id="tour4" ref='tour4'>
