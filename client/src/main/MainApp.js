@@ -213,7 +213,7 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
   }
 };
 
-let colors=['#2ecc71', '#3498db', '#e74c3c'];
+let colors=['#0072b2', '#009e73', '#d55e00'];
 
 const UploadSnackbar = (props) =>(
   ReactDOM.createPortal(<Snackbar
