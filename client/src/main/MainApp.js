@@ -213,7 +213,7 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
   }
 };
 
-let colors=['#0072b2', '#009e73', '#d55e00'];
+let colors=['#0bb45a', '#00a0fa', '#aa093c'];
 
 const UploadSnackbar = (props) =>(
   ReactDOM.createPortal(<Snackbar
@@ -257,15 +257,15 @@ class MainApp extends Component {
           name:'What destinations do you visit on your bike?',
           prompt:'Click to start drawing a point.',
           type:'point',
-          color: (chroma(colors[0]).darken(0.5)).toString(),
+          color: (chroma(colors[0])).toString(),
           viewResults: true
         },
         {
           id: 3,
-          name:'What desinations would you like to visit if you had a safe and comfortable route?',
+          name:'What destinations would you like to visit if you had a safe and comfortable route?',
           prompt:'Click to start straing a point.',
           type:'point',
-          color: (chroma(colors[1]).darken(0.5)).toString(),
+          color: (chroma(colors[1])).toString(),
           viewResults: true
         },
         {
@@ -1001,6 +1001,10 @@ class MainApp extends Component {
                 </>
               )}
               <Button size='small' style={{marginTop:'10px'}} onClick={this.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+              <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
+                To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
+                If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
+              </Typography>
 
             </div>
 
@@ -1174,11 +1178,11 @@ class MainApp extends Component {
                 </Button>
               </DialogActions>
             </Dialog>
-            <template id="tour1" ref='tour1'>
+            <template id="tour1" ref='tour1' style={{display:'none'}}>
               <div style={{textAlign:'left', padding:'10px'}}>
               <Typography variant='h6'>Step 1 - Create Features</Typography>
               <p>
-                First, click a button to draw a line or a route to answer questions about where you current bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.
+                First, click a button to draw a line or a route to answer questions about where you currently bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.
               </p>
               </div>
               <div style={{textAlign:'right'}}>
@@ -1186,7 +1190,7 @@ class MainApp extends Component {
               <Button color='primary' variant='contained' onClick={()=>{this.tour(document.querySelector("#editPanel"), this.refs.tour2, 'right');}}><PlayIcon /> Next</Button>
               </div>
             </template>
-            <template id="tour2" ref='tour2'>
+            <template id="tour2" ref='tour2' style={{display:'none'}}>
               <div style={{textAlign:'left', padding:'10px'}}>
               <Typography variant='h6'>Step 2 - Edit Features (Optional)</Typography>
               <p>
@@ -1198,7 +1202,7 @@ class MainApp extends Component {
               <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector("#uploadButton"), this.refs.tour3, 'right')}><PlayIcon /> Next</Button>
               </div>
             </template>
-            <template id="tour3" ref='tour3'>
+            <template id="tour3" ref='tour3' style={{display:'none'}}>
               <div style={{textAlign:'left', padding:'10px'}}>
               <Typography variant='h6'>Step 3 - Upload Features</Typography>
               <p>
@@ -1210,14 +1214,14 @@ class MainApp extends Component {
               <Button color='primary' color='primary' variant='contained' onClick={()=>this.tour(document.querySelector("#resultsTab"), this.refs.tour4, 'bottom')}><PlayIcon /> Next</Button>
               </div>
             </template>
-            <template id="tour4" ref='tour4'>
+            <template id="tour4" ref='tour4' style={{display:'none'}}>
               <div style={{textAlign:'left', padding:'10px'}}>
               <Typography variant='h6'>Step 3 - View Results</Typography>
               <p>
                 Click the Results tab to view everyone's results on the map.
               </p>
               </div>
-              <div style={{textAlign:'right'}}>
+              <div style={{textAlign:'right'}} >
               <Button color='primary' variant='contained' onClick={()=>{console.log('close');tourTippy.destroy()}}><DoneIcon /> Done</Button>&nbsp;
               </div>
             </template>
