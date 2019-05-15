@@ -929,6 +929,35 @@ class MainApp extends Component {
           });
         tourTippy.show();
     }
+    else{
+      if(tourTippy){
+        tourTippy.destroy();
+      }
+      this.setState({tour:true})
+
+      let content = ref;
+      content.style.display = 'block';
+      tourTippy = tippy(target);
+      tourTippy.set({
+          content: content,
+          trigger: 'click',
+          placement: placement,
+          boundary: 'window',
+          theme: 'light-border',
+          arrow: true,
+          distance: 5,
+          hideOnClick: true,
+          interactive: true,
+          ignoreAttributes: true,
+          onHidden: ()=>{
+            console.log('hidden')
+            tourTippy.destroy();
+            this.setState({tour:false});
+          }
+        });
+      tourTippy.show();
+
+    }
   }
 
   render() {
@@ -940,8 +969,6 @@ class MainApp extends Component {
         <div className="App">
           <AppBar position="fixed" style={{zIndex: 1202, flexWrap:'wrap', width:'100%', maxWidth: '100%'}}>
             <Toolbar style={{flexWrap:'wrap', maxWidth: '100%'}} id='toolbar'>
-
-
               <Typography variant="h6" color="inherit" style={{flexGrow:2,  maxWidth: '100%'}} noWrap >
               <IconButton
                 onClick = {this.toggleDrawer(true)}
@@ -1094,7 +1121,7 @@ class MainApp extends Component {
           <MenuItem className='compactList' onClick={()=>this.setBasemap('aerial')}>Aerial Photo</MenuItem>
         </Menu>
           {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false) ? <Fab onClick={this.toggleBottomDrawer(true)} color="primary" aria-label="Add" id='add-button'><AddIcon /></Fab> : <div /> }
-          {(this.state.view === 0 && this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && this.state.drawnFeatures > 0) ? <Fab onClick={()=>this.openUploadDialog(true)} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : <div /> }
+          {(this.state.view === 0 && (this.state.tour=== true || (this.state.editing === false && this.state.deleting=== false && this.state.drawing===false && this.state.drawnFeatures > 0))) ? <Fab onClick={()=>{if(this.state.drawnFeatures > 0){this.openUploadDialog(true)}}} color="secondary" aria-label="Add" id='upload-button'><UploadIcon /></Fab> : <div /> }
           {(this.state.view === 1 && this.state.mode === 'map'  ) ? <Fab onClick={()=>this.changeMode('cards')} color="primary" id='cardswitcher'><CardsIcon /></Fab> : <div /> }
           {(this.state.view === 1 && this.state.mode === 'cards'  ) ? <Fab onClick={()=>this.changeMode('map')} color="primary" id='mapswitcher'><MapIcon /></Fab> : <div /> }
 
@@ -1171,7 +1198,7 @@ class MainApp extends Component {
                   <CancelIcon /> Close
                 </Button>
                 <Button variant='contained' onClick={()=>{
-                  this.closeHelp();this.tour(document.querySelector("#createFeaturesPanel"), this.refs.tour1, 'right');
+                  this.closeHelp();this.tour((x>600 ? document.querySelector("#createFeaturesPanel") : document.querySelector("#add-button")) , (x>600 ? this.refs.tour1: this.refs.tour5), (x>600 ? 'right': 'top'));
 
                 }} color="primary">
                   <PlayIcon /> Start Tour
@@ -1216,13 +1243,49 @@ class MainApp extends Component {
             </template>
             <template id="tour4" ref='tour4' style={{display:'none'}}>
               <div style={{textAlign:'left', padding:'10px'}}>
-              <Typography variant='h6'>Step 3 - View Results</Typography>
+              <Typography variant='h6'>Step 4 - View Results</Typography>
               <p>
                 Click the Results tab to view everyone's results on the map.
               </p>
               </div>
               <div style={{textAlign:'right'}} >
               <Button color='primary' variant='contained' onClick={()=>{console.log('close');tourTippy.destroy()}}><DoneIcon /> Done</Button>&nbsp;
+              </div>
+            </template>
+            <template id="tour5" ref='tour5' style={{display:'none'}}>
+              <div style={{textAlign:'left', padding:'10px'}}>
+              <Typography variant='h6'>Step 1 - Create Features</Typography>
+              <p>
+                First, click a button to draw a line or a route to answer questions about where you currently bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.
+              </p>
+              </div>
+              <div style={{textAlign:'right'}}>
+              <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
+              <Button color='primary' variant='contained' onClick={()=>{this.tour(document.querySelector("#menuButton"), this.refs.tour6, 'bottom');}}><PlayIcon /> Next</Button>
+              </div>
+            </template>
+            <template id="tour6" ref='tour6' style={{display:'none'}}>
+              <div style={{textAlign:'left', padding:'10px'}}>
+              <Typography variant='h6'>Step 2 - Edit Features (Optional)</Typography>
+              <p>
+                Click the menu button to reveal additional tools for editing and deleteing features.
+              </p>
+              </div>
+              <div style={{textAlign:'right'}}>
+              <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
+              <Button color='primary' variant='contained' onClick={()=>{this.tour(document.querySelector("#upload-button"), this.refs.tour7, 'top');}}><PlayIcon /> Next</Button>
+              </div>
+            </template>
+            <template id="tour7" ref='tour7' style={{display:'none'}}>
+              <div style={{textAlign:'left', padding:'10px'}}>
+              <Typography variant='h6'>Step 3 - Upload Features</Typography>
+              <p>
+                Upload your features to add them to the results map.
+              </p>
+              </div>
+              <div style={{textAlign:'right'}}>
+              <Button color='primary' onClick={()=>{console.log('close');tourTippy.destroy()}}><CancelIcon /> Close</Button>&nbsp;
+              <Button color='primary' variant='contained' onClick={()=>{this.tour(document.querySelector("#resultsTab"), this.refs.tour4, 'bottom');}}><PlayIcon /> Next</Button>
               </div>
             </template>
             <img src={PlacePNG} style={{display:"none"}} />

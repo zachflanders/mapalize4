@@ -32,7 +32,7 @@ module.exports = (sequelize, type) => {
     },
     role:{
       type: type.STRING,
-      defaultValue: 'User'
+      defaultValue: 'mod'
     },
     created:{
       type: type.DATE,
