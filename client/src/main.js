@@ -31,31 +31,19 @@ import LineString from 'ol/geom/LineString';
 
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import Draw from 'ol/interaction/Draw';
-import Modify from 'ol/interaction/Modify';
+
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
-import CircleStyle from 'ol/style/Circle';
-import Fill from 'ol/style/Fill';
-import Text from 'ol/style/Text';
+
 import Icon from 'ol/style/Icon';
-import GeoJSON from 'ol/format/GeoJSON';
 import {fromLonLat} from 'ol/proj';
-import {transform} from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
 import View from 'ol/View';
-import Zoom from 'ol/control/Zoom';
-import Heatmap from 'ol/layer/Heatmap';
-import Overlay from 'ol/Overlay';
-import Feature from 'ol/Feature';
-import Select from 'ol/interaction/Select.js';
-import {click, pointerMove} from 'ol/events/condition.js';
-import Cluster from 'ol/source/Cluster';
-import {defaults as defaultInteractions} from 'ol/interaction.js';
-import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
 
-import PlaceSVG from './assets/place.svg';
+import Feature from 'ol/Feature';
+
+
 import PlacePNG from './assets/place.png';
 
 import * as moment from 'moment';
@@ -76,8 +64,6 @@ class MapCard extends React.Component {
     this.componentDidUpdate = this.componentDidUpdate.bind(this);
 
   }
-
-
 
  render() {
    return (
@@ -238,7 +224,7 @@ class Paginate extends React.Component {
     let cards;
     if(!_.isEmpty(sortedFeatures)){
       cards = sortedFeatures.map(function(item, count){
-        if(item.viewResults === true && count < (itemsPerPage*this.state.currentPage) && (this.state.currentPage===1 || count >= (itemsPerPage*this.state.currentPage-itemsPerPage*(this.state.currentPage-1)))){
+        if(item.viewResults === true && count < (itemsPerPage*this.state.currentPage) && (this.state.currentPage===1 || (count >= (itemsPerPage*this.state.currentPage-itemsPerPage)&& count <= itemsPerPage*this.state.currentPage))){
           return(
             <div key={item.id} className='resultCard' style={{flex:'1 auto', margin:'0px'}}>{this.renderMapCard(item)}</div>
           )
