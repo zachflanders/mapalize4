@@ -1105,7 +1105,7 @@ class MainApp extends Component {
       </Drawer>
         <Fab id='basemapsFab'
           size='small'
-          style={this.state.mode==='map' ? {display:'flex'} : {display:'none'}}
+          style={this.state.mode==='map' || this.state.view ==='0' ? {display:'flex'} : {display:'none'}}
           onClick={this.openBasemapMenu}
         >
           <LayersIcon />

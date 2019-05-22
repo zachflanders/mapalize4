@@ -75,7 +75,7 @@ class MapCard extends React.Component {
               </Avatar>
             }
             title= {<strong>{this.props.data.name}</strong>}
-            subheader={(this.props.data.date) ? moment(this.props.data.date).subtract(5,'hours').format('MMMM Do YYYY, h:mm a') : ''}
+            subheader={(this.props.data.date) ? moment(this.props.data.date).format('MMMM Do YYYY, h:mm a') : ''}
           />
          <div id={'cardmap-'+this.props.data.id} className='cardmap'></div>
          <CardContent>
