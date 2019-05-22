@@ -6,10 +6,10 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
-import {Link, Redirect} from 'react-router-dom'
-import {signin, authenticate} from '../auth'
+import {Link} from 'react-router-dom'
+import {signup} from '../auth';
 import ReCAPTCHA from "react-google-recaptcha";
-import Nav from '../components/Nav';
+import Nav from '../Nav';
 
 
 
@@ -22,17 +22,20 @@ const styles = theme => ({
   }
 });
 
-class Signin extends Component {
+class Signup extends Component {
   constructor(){
     super()
     this.state = {
+      name: '',
       email: '',
       password:'',
       error: '',
-      redirectToReferer: false,
-      loading: false,
-      recaptcha: false
+      open: false,
+      recaptcha: false,
+      accessCode: ''
     }
+    this.handleCaptchaResponseChange = this.handleCaptchaResponseChange.bind(this);
+
   }
 
   handleChange = (name) => (event) => {
@@ -42,34 +45,50 @@ class Signin extends Component {
 
   clickSubmit = event => {
     event.preventDefault();
-    this.setState({loading: true});
-    const {name, email, password, recaptcha} = this.state;
+    const {name, email, password, recaptcha, accessCode} = this.state;
     const user = {
       name,
       email,
       password,
-      recaptcha
+      recaptcha,
+      accessCode
     };
-    signin(user)
+    signup(user)
     .then(data =>{
       if(data.error){
-        this.setState({error: data.error, loading: false})
+        this.setState({error: data.error})
       }
       else{
-        //authenticate
-        authenticate(data, ()=>{
-          this.setState({redirectToReferer: true})
+        this.setState({
+          error: '',
+          name: '',
+          email: '',
+          password: '',
+          open: true,
+          recaptcha: false,
+          accessCode: ''
         })
-        //redirect
       }
     });
 
   };
 
+  handleCaptchaResponseChange(response) {
+   this.setState({
+     recaptcha: response,
+   });
+ }
 
 
-  signinForm = (email, password, classes) => (
+  signupForm = (name, email, password, accessCode, classes) => (
     <form style={{textAlign:'center'}}>
+      <TextField
+        id="name"
+        className={classes.textField}
+        label="Name"
+        onChange={this.handleChange("name")}
+        value={name}
+        />
       <TextField
         id="email"
         className={classes.textField}
@@ -86,50 +105,52 @@ class Signin extends Component {
         onChange={this.handleChange("password")}
         value={password}
         />
+        <TextField
+          id="code"
+          className={classes.textField}
+          label="Access Code"
+          onChange={this.handleChange("accessCode")}
+          value={accessCode}
+          />
+
     <Button
       onClick={this.clickSubmit}
       variant='contained'
       color='primary'>
-        Login
+        Sign Up
     </Button>
     </form>
   )
 
   render() {
     const { classes } = this.props;
-    const {name, email, password, error, redirectToReferer, loading} = this.state;
-    if(redirectToReferer){
-      return <Redirect to='/' />
-    }
+    const {name, email, password, accessCode, error} = this.state;
     return(
       <div>
         <Nav />
         <div style={{marginTop:'84px'}}>
-
         <Paper className='centered padded' style={{width:'350px'}}>
-          <Typography variant="h5" component="h2" style={{textAlign:'center'}}>Login</Typography>
-          {loading ? <div style={{textAlign:'center'}}>Loading...</div> : ""}
-          {this.signinForm(email, password, classes)}
+          <Typography variant="h5" component="h2" style={{textAlign:'center'}}>Create Account</Typography>
+          {this.signupForm(name, email, password, accessCode, classes)}
           <br />
-          <Typography variant='caption' color='textSecondary' style={{textAlign:'center'}}>Don't have an account?  <Link to='/signup' style={{color:"rgba(0, 0, 0, 0.54)"}}>Create</Link></Typography>
+          <Typography variant='caption' color='textSecondary' style={{textAlign:'center'}}>Already have an account? <Link to='/login' style={{color:"rgba(0, 0, 0, 0.54)"}}>Login</Link></Typography>
+
         </Paper>
         <Snackbar
           open={this.state.error}
           message={this.state.error}
         />
+        <Snackbar
+          open={this.state.open}
+          message={'New account created.  Please login.'}
+        />
         </div>
       </div>
     );
   }
-  onloadCallback() {
-    console.log("grecaptcha is ready!");
-  };
-  componentDidMount(){
-    this.onloadCallback()
-  }
 }
-Signin.propTypes = {
+Signup.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Signin);
+export default withStyles(styles)(Signup);

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import '../App.css';
+import '../../App.css';
 import './sidebar.css';
 import chroma from 'chroma-js';
 
@@ -357,7 +357,6 @@ class Sidebar extends Component {
   }
   componentDidMount(){
     console.log(this.props.tour);
-    this.props.passRefUpward(this.refs);
 
     }
 

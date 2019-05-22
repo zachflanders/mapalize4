@@ -1,19 +1,16 @@
-import React, { Component } from 'react';
-import { renderToString } from 'react-dom/server'
-import ReactDOM from 'react-dom';
+import React, {Component} from 'react';
 
-import '../App.css';
-import MainDisplay from '../main.js';
-import Sidebar from '../components/Sidebar.js';
-import Bottombar from '../bottombar.js';
-import PlaceSVG from '../assets/place.svg';
-import PlacePNG from '../assets/place.png';
+//components
+import '../../App.css';
+import MainDisplay from './main.js';
+import Sidebar from './Sidebar.js';
+import Bottombar from './bottombar.js';
+import PlacePNG from '../../assets/place.png';
 import {logout, isAuthenticated} from '../auth';
-import NkcLogo from '../assets/nkclogo.png';
-import Shepherd from 'shepherd.js';
-import 'shepherd.js/dist/css/shepherd-theme-default.css';
-
-
+import NkcLogo from '../../assets/nkclogo.png';
+import UploadSnackbar from './UploadSnackbar';
+import Nav from './Nav';
+import Results from './Results';
 
 //openlayers imports
 import 'ol/ol.css';
@@ -34,7 +31,6 @@ import {fromLonLat} from 'ol/proj';
 import {transform} from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
-import TileImage from 'ol/source/TileImage';
 import View from 'ol/View';
 import Zoom from 'ol/control/Zoom';
 import Heatmap from 'ol/layer/Heatmap';
@@ -49,35 +45,20 @@ import XYZ from 'ol/source/XYZ';
 import Polygon from 'ol/geom/Polygon';
 
 //Material-ui imports
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
 import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import EditIcon from '@material-ui/icons/Edit';
-import FireIcon from '@material-ui/icons/Whatshot';
-import BikeIcon from '@material-ui/icons/DirectionsBike';
-import MenuIcon from '@material-ui/icons/Menu';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-import Snackbar from '@material-ui/core/Snackbar';
 import DoneIcon from '@material-ui/icons/Done';
 import TextField from '@material-ui/core/TextField';
-import { createMuiTheme } from '@material-ui/core/styles';
-import { MuiThemeProvider } from '@material-ui/core/styles';
-import indigo from '@material-ui/core/colors/indigo';
-import teal from '@material-ui/core/colors/teal';
 import CancelIcon from '@material-ui/icons/Close';
 import CardsIcon from '@material-ui/icons/ViewModule';
 import MapIcon from '@material-ui/icons/Map';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import LineIcon from '@material-ui/icons/Timeline';
-import PointIcon from '@material-ui/icons/AddLocation';
 import PlaceIcon from '@material-ui/icons/Place';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import UploadIcon from '@material-ui/icons/CloudUpload';
@@ -86,27 +67,20 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Grow from '@material-ui/core/Grow';
 import LayersIcon from '@material-ui/icons/Layers';
 import PlayIcon from '@material-ui/icons/PlayArrow';
-
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import ListSubheader from '@material-ui/core/ListSubheader';
-
-
 
 import turf from 'turf';
 import axios from 'axios';
 import chroma from 'chroma-js';
 import tippy from 'tippy.js';
-import Tippy from '@tippy.js/react'
 import './tippytheme.css';
 import * as moment from 'moment';
 
 const pngScale =0.18;
 const pngAnchor = [0.5, 200];
-
 
 const convertToClick = (e) => {
   const evt = new MouseEvent('click', { bubbles: true })
@@ -159,30 +133,6 @@ var select = new Select({
   condition: click,
   layers: layerArray
 });
-let addSelectionListener = function(){
-  var collection = select.getFeatures();
-  collection.forEach(function(feature){
-  feature.setStyle(new Style({
-      stroke: new Stroke({
-        color: '#000',
-        width: 8
-      })
-    }));
-  });
-}
-/*
-let removeSelectionListener = function(){
-  var collection = vectorLayer.getSource().getFeatures();
-  collection.forEach(function(feature){
-  feature.setStyle(new Style({
-      stroke: new Stroke({
-        color: '#fff',
-        width: 8
-      })
-    }));
-  });
-}
-*/
 
 var selectDelete = new Select({
   condition: click,
@@ -214,19 +164,6 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
 };
 
 let colors=['#0bb45a', '#00a0fa', '#aa093c'];
-
-const UploadSnackbar = (props) =>(
-  ReactDOM.createPortal(<Snackbar
-    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-    open={props.uploadMessage}
-    ContentProps={{
-      'aria-describedby': 'message-id',
-    }}
-    message={<span id="message-id">{props.uploadMessage}</span>}
-    autoHideDuration = {2000}
-    onClose={()=>props.onClose()}
-    />, document.body)
-)
 
 class MainApp extends Component {
 
@@ -323,17 +260,8 @@ class MainApp extends Component {
     this.openUploadDialog = this.openUploadDialog.bind(this);
     this.sortCards = this.sortCards.bind(this);
     this.setBasemap = this.setBasemap.bind(this);
-    this.getRefsFromChild = this.getRefsFromChild.bind(this);
     this.setUploadMessage = this.setUploadMessage.bind(this);
 
-  }
-
-  getRefsFromChild(childRefs) {
-    // you can get your requested value here, you can either use state/props/ or whatever you like based on your need case by case
-    this.setState({
-      sidebarRefs: childRefs
-    });
-    console.log(this.state.myRequestedRefs); // this should have *info*, *contact* as keys
   }
 
   openUploadDialog(open){
@@ -402,8 +330,6 @@ class MainApp extends Component {
       mapTippy.enable();
       mapTippy.show()
     }
-
-
   }
 
   toggleDrawer = (open) => () => {
@@ -505,8 +431,8 @@ class MainApp extends Component {
     layerArray.map(function(item, counter){
       return drawnFeaturesArray.push(writer.writeFeatures(item.getSource().getFeatures()));
     });
-    layerArray.map(function(layer, count){
-        map.removeLayer(layer);
+    layerArray.map((layer, count)=>{
+        return map.removeLayer(layer);
     });
     axios.post('/api/features/add', {
       features: drawnFeaturesArray
@@ -522,14 +448,14 @@ class MainApp extends Component {
           return item.clear();
         });
         this.setState({drawnFeatures: 0});
-        layerArray.map(function(layer, count){
-          map.addLayer(layer);
+        layerArray.map((layer, count)=>{
+          return map.addLayer(layer);
         });
       }
       else{
         this.setState({uploadMessage: <span><CancelIcon style={{verticalAlign:'middle'}} /> Oops. Something went wrong.</span>});
-        layerArray.map(function(layer, count){
-          map.addLayer(layer);
+        layerArray.map((layer, count)=>{
+          return map.addLayer(layer);
         });
       }
       console.log(response);
@@ -574,7 +500,10 @@ class MainApp extends Component {
       features.map(function(feature){
         this.state.features.map(function(featureLayer,count){
           if(feature.name === featureLayer.name){
-            filteredFeatures.push(feature);
+            return filteredFeatures.push(feature);
+          }
+          else {
+            return null
           }
         })
         if(feature.line){
@@ -871,34 +800,9 @@ class MainApp extends Component {
 
       });
       map.getLayers().setAt(0, basemap)
-
-
     }
-    /*
-    else if(type==='darkmap'){
-      console.log(map.getLayers());
-      let basemap=new TileLayer({
-        source: new XYZ({url: 'http://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'})
-
-        source: new TileWMS({
-          url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-          params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
-          serverType: 'geoserver',
-          transition: 0
-        })
-
-
-      });
-      map.getLayers().setAt(0, basemap)
-
-
-    }
-    */
     this.closeBasemapMenu();
   }
-
-
-
 
   tour = (target, ref, placement) => {
     if(x>600){
@@ -963,33 +867,19 @@ class MainApp extends Component {
   render() {
     const { basemapMenuAnchorEl } = this.state;
     const { classes, history } = this.props;
-
-
     return (
         <div className="App">
-          <AppBar position="fixed" style={{zIndex: 1202, flexWrap:'wrap', width:'100%', maxWidth: '100%'}}>
-            <Toolbar style={{flexWrap:'wrap', maxWidth: '100%'}} id='toolbar'>
-              <Typography variant="h6" color="inherit" style={{flexGrow:2,  maxWidth: '100%'}} noWrap >
-              <IconButton
-                onClick = {this.toggleDrawer(true)}
-                id='menuButton'
-                color="inherit"
-                aria-label="Menu"
-                style={{marginLeft: -12, marginRight: 20}}
-              >
-                <MenuIcon />
-              </IconButton>
-                <BikeIcon style={{verticalAlign:'middle', marginBottom:'5px', height:'32px'}} />
-                &nbsp;&nbsp;{this.state.title}
-              </Typography>
-              <Tabs value={this.state.view} className='tabContainer' onChange = {this.switchView} variant='fullWidth' id='menuTabs'>
-                <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{flexGrow: 1}} className='tab' />
-                <Tab id='resultsTab' label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} style={{flexGrow: 1}} />
-              </Tabs>
-            </Toolbar>
-          </AppBar>
+          <Nav
+            results = {this.props.results}
+            input = {this.props.input}
+            title = {this.state.title}
+            view = {this.state.view}
+            toggleDrawer = {this.toggleDrawer}
+            switchView = {this.switchView}
+          />
+          {this.props.results && <Results/>}
+          {this.props.input && <div>
           <Drawer variant="permanent" className='desktop'>
-
             <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>
               <Sidebar
                 view={this.state.view}
@@ -1010,7 +900,6 @@ class MainApp extends Component {
                 changeMode = {this.changeMode}
                 toggleEdit =  {this.toggleEdit}
                 toggleDelete =  {this.toggleDelete}
-                passRefUpward={this.getRefsFromChild}
                 tour = {this.state.tour}
               />
               {isAuthenticated() && (
@@ -1034,8 +923,6 @@ class MainApp extends Component {
               </Typography>
 
             </div>
-
-
           </Drawer>
           <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
           <div
@@ -1064,7 +951,6 @@ class MainApp extends Component {
               changeMode = {this.changeMode}
               toggleEdit =  {this.toggleEdit}
               toggleDelete =  {this.toggleDelete}
-              passRefUpward={this.getRefsFromChild}
               tour = {this.state.tour}
             />
           </div>
@@ -1289,6 +1175,7 @@ class MainApp extends Component {
               </div>
             </template>
             <img src={PlacePNG} style={{display:"none"}} />
+          </div>}
 
         </div>
     );
@@ -1629,27 +1516,6 @@ class MainApp extends Component {
           else if(e.deselected.length > 0){
             convexVector.getSource().clear()
           }
-
-          /*
-          var h = e.feature.get("convexHull");
-      			if (!h)
-      			{	var cluster = e.feature.get("features");
-      				// calculate convex hull
-      				if (cluster && cluster.length)
-      				{	var c = [];
-      					for (var i=0, f; f = cluster[i]; i++)
-      					{	c.push(f.getGeometry().getCoordinates());
-      					}
-      					h = ol.coordinate.convexHull(c);
-      					e.feature.get("convexHull", h);
-      				}
-      			}
-      			vector.getSource().clear();
-      			if (h.length>2) vector.getSource().addFeature ( new ol.Feature( new ol.geom.Polygon([h]) ) );
-      		});
-      	hover.on("leave", function(e)
-      		{	vector.getSource().clear();
-              */
       		});
 
       })

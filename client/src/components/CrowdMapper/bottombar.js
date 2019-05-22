@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
+import '../../App.css';
 
 //Material-ui imports
 import Button from '@material-ui/core/Button';

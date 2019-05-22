@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import './App.css';
-import {logout, isMod} from './auth'
+import '../../App.css';
+import {logout, isMod} from '../auth'
 
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -44,7 +44,7 @@ import View from 'ol/View';
 import Feature from 'ol/Feature';
 
 
-import PlacePNG from './assets/place.png';
+import PlacePNG from '../../assets/place.png';
 
 import * as moment from 'moment';
 import Masonry from 'react-masonry-component';

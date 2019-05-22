@@ -2,12 +2,9 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import {isAuthenticated, isMod} from '../auth'
 import  './Moderate.css';
-import PlacePNG from '../assets/place.png';
+import PlacePNG from '../../assets/place.png';
 import {Link, Redirect} from 'react-router-dom';
-import Nav from '../components/Nav';
-
-
-
+import Nav from '../Nav';
 
 import 'ol/ol.css';
 import Map from 'ol/Map';
