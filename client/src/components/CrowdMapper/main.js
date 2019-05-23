@@ -270,7 +270,7 @@ class MainDisplay extends Component {
 
 
   render() {
-    if(this.props.mode === 'map' || this.props.view === 0){
+    if(this.props.mode === 'map'){
       return (" ");
     }
     else{

@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
+import {withRouter} from 'react-router-dom';
+
 
 //components
 import '../../App.css';
-import MainDisplay from './main.js';
 import Sidebar from './Sidebar.js';
 import Bottombar from './bottombar.js';
 import PlacePNG from '../../assets/place.png';
@@ -11,6 +12,8 @@ import NkcLogo from '../../assets/nkclogo.png';
 import UploadSnackbar from './UploadSnackbar';
 import Nav from './Nav';
 import Results from './Results';
+import Input from './Input';
+
 
 //openlayers imports
 import 'ol/ol.css';
@@ -103,7 +106,19 @@ var basemapLayers = [];
 var resultsSourceArray = [];
 var resultsLayerArray = [];
 let hover = [];
-var map = {};
+var map = new Map({
+  view: new View({
+    center: fromLonLat([-94.573, 39.143]),
+    zoom: 14,
+    maxZoom: 20,
+    minZoom: 12
+  }),
+  controls: [
+    new Zoom({
+      className: 'zoom-control'
+    })
+  ]
+});
 var drawInteraction = [];
 var modify = [];
 let convexVector = new VectorLayer({
@@ -771,6 +786,7 @@ class MainApp extends Component {
   }
 
   openHelp = () =>{
+    console.log('open help');
     this.setState({showHelp: true});
   }
   closeHelp = () =>{
@@ -877,53 +893,94 @@ class MainApp extends Component {
             toggleDrawer = {this.toggleDrawer}
             switchView = {this.switchView}
           />
-          {this.props.results && <Results/>}
+          {this.props.results &&
+              <div>
+                <Sidebar
+                  history = {history}
+                  view={this.state.view}
+                  mode={this.state.mode}
+                  cardSortState = {this.state.cardSortState}
+                  sortCards = {this.sortCards}
+                  drawing={this.state.drawing}
+                  editing={this.state.editing}
+                  deleting = {this.state.deleting}
+                  features = {this.state.features}
+                  drawnFeatures = {this.state.drawnFeatures}
+                  finishLine = {this.finishLine}
+                  deleteLastPoint = {this.deleteLastPoint}
+                  cancelEdit = {this.cancelEdit}
+                  addInteraction = {this.addInteraction}
+                  openUploadDialog = {this.openUploadDialog}
+                  switchLayer={this.switchLayer}
+                  changeMode = {this.changeMode}
+                  toggleEdit =  {this.toggleEdit}
+                  toggleDelete =  {this.toggleDelete}
+                  tour = {this.state.tour}
+                />
+                <Results
+                  features = {this.state.features}
+                  resultsLayerArray = {resultsLayerArray}
+                  layerArray = {layerArray}
+                  cancelEdit = {this.cancelEdit}
+                  overlay = {overlay}
+                  resultsOverlay = {resultsOverlay}
+                  select = {select}
+                  hover = {hover}
+                  getResults = {this.getResults}
+                  clusterSelectClick = {clusterSelectClick}
+                  map = {map}
+                  mode={this.state.mode}
+                  view={this.state.view}
+                  data={this.state.featureData}
+                  layers = {this.state.features}
+                  cardSortState = {this.state.cardSortState}
+                />
+              </div>
+          }
           {this.props.input && <div>
-          <Drawer variant="permanent" className='desktop'>
-            <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>
-              <Sidebar
-                view={this.state.view}
-                mode={this.state.mode}
-                cardSortState = {this.state.cardSortState}
-                sortCards = {this.sortCards}
-                drawing={this.state.drawing}
-                editing={this.state.editing}
-                deleting = {this.state.deleting}
-                features = {this.state.features}
-                drawnFeatures = {this.state.drawnFeatures}
-                finishLine = {this.finishLine}
-                deleteLastPoint = {this.deleteLastPoint}
-                cancelEdit = {this.cancelEdit}
-                addInteraction = {this.addInteraction}
-                openUploadDialog = {this.openUploadDialog}
-                switchLayer={this.switchLayer}
-                changeMode = {this.changeMode}
-                toggleEdit =  {this.toggleEdit}
-                toggleDelete =  {this.toggleDelete}
-                tour = {this.state.tour}
-              />
-              {isAuthenticated() && (
-                <>
-                <br/>
-                <div style={{display:'flex', flexDirection: 'row'}}>
-                <Typography variant='caption' color='textSecondary' style={{padding:'8px', flexGrow:1}}>
-                  Logged in as:
-                  <br /> {isAuthenticated().user.name}
-                </Typography>
-                  <div style={{paddingTop:'10px'}}>
-                    <Button size='small' onClick={()=>logout(()=>{history.push('/')})}>Logout</Button>
-                  </div>
-                </div>
-                </>
-              )}
-              <Button size='small' style={{marginTop:'10px'}} onClick={this.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
-              <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
-                To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
-                If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
-              </Typography>
 
-            </div>
-          </Drawer>
+            <Sidebar
+              history = {history}
+              view={this.state.view}
+              mode={this.state.mode}
+              cardSortState = {this.state.cardSortState}
+              sortCards = {this.sortCards}
+              drawing={this.state.drawing}
+              editing={this.state.editing}
+              deleting = {this.state.deleting}
+              features = {this.state.features}
+              drawnFeatures = {this.state.drawnFeatures}
+              finishLine = {this.finishLine}
+              deleteLastPoint = {this.deleteLastPoint}
+              cancelEdit = {this.cancelEdit}
+              addInteraction = {this.addInteraction}
+              openUploadDialog = {this.openUploadDialog}
+              switchLayer={this.switchLayer}
+              changeMode = {this.changeMode}
+              toggleEdit =  {this.toggleEdit}
+              toggleDelete =  {this.toggleDelete}
+              tour = {this.state.tour}
+              openHelp = {this.openHelp}
+            />
+            <Input
+              features = {this.state.features}
+              resultsLayerArray = {resultsLayerArray}
+              layerArray = {layerArray}
+              cancelEdit = {this.cancelEdit}
+              overlay = {overlay}
+              resultsOverlay = {resultsOverlay}
+              select = {select}
+              hover = {hover}
+              getInput = {this.getInput}
+              clusterSelectClick = {clusterSelectClick}
+              map = {map}
+              mode={this.state.mode}
+              view={this.state.view}
+              data={this.state.featureData}
+              layers = {this.state.features}
+              cardSortState = {this.state.cardSortState}
+            />
+
           <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
           <div
             tabIndex={0}
@@ -1013,14 +1070,7 @@ class MainApp extends Component {
 
 
 
-          <MainDisplay
-            mode={this.state.mode}
-            view={this.state.view}
-            data={this.state.featureData}
-            layers = {this.state.features}
-            cardSortState = {this.state.cardSortState}
-            />
-          <div id='map' style={this.state.viewMap ? {display:'block'} : {display:'none'}}></div>
+
           <div style={{display:'block', position:'absolute', bottom:'0', width:'100%', height:'10px', zIndex:'2000'}} id='tooltipAnchor'></div>
           <Paper id='popover' style={{width:'250px', padding: '15px', position: 'absolute', left:'-138px', top:'-218px'}}>
             <form onSubmit={this.saveComment}>
@@ -1176,14 +1226,20 @@ class MainApp extends Component {
             </template>
             <img src={PlacePNG} style={{display:"none"}} />
           </div>}
+          <div id='map' style={this.props.input || this.state.viewMap ? {display:'block'} : {display:'none'}}></div>
+
 
         </div>
     );
   }
-  componentDidMount(){
+  componentWillMount(){
 
+  }
+  componentDidMount(){
     tippy('.featureButton');
-    this.openHelp();
+    if(this.props.location.pathname === '/'){
+      this.openHelp();
+    }
     basemapLayers = [];
     basemapLayers.push(new TileLayer({
       source: new TileWMS({
@@ -1387,22 +1443,16 @@ class MainApp extends Component {
     overlay.setElement(container);
     var container2 = document.getElementById('resultsPopover');
     resultsOverlay.setElement(container2);
-    map = new Map({
-        target: 'map',
-        layers: basemapLayers.concat(layerArray),
-        overlays: [overlay, resultsOverlay],
-        view: new View({
-          center: fromLonLat([-94.573, 39.143]),
-          zoom: 14,
-          maxZoom: 20,
-          minZoom: 12
-        }),
-        controls: [
-          new Zoom({
-            className: 'zoom-control'
-          })
-        ]
-      });
+    map.setTarget('map');
+    basemapLayers.forEach((layer)=>{
+      map.addLayer(layer);
+    });
+    layerArray.forEach((layer)=>{
+      map.addLayer(layer);
+    })
+    map.addOverlay(overlay);
+    map.addOverlay(resultsOverlay);
+
 	    map.addLayer(convexVector);
       hull = new Feature(new Polygon([[0,0]]));
       convexVector.getSource().addFeature(hull);
@@ -1661,7 +1711,8 @@ class MainApp extends Component {
       })
     }
     componentDidUpdate(){
+      console.log('update');
       map.updateSize();
     }
 }
-export default MainApp;
+export default withRouter(MainApp);
