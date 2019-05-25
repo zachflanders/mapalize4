@@ -2,18 +2,14 @@ import React, { Component } from 'react';
 import { renderToString } from 'react-dom/server'
 import ReactDOM from 'react-dom';
 
-import '../App.css';
-import MainDisplay from '../main.js';
-import Sidebar from '../components/Sidebar.js';
-import Bottombar from '../bottombar.js';
-import PlaceSVG from '../assets/place.svg';
-import PlacePNG from '../assets/place.png';
-import {logout, isAuthenticated} from '../auth';
-import NkcLogo from '../assets/nkclogo.png';
-import Shepherd from 'shepherd.js';
-import 'shepherd.js/dist/css/shepherd-theme-default.css';
-
-
+import '../../App.css';
+import MainDisplay from './main.js';
+import Sidebar from './Sidebar.js';
+import Bottombar from './bottombar.js';
+import PlaceSVG from '../../assets/place.svg';
+import PlacePNG from '../../assets/place.png';
+import {logout, isAuthenticated} from '../../auth';
+import NkcLogo from '../../assets/nkclogo.png';
 
 //openlayers imports
 import 'ol/ol.css';

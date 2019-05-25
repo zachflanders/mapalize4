@@ -7,9 +7,9 @@ import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import {Link, Redirect} from 'react-router-dom'
-import {signin, authenticate} from '../auth'
+import {signin, authenticate} from '../../auth'
 import ReCAPTCHA from "react-google-recaptcha";
-import Nav from '../components/Nav';
+import Nav from '../Nav';
 
 
 

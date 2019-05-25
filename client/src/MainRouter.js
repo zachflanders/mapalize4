@@ -1,9 +1,9 @@
 import React from 'react';
 import {Route, Switch} from 'react-router-dom';
-import MainApp from './main/MainApp.js';
-import Signup from './user/Signup';
-import Signin from './user/Signin';
-import Moderate from './feature/Moderate';
+import MainApp from './components/CrowdMapper';
+import Signup from './components/user/Signup';
+import Signin from './components/user/Signin';
+import Moderate from './components/feature/Moderate';
 
 
 const MainRouter = () => (
