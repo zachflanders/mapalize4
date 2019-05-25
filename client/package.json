@@ -37,7 +37,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --transformIgnorePatterns=\"/node_modules/(?!(ol|ol-ext)/).*/\" --coveragePathIgnorePatterns=[\"/node_modules/\",\"env-setup.js\", \"src/ol/interaction/\"] --env=jsdom",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -51,18 +51,7 @@
   ],
   "proxy": "http://localhost:8000/",
   "devDependencies": {
+    "jest-canvas-mock": "^2.1.0",
     "react-test-renderer": "^16.8.6"
-  },
-  "jest": {
-    "setupFiles": [
-      "<rootDir>/env-setup.js"
-    ],
-    "transformIgnorePatterns": [
-      "/node_modules/(?!(ol|labelgun|mapbox-to-ol-style|ol-mapbox-style)/).*/"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "env-setup.js"
-    ]
   }
 }
