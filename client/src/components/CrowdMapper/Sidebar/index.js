@@ -204,7 +204,7 @@ class Sidebar extends Component {
       if(this.props.view === 0){
         let item = this.props.features[this.props.drawing];
         return (
-          
+          <>
           <Drawer variant="permanent" className='desktop'>
             <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>        
               {this.props.drawing !== false && this.renderDrawingMenu(item)}
@@ -231,10 +231,48 @@ class Sidebar extends Component {
                   If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
                 </Typography>
             </div>
-          </Drawer>)
+          </Drawer>
+          <Drawer open={this.props.drawerOpen} onClose={this.props.toggleDrawer(false)}>
+            <div
+              tabIndex={0}
+              role="button"
+              onClick={this.props.toggleDrawer(false)}
+              onKeyDown={this.props.toggleDrawer(false)}
+            >
+              <div style={{width: drawerWidth, padding:'15px'}} id='sidebarMobile'>
+              {this.props.drawing !== false && this.renderDrawingMenu(item)}
+              {this.props.editing === true && this.renderEditingMenu()}
+              {this.props.deleting === true && this.renderDeletingMenu()}
+              {this.props.drawing === false && this.props.editing===false && this.props.deleting=== false && this.renderInputMenu()}
+              {isAuthenticated() && (
+                  <>
+                  <br/>
+                  <div style={{display:'flex', flexDirection: 'row'}}>
+                  <Typography variant='caption' color='textSecondary' style={{padding:'8px', flexGrow:1}}>
+                    Logged in as:
+                    <br /> {isAuthenticated().user.name}
+                  </Typography>
+                    <div style={{paddingTop:'10px'}}>
+                      <Button size='small' onClick={()=>logout(()=>{history.push('/')})}>Logout</Button>
+                    </div>
+                  </div>
+                  </>
+                )}
+                <Button size='small' style={{marginTop:'10px'}} onClick={this.props.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+                <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
+                  To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
+                  If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
+                </Typography>
+              </div>
+              </div>
+            </Drawer>
+            </>
+          
+          )
       }
       else{
         return(
+          <>
           <Drawer variant="permanent" className='desktop'>
             <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>
               <Paper>
@@ -317,9 +355,102 @@ class Sidebar extends Component {
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
                   To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
                   If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
-                </Typography>w
+                </Typography>
            </div>
           </Drawer>
+          <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
+          <div
+            tabIndex={0}
+            role="button"
+            onClick={this.toggleDrawer(false)}
+            onKeyDown={this.toggleDrawer(false)}
+          >
+            <div style={{width: drawerWidth, padding:'15px'}} id='sidebarMobile'>
+            <Paper>
+                <div style={{padding:'8px'}}>
+                  <ViewIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>View Results As</strong>
+                </div>
+                <Divider />
+                <div style={{padding:'8px'}}>
+                  <Button
+                    onClick = {() => this.props.changeMode('map')}
+                    className='full-width-left'
+                    size='small'
+                  >
+                    <MapIcon /> &nbsp;&nbsp; Map
+                  </Button>
+                  <br />
+                  <Button
+                    onClick = {() => this.props.changeMode('cards')}
+                    className='full-width-left'
+                    size='small'  >
+                      <CardsIcon /> &nbsp;&nbsp; Cards
+                  </Button>
+                </div>
+              </Paper>
+              <br />
+              {this.props.mode==='cards' &&
+                <>
+                  <Paper>
+                    <div style={{padding:'8px'}}>
+                      <SortIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>Sort Results</strong>
+                    </div>
+                    <Divider />
+                    <div style={{padding:'8px'}}>
+                      <Button
+                        onClick = {() => this.props.sortCards('newest')}
+                        className='full-width-left'
+                        size='small'
+                      >
+                        Newest First
+                      </Button>
+                      <br />
+                      <Button
+                        onClick = {() => this.props.sortCards('oldest')}
+                        className='full-width-left'
+                        size='small'  >
+                          Oldest First
+                      </Button>
+                    </div>
+                  </Paper>
+                  <br />
+                </>
+              }
+              <Paper>
+                <div style={{padding:'8px'}}>
+                  <LayersIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>View Layers</strong>
+                </div>
+                <Divider />
+                <div style={{padding:'8px 8px 8px 12px'}}>
+                  <ResultsLayerList
+                    features = {this.props.features}
+                    switchLayer = {this.props.switchLayer}
+                  />
+                </div>
+             </Paper>
+             {isAuthenticated() && (
+                  <>
+                  <br/>
+                  <div style={{display:'flex', flexDirection: 'row'}}>
+                  <Typography variant='caption' color='textSecondary' style={{padding:'8px', flexGrow:1}}>
+                    Logged in as:
+                    <br /> {isAuthenticated().user.name}
+                  </Typography>
+                    <div style={{paddingTop:'10px'}}>
+                      <Button size='small' onClick={()=>logout(()=>{history.push('/')})}>Logout</Button>
+                    </div>
+                  </div>
+                  </>
+                )}
+                <Button size='small' style={{marginTop:'10px'}} onClick={this.props.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+                <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
+                  To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
+                  If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
+                </Typography>
+            </div>
+            </div>
+          </Drawer>
+          </>
         )
       }
    

@@ -940,79 +940,10 @@ class MainApp extends Component {
             view = {this.state.view}
             switchView = {this.switchView}
            />
-            {x > 600 &&
-              <Sidebar
-                screenWidth = {x}
-                history = {history}
-                view={this.state.view}
-                mode={this.state.mode}
-                cardSortState = {this.state.cardSortState}
-                sortCards = {this.sortCards}
-                drawing={this.state.drawing}
-                editing={this.state.editing}
-                deleting = {this.state.deleting}
-                features = {this.state.features}
-                drawnFeatures = {this.state.drawnFeatures}
-                finishLine = {this.finishLine}
-                deleteLastPoint = {this.deleteLastPoint}
-                cancelEdit = {this.cancelEdit}
-                addInteraction = {this.addInteraction}
-                openUploadDialog = {this.openUploadDialog}
-                switchLayer={this.switchLayer}
-                changeMode = {this.changeMode}
-                toggleEdit =  {this.toggleEdit}
-                toggleDelete =  {this.toggleDelete}
-                passRefUpward={this.getRefsFromChild}
-                tour = {this.state.tour}
-                openHelp = {this.openHelp}
-              />
-            }
-            {x < 600 &&
-          <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
-          <div
-            tabIndex={0}
-            role="button"
-            onClick={this.toggleDrawer(false)}
-            onKeyDown={this.toggleDrawer(false)}
-          >
-          <div style={{width: drawerWidth, padding:'15px'}} id='sidebarMobile'>
-            <Sidebar
-              history = {history}
-              view={this.state.view}
-              mode={this.state.mode}
-              cardSortState = {this.state.cardSortState}
-              sortCards = {this.sortCards}
-              drawing={this.state.drawing}
-              editing={this.state.editing}
-              deleting = {this.state.deleting}
-              features = {this.state.features}
-              drawnFeatures = {this.state.drawnFeatures}
-              finishLine = {this.finishLine}
-              deleteLastPoint = {this.deleteLastPoint}
-              cancelEdit = {this.cancelEdit}
-              addInteraction = {this.addInteraction}
-              openUploadDialog = {this.openUploadDialog}
-              switchLayer={this.switchLayer}
-              changeMode = {this.changeMode}
-              toggleEdit =  {this.toggleEdit}
-              toggleDelete =  {this.toggleDelete}
-              passRefUpward={this.getRefsFromChild}
-              tour = {this.state.tour}
-            />
-          </div>
-
-          </div>
-        </Drawer>
-        }
-        <Drawer anchor='bottom' open={this.state.bottomDrawerOpen} onClose={this.toggleBottomDrawer(false)}>
-        <div
-          tabIndex={0}
-          role="button"
-          onClick={this.toggleBottomDrawer(false)}
-          onKeyDown={this.toggleBottomDrawer(false)}
-        >
-        <div style={{padding:'15px'}} id='bottombarMobile'>
-          <Bottombar
+          <Sidebar
+            toggleDrawer = {this.toggleDrawer}
+            screenWidth = {x}
+            history = {history}
             view={this.state.view}
             mode={this.state.mode}
             cardSortState = {this.state.cardSortState}
@@ -1031,10 +962,41 @@ class MainApp extends Component {
             changeMode = {this.changeMode}
             toggleEdit =  {this.toggleEdit}
             toggleDelete =  {this.toggleDelete}
-          />
-        </div>
-        </div>
-      </Drawer>
+            passRefUpward={this.getRefsFromChild}
+            tour = {this.state.tour}
+            openHelp = {this.openHelp}
+          />            
+          <Drawer anchor='bottom' open={this.state.bottomDrawerOpen} onClose={this.toggleBottomDrawer(false)}>
+            <div
+              tabIndex={0}
+              role="button"
+              onClick={this.toggleBottomDrawer(false)}
+              onKeyDown={this.toggleBottomDrawer(false)}
+            >
+              <div style={{padding:'15px'}} id='bottombarMobile'>
+                <Bottombar
+                  view={this.state.view}
+                  mode={this.state.mode}
+                  cardSortState = {this.state.cardSortState}
+                  sortCards = {this.sortCards}
+                  drawing={this.state.drawing}
+                  editing={this.state.editing}
+                  deleting = {this.state.deleting}
+                  features = {this.state.features}
+                  drawnFeatures = {this.state.drawnFeatures}
+                  finishLine = {this.finishLine}
+                  deleteLastPoint = {this.deleteLastPoint}
+                  cancelEdit = {this.cancelEdit}
+                  addInteraction = {this.addInteraction}
+                  openUploadDialog = {this.openUploadDialog}
+                  switchLayer={this.switchLayer}
+                  changeMode = {this.changeMode}
+                  toggleEdit =  {this.toggleEdit}
+                  toggleDelete =  {this.toggleDelete}
+                />
+              </div>
+            </div>
+          </Drawer>
         <Fab id='basemapsFab'
           size='small'
           style={this.state.mode==='map' || this.state.view ==='0' ? {display:'flex'} : {display:'none'}}
