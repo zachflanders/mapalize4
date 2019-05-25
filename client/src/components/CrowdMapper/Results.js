@@ -24,6 +24,8 @@ class Results extends React.Component{
 
 
   componentDidMount() {
+    this.props.switchView(undefined, 1);
+    /*
     const {map, resultsLayerArray, layerArray, cancelEdit, overlay, resultsOverlay, select, hover, getResults, clusterSelectClick} = this.props;
     this.props.features.map(function(item, count){
       console.log(item);
@@ -51,6 +53,7 @@ class Results extends React.Component{
     if(clusterSelectClick !== null){
       map.addInteraction(clusterSelectClick);
     }
+    */
   }
 }
 

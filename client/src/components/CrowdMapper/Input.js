@@ -17,6 +17,8 @@ class Input extends React.Component{
 
 
   componentDidMount() {
+    //this.props.switchView(undefined, 1);
+    /*
     const {map, resultsLayerArray, layerArray, overlay, resultsOverlay, select, getInput, clusterSelectClick} = this.props;
     this.props.features.map(function(item, count){
       console.log(item);
@@ -37,6 +39,7 @@ class Input extends React.Component{
       map.removeInteraction(clusterSelectClick);
     }
     getInput();
+    */
   }
 }
 

@@ -918,6 +918,7 @@ class MainApp extends Component {
                   tour = {this.state.tour}
                 />
                 <Results
+                  switchView = {this.switchView}
                   features = {this.state.features}
                   resultsLayerArray = {resultsLayerArray}
                   layerArray = {layerArray}
@@ -963,6 +964,7 @@ class MainApp extends Component {
               openHelp = {this.openHelp}
             />
             <Input
+              switchView = {this.switchView}
               features = {this.state.features}
               resultsLayerArray = {resultsLayerArray}
               layerArray = {layerArray}
