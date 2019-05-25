@@ -52,5 +52,17 @@
   "proxy": "http://localhost:8000/",
   "devDependencies": {
     "react-test-renderer": "^16.8.6"
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/env-setup.js"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(ol|labelgun|mapbox-to-ol-style|ol-mapbox-style)/).*/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "env-setup.js"
+    ]
   }
 }
