@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-import { renderToString } from 'react-dom/server'
 import ReactDOM from 'react-dom';
 
 import '../../App.css';
 import MainDisplay from './main.js';
 import Sidebar from './Sidebar';
 import Bottombar from './bottombar.js';
-import PlaceSVG from '../../assets/place.svg';
 import PlacePNG from '../../assets/place.png';
-import {logout, isAuthenticated} from '../../auth';
 import NkcLogo from '../../assets/nkclogo.png';
 import Nav from './Nav.js';
 
@@ -31,7 +28,6 @@ import {fromLonLat} from 'ol/proj';
 import {transform} from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
-import TileImage from 'ol/source/TileImage';
 import View from 'ol/View';
 import Zoom from 'ol/control/Zoom';
 import Heatmap from 'ol/layer/Heatmap';
@@ -46,35 +42,20 @@ import XYZ from 'ol/source/XYZ';
 import Polygon from 'ol/geom/Polygon';
 
 //Material-ui imports
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
 import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import EditIcon from '@material-ui/icons/Edit';
-import FireIcon from '@material-ui/icons/Whatshot';
-import BikeIcon from '@material-ui/icons/DirectionsBike';
-import MenuIcon from '@material-ui/icons/Menu';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Snackbar from '@material-ui/core/Snackbar';
 import DoneIcon from '@material-ui/icons/Done';
 import TextField from '@material-ui/core/TextField';
-import { createMuiTheme } from '@material-ui/core/styles';
-import { MuiThemeProvider } from '@material-ui/core/styles';
-import indigo from '@material-ui/core/colors/indigo';
-import teal from '@material-ui/core/colors/teal';
 import CancelIcon from '@material-ui/icons/Close';
 import CardsIcon from '@material-ui/icons/ViewModule';
 import MapIcon from '@material-ui/icons/Map';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
-import HelpIcon from '@material-ui/icons/HelpOutline';
 import LineIcon from '@material-ui/icons/Timeline';
-import PointIcon from '@material-ui/icons/AddLocation';
 import PlaceIcon from '@material-ui/icons/Place';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import UploadIcon from '@material-ui/icons/CloudUpload';
@@ -83,27 +64,20 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Grow from '@material-ui/core/Grow';
 import LayersIcon from '@material-ui/icons/Layers';
 import PlayIcon from '@material-ui/icons/PlayArrow';
-
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import ListSubheader from '@material-ui/core/ListSubheader';
-
-
 
 import turf from 'turf';
 import axios from 'axios';
 import chroma from 'chroma-js';
 import tippy from 'tippy.js';
-import Tippy from '@tippy.js/react'
 import './tippytheme.css';
 import * as moment from 'moment';
 
 const pngScale =0.18;
 const pngAnchor = [0.5, 200];
-
 
 const convertToClick = (e) => {
   const evt = new MouseEvent('click', { bubbles: true })
@@ -622,7 +596,6 @@ class MainApp extends Component {
           sourceArray[count].refresh()
         }
         else{
-
           let collection = sourceArray[count].getFeatures();
           collection.forEach(function(feature){
           feature.setStyle(new Style({
@@ -822,50 +795,37 @@ class MainApp extends Component {
     }
 
   }
-
   closeSnackbar(){
     this.setState({uploadMessage: undefined, showUploadMessage: false});
   }
-
   openHelp = () =>{
     this.setState({showHelp: true});
   }
   closeHelp = () =>{
     this.setState({showHelp: false});
   }
-
   setBasemap(type){
     console.log('change basemap');
     if(type==='aerial'){
       console.log(map.getLayers());
-      let basemap=new TileLayer({ source: new XYZ({ url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}' }) });
+      let basemap=new TileLayer({ source: new XYZ({ url: 'https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}' }) });
       console.log(map.getLayers());
       map.getLayers().setAt(0, basemap)
     }
     else if(type==='lightmap'){
       console.log(map.getLayers());
       let basemap=new TileLayer({
-        //source: new XYZ({url: 'http://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'})
-
         source: new TileWMS({
           url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
           params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
           serverType: 'geoserver',
           transition: 0
         })
-
-
       });
       map.getLayers().setAt(0, basemap)
-
-
     }
-
     this.closeBasemapMenu();
   }
-
-
-
 
   tour = (target, ref, placement) => {
     if(x>600){
@@ -901,7 +861,6 @@ class MainApp extends Component {
         tourTippy.destroy();
       }
       this.setState({tour:true})
-
       let content = ref;
       content.style.display = 'block';
       tourTippy = tippy(target);
@@ -923,15 +882,12 @@ class MainApp extends Component {
           }
         });
       tourTippy.show();
-
     }
   }
 
   render() {
     const { basemapMenuAnchorEl } = this.state;
-    const { classes, history } = this.props;
-
-
+    const {history} = this.props;
     return (
         <div className="App">
           <Nav
@@ -942,6 +898,7 @@ class MainApp extends Component {
            />
           <Sidebar
             toggleDrawer = {this.toggleDrawer}
+            drawerOpen = {this.state.drawerOpen}
             screenWidth = {x}
             history = {history}
             view={this.state.view}
@@ -1078,7 +1035,7 @@ class MainApp extends Component {
               </DialogActions>
             </Dialog>
             <Dialog
-              open={false}
+              open={this.state.showHelp}
               onClose={this.closeHelp}
             >
               <DialogTitle><img src={NkcLogo} width='200'/></DialogTitle>
@@ -1189,9 +1146,8 @@ class MainApp extends Component {
     );
   }
   componentDidMount(){
-
     tippy('.featureButton');
-    this.openHelp();
+    //this.openHelp();
     basemapLayers = [];
     basemapLayers.push(new TileLayer({
       source: new TileWMS({
@@ -1324,7 +1280,6 @@ class MainApp extends Component {
             }
           })
         );
-
         hover.push(
           new Select({
             condition:pointerMove,
@@ -1369,10 +1324,7 @@ class MainApp extends Component {
               }
               return style;
             }
-
           }));
-
-
       };
       modify.push(new Modify({
         source: sourceArray[count],

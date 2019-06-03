@@ -225,7 +225,7 @@ class Sidebar extends Component {
                   </div>
                   </>
                 )}
-                <Button size='small' style={{marginTop:'10px'}} onClick={this.props.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+                <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
                   To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
                   If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
@@ -258,7 +258,7 @@ class Sidebar extends Component {
                   </div>
                   </>
                 )}
-                <Button size='small' style={{marginTop:'10px'}} onClick={this.props.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+                <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
                   To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
                   If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
@@ -351,19 +351,19 @@ class Sidebar extends Component {
                   </div>
                   </>
                 )}
-                <Button size='small' style={{marginTop:'10px'}} onClick={this.props.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+                <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
                   To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
                   If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
                 </Typography>
            </div>
           </Drawer>
-          <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
+          <Drawer open={this.props.drawerOpen} onClose={this.props.toggleDrawer(false)}>
           <div
             tabIndex={0}
             role="button"
-            onClick={this.toggleDrawer(false)}
-            onKeyDown={this.toggleDrawer(false)}
+            onClick={this.props.toggleDrawer(false)}
+            onKeyDown={this.props.toggleDrawer(false)}
           >
             <div style={{width: drawerWidth, padding:'15px'}} id='sidebarMobile'>
             <Paper>
@@ -442,7 +442,7 @@ class Sidebar extends Component {
                   </div>
                   </>
                 )}
-                <Button size='small' style={{marginTop:'10px'}} onClick={this.props.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
+                <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
                   To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
                   If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
