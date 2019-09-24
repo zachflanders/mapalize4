@@ -808,18 +808,21 @@ class MainApp extends Component {
     console.log('change basemap');
     if(type==='aerial'){
       console.log(map.getLayers());
-      let basemap=new TileLayer({ source: new XYZ({ url: 'https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}' }) });
+      let basemap=new TileLayer({ 
+        source: new XYZ({ 
+          url: 'https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&scale=2',
+          tilePixelRatio: 2, 
+        }) 
+      });
       console.log(map.getLayers());
       map.getLayers().setAt(0, basemap)
     }
     else if(type==='lightmap'){
       console.log(map.getLayers());
       let basemap=new TileLayer({
-        source: new TileWMS({
-          url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-          params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
-          serverType: 'geoserver',
-          transition: 0
+        source: new XYZ({
+          url: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+          tilePixelRatio: 2,
         })
       });
       map.getLayers().setAt(0, basemap)
@@ -1150,11 +1153,9 @@ class MainApp extends Component {
     //this.openHelp();
     basemapLayers = [];
     basemapLayers.push(new TileLayer({
-      source: new TileWMS({
-        url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-        params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
-        serverType: 'geoserver',
-        transition: 0
+      source: new XYZ({
+        url: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+        tilePixelRatio: 2,
       })
     }));
     this.state.features.map(function(item, count){

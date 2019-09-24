@@ -40,6 +40,7 @@ import {fromLonLat} from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
 import View from 'ol/View';
+import XYZ from 'ol/source/XYZ';
 
 import Feature from 'ol/Feature';
 
@@ -118,12 +119,10 @@ class MapCard extends React.Component {
    cardmap[this.props.data.id] = new Map({
        target: 'cardmap-'+this.props.data.id,
        layers: [new TileLayer({
-         source: new TileWMS({
-           url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-           params: {'LAYERS': 'Mapalize:OSM-KC-ROADS', 'TILED': true},
-           serverType: 'geoserver',
-           transition: 0
-         })
+         source: new XYZ({
+          url: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+          tilePixelRatio: 2,
+        })
        }), layer],
        interactions: [],
        view: new View({
