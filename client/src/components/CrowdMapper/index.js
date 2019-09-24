@@ -1150,7 +1150,7 @@ class MainApp extends Component {
   }
   componentDidMount(){
     tippy('.featureButton');
-    //this.openHelp();
+    this.openHelp();
     basemapLayers = [];
     basemapLayers.push(new TileLayer({
       source: new XYZ({
