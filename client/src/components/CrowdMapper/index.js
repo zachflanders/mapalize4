@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
-import { renderToString } from 'react-dom/server'
 import ReactDOM from 'react-dom';
 
 import '../../App.css';
 import MainDisplay from './main.js';
-import Sidebar from './Sidebar.js';
+import Sidebar from './Sidebar';
 import Bottombar from './bottombar.js';
-import PlaceSVG from '../../assets/place.svg';
 import PlacePNG from '../../assets/place.png';
-import {logout, isAuthenticated} from '../../auth';
 import NkcLogo from '../../assets/nkclogo.png';
+import Nav from './Nav.js';
 
 //openlayers imports
 import 'ol/ol.css';
@@ -30,7 +28,6 @@ import {fromLonLat} from 'ol/proj';
 import {transform} from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
-import TileImage from 'ol/source/TileImage';
 import View from 'ol/View';
 import Zoom from 'ol/control/Zoom';
 import Heatmap from 'ol/layer/Heatmap';
@@ -45,35 +42,20 @@ import XYZ from 'ol/source/XYZ';
 import Polygon from 'ol/geom/Polygon';
 
 //Material-ui imports
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
 import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import EditIcon from '@material-ui/icons/Edit';
-import FireIcon from '@material-ui/icons/Whatshot';
-import BikeIcon from '@material-ui/icons/DirectionsBike';
-import MenuIcon from '@material-ui/icons/Menu';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Snackbar from '@material-ui/core/Snackbar';
 import DoneIcon from '@material-ui/icons/Done';
 import TextField from '@material-ui/core/TextField';
-import { createMuiTheme } from '@material-ui/core/styles';
-import { MuiThemeProvider } from '@material-ui/core/styles';
-import indigo from '@material-ui/core/colors/indigo';
-import teal from '@material-ui/core/colors/teal';
 import CancelIcon from '@material-ui/icons/Close';
 import CardsIcon from '@material-ui/icons/ViewModule';
 import MapIcon from '@material-ui/icons/Map';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
-import HelpIcon from '@material-ui/icons/HelpOutline';
 import LineIcon from '@material-ui/icons/Timeline';
-import PointIcon from '@material-ui/icons/AddLocation';
 import PlaceIcon from '@material-ui/icons/Place';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import UploadIcon from '@material-ui/icons/CloudUpload';
@@ -82,27 +64,20 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Grow from '@material-ui/core/Grow';
 import LayersIcon from '@material-ui/icons/Layers';
 import PlayIcon from '@material-ui/icons/PlayArrow';
-
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import ListSubheader from '@material-ui/core/ListSubheader';
-
-
 
 import turf from 'turf';
 import axios from 'axios';
 import chroma from 'chroma-js';
 import tippy from 'tippy.js';
-import Tippy from '@tippy.js/react'
 import './tippytheme.css';
 import * as moment from 'moment';
 
 const pngScale =0.18;
 const pngAnchor = [0.5, 200];
-
 
 const convertToClick = (e) => {
   const evt = new MouseEvent('click', { bubbles: true })
@@ -166,19 +141,6 @@ let addSelectionListener = function(){
     }));
   });
 }
-/*
-let removeSelectionListener = function(){
-  var collection = vectorLayer.getSource().getFeatures();
-  collection.forEach(function(feature){
-  feature.setStyle(new Style({
-      stroke: new Stroke({
-        color: '#fff',
-        width: 8
-      })
-    }));
-  });
-}
-*/
 
 var selectDelete = new Select({
   condition: click,
@@ -212,9 +174,10 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
 let colors=['#0bb45a', '#00a0fa', '#aa093c'];
 
 const UploadSnackbar = (props) =>(
+
   ReactDOM.createPortal(<Snackbar
     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-    open={props.uploadMessage}
+    open={props.showUploadMessage}
     ContentProps={{
       'aria-describedby': 'message-id',
     }}
@@ -287,7 +250,7 @@ class MainApp extends Component {
       drawerOpen: false,
       bottomDrawerOpen: false,
       uploadMessage: undefined,
-      uploadMessageDisplay: false,
+      showUploadMessage: false,
       lineDrawMessage: "Click to draw line",
       resultClusterNumber: 0,
       uploadDialog: false,
@@ -411,6 +374,7 @@ class MainApp extends Component {
   }
 
   switchView(event, value){
+    console.log(value);
     if(value === 1){
       this.setState({
         view: 1
@@ -490,7 +454,7 @@ class MainApp extends Component {
   }
 
   setUploadMessage(message){
-    this.setState({uploadMessage:message});
+    this.setState({uploadMessage:message, showUploadMessage: true});
   }
 
   upload(){
@@ -523,7 +487,7 @@ class MainApp extends Component {
         });
       }
       else{
-        this.setState({uploadMessage: <span><CancelIcon style={{verticalAlign:'middle'}} /> Oops. Something went wrong.</span>});
+        this.setState({uploadMessage: <span><CancelIcon style={{verticalAlign:'middle'}} /> Oops. Something went wrong.</span>, showUploadMessage: true});
         layerArray.map(function(layer, count){
           map.addLayer(layer);
         });
@@ -632,7 +596,6 @@ class MainApp extends Component {
           sourceArray[count].refresh()
         }
         else{
-
           let collection = sourceArray[count].getFeatures();
           collection.forEach(function(feature){
           feature.setStyle(new Style({
@@ -832,69 +795,40 @@ class MainApp extends Component {
     }
 
   }
-
   closeSnackbar(){
-    this.setState({uploadMessage: undefined});
+    this.setState({uploadMessage: undefined, showUploadMessage: false});
   }
-
   openHelp = () =>{
     this.setState({showHelp: true});
   }
   closeHelp = () =>{
     this.setState({showHelp: false});
   }
-
   setBasemap(type){
     console.log('change basemap');
     if(type==='aerial'){
       console.log(map.getLayers());
-      let basemap=new TileLayer({ source: new XYZ({ url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}' }) });
+      let basemap=new TileLayer({ 
+        source: new XYZ({ 
+          url: 'https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&scale=2',
+          tilePixelRatio: 2, 
+        }) 
+      });
       console.log(map.getLayers());
       map.getLayers().setAt(0, basemap)
     }
     else if(type==='lightmap'){
       console.log(map.getLayers());
       let basemap=new TileLayer({
-        //source: new XYZ({url: 'http://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'})
-
-        source: new TileWMS({
-          url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-          params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
-          serverType: 'geoserver',
-          transition: 0
+        source: new XYZ({
+          url: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+          tilePixelRatio: 2,
         })
-
-
       });
       map.getLayers().setAt(0, basemap)
-
-
     }
-    /*
-    else if(type==='darkmap'){
-      console.log(map.getLayers());
-      let basemap=new TileLayer({
-        source: new XYZ({url: 'http://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'})
-
-        source: new TileWMS({
-          url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-          params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
-          serverType: 'geoserver',
-          transition: 0
-        })
-
-
-      });
-      map.getLayers().setAt(0, basemap)
-
-
-    }
-    */
     this.closeBasemapMenu();
   }
-
-
-
 
   tour = (target, ref, placement) => {
     if(x>600){
@@ -930,7 +864,6 @@ class MainApp extends Component {
         tourTippy.destroy();
       }
       this.setState({tour:true})
-
       let content = ref;
       content.style.display = 'block';
       tourTippy = tippy(target);
@@ -952,131 +885,25 @@ class MainApp extends Component {
           }
         });
       tourTippy.show();
-
     }
   }
 
   render() {
     const { basemapMenuAnchorEl } = this.state;
-    const { classes, history } = this.props;
-
-
+    const {history} = this.props;
     return (
         <div className="App">
-          <AppBar position="fixed" style={{zIndex: 1202, flexWrap:'wrap', width:'100%', maxWidth: '100%'}}>
-            <Toolbar style={{flexWrap:'wrap', maxWidth: '100%'}} id='toolbar'>
-              <Typography variant="h6" color="inherit" style={{flexGrow:2,  maxWidth: '100%'}} noWrap >
-              <IconButton
-                onClick = {this.toggleDrawer(true)}
-                id='menuButton'
-                color="inherit"
-                aria-label="Menu"
-                style={{marginLeft: -12, marginRight: 20}}
-              >
-                <MenuIcon />
-              </IconButton>
-                <BikeIcon style={{verticalAlign:'middle', marginBottom:'5px', height:'32px'}} />
-                &nbsp;&nbsp;{this.state.title}
-              </Typography>
-              <Tabs value={this.state.view} className='tabContainer' onChange = {this.switchView} variant='fullWidth' id='menuTabs'>
-                <Tab label={<span><EditIcon style={{verticalAlign:'middle',top:'0px'}}/>&nbsp;&nbsp; Input</span>} style={{flexGrow: 1}} className='tab' />
-                <Tab id='resultsTab' label={<span><FireIcon style={{verticalAlign:'middle'}}/>&nbsp;&nbsp; Results</span>} style={{flexGrow: 1}} />
-              </Tabs>
-            </Toolbar>
-          </AppBar>
-          <Drawer variant="permanent" className='desktop'>
-
-            <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>
-              <Sidebar
-                view={this.state.view}
-                mode={this.state.mode}
-                cardSortState = {this.state.cardSortState}
-                sortCards = {this.sortCards}
-                drawing={this.state.drawing}
-                editing={this.state.editing}
-                deleting = {this.state.deleting}
-                features = {this.state.features}
-                drawnFeatures = {this.state.drawnFeatures}
-                finishLine = {this.finishLine}
-                deleteLastPoint = {this.deleteLastPoint}
-                cancelEdit = {this.cancelEdit}
-                addInteraction = {this.addInteraction}
-                openUploadDialog = {this.openUploadDialog}
-                switchLayer={this.switchLayer}
-                changeMode = {this.changeMode}
-                toggleEdit =  {this.toggleEdit}
-                toggleDelete =  {this.toggleDelete}
-                passRefUpward={this.getRefsFromChild}
-                tour = {this.state.tour}
-              />
-              {isAuthenticated() && (
-                <>
-                <br/>
-                <div style={{display:'flex', flexDirection: 'row'}}>
-                <Typography variant='caption' color='textSecondary' style={{padding:'8px', flexGrow:1}}>
-                  Logged in as:
-                  <br /> {isAuthenticated().user.name}
-                </Typography>
-                  <div style={{paddingTop:'10px'}}>
-                    <Button size='small' onClick={()=>logout(()=>{history.push('/')})}>Logout</Button>
-                  </div>
-                </div>
-                </>
-              )}
-              <Button size='small' style={{marginTop:'10px'}} onClick={this.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
-              <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
-                To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
-                If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
-              </Typography>
-
-            </div>
-
-
-          </Drawer>
-          <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer(false)}>
-          <div
-            tabIndex={0}
-            role="button"
-            onClick={this.toggleDrawer(false)}
-            onKeyDown={this.toggleDrawer(false)}
-          >
-          <div style={{width: drawerWidth, padding:'15px'}} id='sidebarMobile'>
-            <Sidebar
-              view={this.state.view}
-              mode={this.state.mode}
-              cardSortState = {this.state.cardSortState}
-              sortCards = {this.sortCards}
-              drawing={this.state.drawing}
-              editing={this.state.editing}
-              deleting = {this.state.deleting}
-              features = {this.state.features}
-              drawnFeatures = {this.state.drawnFeatures}
-              finishLine = {this.finishLine}
-              deleteLastPoint = {this.deleteLastPoint}
-              cancelEdit = {this.cancelEdit}
-              addInteraction = {this.addInteraction}
-              openUploadDialog = {this.openUploadDialog}
-              switchLayer={this.switchLayer}
-              changeMode = {this.changeMode}
-              toggleEdit =  {this.toggleEdit}
-              toggleDelete =  {this.toggleDelete}
-              passRefUpward={this.getRefsFromChild}
-              tour = {this.state.tour}
-            />
-          </div>
-          <Button size='small' style={{marginTop:'10px'}} onClick={this.openHelp}><HelpIcon/>&nbsp;&nbsp;Help</Button>
-
-          </div>
-        </Drawer>
-        <Drawer anchor='bottom' open={this.state.bottomDrawerOpen} onClose={this.toggleBottomDrawer(false)}>
-        <div
-          tabIndex={0}
-          role="button"
-          onClick={this.toggleBottomDrawer(false)}
-          onKeyDown={this.toggleBottomDrawer(false)}
-        >
-        <div style={{padding:'15px'}} id='bottombarMobile'>
-          <Bottombar
+          <Nav
+            title = {this.state.title}
+            toggleDrawer = {this.toggleDrawer}
+            view = {this.state.view}
+            switchView = {this.switchView}
+           />
+          <Sidebar
+            toggleDrawer = {this.toggleDrawer}
+            drawerOpen = {this.state.drawerOpen}
+            screenWidth = {x}
+            history = {history}
             view={this.state.view}
             mode={this.state.mode}
             cardSortState = {this.state.cardSortState}
@@ -1095,10 +922,41 @@ class MainApp extends Component {
             changeMode = {this.changeMode}
             toggleEdit =  {this.toggleEdit}
             toggleDelete =  {this.toggleDelete}
-          />
-        </div>
-        </div>
-      </Drawer>
+            passRefUpward={this.getRefsFromChild}
+            tour = {this.state.tour}
+            openHelp = {this.openHelp}
+          />            
+          <Drawer anchor='bottom' open={this.state.bottomDrawerOpen} onClose={this.toggleBottomDrawer(false)}>
+            <div
+              tabIndex={0}
+              role="button"
+              onClick={this.toggleBottomDrawer(false)}
+              onKeyDown={this.toggleBottomDrawer(false)}
+            >
+              <div style={{padding:'15px'}} id='bottombarMobile'>
+                <Bottombar
+                  view={this.state.view}
+                  mode={this.state.mode}
+                  cardSortState = {this.state.cardSortState}
+                  sortCards = {this.sortCards}
+                  drawing={this.state.drawing}
+                  editing={this.state.editing}
+                  deleting = {this.state.deleting}
+                  features = {this.state.features}
+                  drawnFeatures = {this.state.drawnFeatures}
+                  finishLine = {this.finishLine}
+                  deleteLastPoint = {this.deleteLastPoint}
+                  cancelEdit = {this.cancelEdit}
+                  addInteraction = {this.addInteraction}
+                  openUploadDialog = {this.openUploadDialog}
+                  switchLayer={this.switchLayer}
+                  changeMode = {this.changeMode}
+                  toggleEdit =  {this.toggleEdit}
+                  toggleDelete =  {this.toggleDelete}
+                />
+              </div>
+            </div>
+          </Drawer>
         <Fab id='basemapsFab'
           size='small'
           style={this.state.mode==='map' || this.state.view ==='0' ? {display:'flex'} : {display:'none'}}
@@ -1155,6 +1013,7 @@ class MainApp extends Component {
             <div className='arrow'></div>
           </Paper>
           <UploadSnackbar
+            showUploadMessage ={this.state.showUploadMessage}
             uploadMessage = {this.state.uploadMessage}
             onClose = {this.closeSnackbar}
           />
@@ -1290,16 +1149,13 @@ class MainApp extends Component {
     );
   }
   componentDidMount(){
-
     tippy('.featureButton');
-    this.openHelp();
+    //this.openHelp();
     basemapLayers = [];
     basemapLayers.push(new TileLayer({
-      source: new TileWMS({
-        url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-        params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
-        serverType: 'geoserver',
-        transition: 0
+      source: new XYZ({
+        url: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+        tilePixelRatio: 2,
       })
     }));
     this.state.features.map(function(item, count){
@@ -1425,7 +1281,6 @@ class MainApp extends Component {
             }
           })
         );
-
         hover.push(
           new Select({
             condition:pointerMove,
@@ -1470,10 +1325,7 @@ class MainApp extends Component {
               }
               return style;
             }
-
           }));
-
-
       };
       modify.push(new Modify({
         source: sourceArray[count],
@@ -1625,27 +1477,6 @@ class MainApp extends Component {
           else if(e.deselected.length > 0){
             convexVector.getSource().clear()
           }
-
-          /*
-          var h = e.feature.get("convexHull");
-      			if (!h)
-      			{	var cluster = e.feature.get("features");
-      				// calculate convex hull
-      				if (cluster && cluster.length)
-      				{	var c = [];
-      					for (var i=0, f; f = cluster[i]; i++)
-      					{	c.push(f.getGeometry().getCoordinates());
-      					}
-      					h = ol.coordinate.convexHull(c);
-      					e.feature.get("convexHull", h);
-      				}
-      			}
-      			vector.getSource().clear();
-      			if (h.length>2) vector.getSource().addFeature ( new ol.Feature( new ol.geom.Polygon([h]) ) );
-      		});
-      	hover.on("leave", function(e)
-      		{	vector.getSource().clear();
-              */
       		});
 
       })

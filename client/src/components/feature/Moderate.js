@@ -38,6 +38,8 @@ import {click, pointerMove} from 'ol/events/condition.js';
 import Cluster from 'ol/source/Cluster';
 import {defaults as defaultInteractions} from 'ol/interaction.js';
 import AnimatedCluster from 'ol-ext/layer/AnimatedCluster';
+import XYZ from 'ol/source/XYZ';
+
 
 import TextField from '@material-ui/core/TextField';
 import Card from '@material-ui/core/Card';
@@ -142,11 +144,8 @@ class Moderate extends Component {
 
     });
     let modBasemapLayers =new TileLayer({
-      source: new TileWMS({
-        url: 'http://ec2-34-214-28-139.us-west-2.compute.amazonaws.com/geoserver/wms',
-        params: {'LAYERS': 'Mapalize:KC-Basemap-Light', 'TILED': true},
-        serverType: 'geoserver',
-        transition: 0
+      source: new XYZ({
+        url: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png'
       })
     });
     modMap = new Map({

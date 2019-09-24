@@ -1,0 +1,1894 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render 1`] = `
+<div
+  className="App"
+>
+  <header
+    className="MuiPaper-root-10 MuiPaper-elevation4-16 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-8 mui-fixed"
+    style={
+      Object {
+        "flexWrap": "wrap",
+        "maxWidth": "100%",
+        "width": "100%",
+        "zIndex": 1202,
+      }
+    }
+  >
+    <div
+      className="MuiToolbar-root-37 MuiToolbar-regular-39 MuiToolbar-gutters-38"
+      id="toolbar"
+      style={
+        Object {
+          "flexWrap": "wrap",
+          "maxWidth": "100%",
+        }
+      }
+    >
+      <h6
+        className="MuiTypography-root-41 MuiTypography-h6-58 MuiTypography-colorInherit-70 MuiTypography-noWrap-67"
+        style={
+          Object {
+            "flexGrow": 2,
+            "maxWidth": "100%",
+          }
+        }
+      >
+        <button
+          aria-label="Menu"
+          className="MuiButtonBase-root-82 MuiIconButton-root-76 MuiIconButton-colorInherit-77"
+          disabled={false}
+          id="menuButton"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "marginLeft": -12,
+              "marginRight": 20,
+            }
+          }
+          tabIndex="0"
+          type="button"
+        >
+          <span
+            className="MuiIconButton-label-81"
+          >
+            <svg
+              aria-hidden="true"
+              className="MuiSvgIcon-root-85"
+              focusable="false"
+              role="presentation"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M0 0h24v24H0z"
+                fill="none"
+              />
+              <path
+                d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+              />
+            </svg>
+          </span>
+          <span
+            className="MuiTouchRipple-root-250"
+          />
+        </button>
+        <svg
+          aria-hidden="true"
+          className="MuiSvgIcon-root-85"
+          focusable="false"
+          role="presentation"
+          style={
+            Object {
+              "height": "32px",
+              "marginBottom": "5px",
+              "verticalAlign": "middle",
+            }
+          }
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+          />
+          <path
+            d="M15.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5zm5.8-10l2.4-2.4.8.8c1.3 1.3 3 2.1 5.1 2.1V9c-1.5 0-2.7-.6-3.6-1.5l-1.9-1.9c-.5-.4-1-.6-1.6-.6s-1.1.2-1.4.6L7.8 8.4c-.4.4-.6.9-.6 1.4 0 .6.2 1.1.6 1.4L11 14v5h2v-6.2l-2.2-2.3zM19 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z"
+          />
+        </svg>
+          
+        North Kansas City Bike Master Plan
+      </h6>
+      <div
+        className="MuiTabs-root-94 tabContainer"
+        id="menuTabs"
+        variant="fullWidth"
+      >
+        <div
+          className="MuiTabs-flexContainer-95"
+        >
+          <div
+            className="MuiTabs-scroller-97 MuiTabs-fixed-98"
+            onScroll={[Function]}
+            role="tablist"
+            style={
+              Object {
+                "marginBottom": 0,
+              }
+            }
+          >
+            <div
+              className="MuiTabs-flexContainer-95"
+            >
+              <button
+                aria-selected={true}
+                className="MuiButtonBase-root-82 MuiTab-root-103 MuiTab-textColorInherit-105 MuiTab-selected-108 tab"
+                disabled={false}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                role="tab"
+                style={
+                  Object {
+                    "flexGrow": 1,
+                  }
+                }
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiTab-wrapper-111"
+                >
+                  <span
+                    className="MuiTab-labelContainer-112"
+                  >
+                    <span
+                      className="MuiTab-label-113"
+                    >
+                      <span>
+                        <svg
+                          aria-hidden="true"
+                          className="MuiSvgIcon-root-85"
+                          focusable="false"
+                          role="presentation"
+                          style={
+                            Object {
+                              "top": "0px",
+                              "verticalAlign": "middle",
+                            }
+                          }
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                          />
+                          <path
+                            d="M0 0h24v24H0z"
+                            fill="none"
+                          />
+                        </svg>
+                           Input
+                      </span>
+                    </span>
+                  </span>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-250"
+                />
+              </button>
+              <button
+                aria-selected={false}
+                className="MuiButtonBase-root-82 MuiTab-root-103 MuiTab-textColorInherit-105"
+                disabled={false}
+                id="resultsTab"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                role="tab"
+                style={
+                  Object {
+                    "flexGrow": 1,
+                  }
+                }
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiTab-wrapper-111"
+                >
+                  <span
+                    className="MuiTab-labelContainer-112"
+                  >
+                    <span
+                      className="MuiTab-label-113"
+                    >
+                      <span>
+                        <svg
+                          aria-hidden="true"
+                          className="MuiSvgIcon-root-85"
+                          focusable="false"
+                          role="presentation"
+                          style={
+                            Object {
+                              "verticalAlign": "middle",
+                            }
+                          }
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"
+                          />
+                          <path
+                            d="M0 0h24v24H0z"
+                            fill="none"
+                          />
+                        </svg>
+                           Results
+                      </span>
+                    </span>
+                  </span>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-250"
+                />
+              </button>
+            </div>
+            <span
+              className="MuiPrivateTabIndicator-root-115 MuiPrivateTabIndicator-colorSecondary-117 MuiTabs-indicator-102"
+              style={
+                Object {
+                  "left": 0,
+                  "width": 0,
+                }
+              }
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div
+    className="MuiDrawer-root-118 MuiDrawer-docked-119 desktop"
+  >
+    <div
+      className="MuiPaper-root-10 MuiPaper-elevation0-12 MuiDrawer-paper-120 MuiDrawer-paperAnchorLeft-121 MuiDrawer-paperAnchorDockedLeft-125"
+    >
+      <div
+        id="sidebar"
+        style={
+          Object {
+            "padding": "15px",
+            "width": "280px",
+          }
+        }
+      >
+        <div>
+          <div
+            className="MuiPaper-root-10 MuiPaper-elevation2-14 MuiPaper-rounded-11"
+            id="createFeaturesPanel"
+          >
+            <div
+              style={
+                Object {
+                  "padding": "8px",
+                }
+              }
+            >
+              <strong>
+                <svg
+                  aria-hidden="true"
+                  className="MuiSvgIcon-root-85"
+                  focusable="false"
+                  role="presentation"
+                  style={
+                    Object {
+                      "verticalAlign": "middle",
+                    }
+                  }
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                  />
+                  <path
+                    d="M0 0h24v24H0z"
+                    fill="none"
+                  />
+                </svg>
+                   Create Features
+              </strong>
+            </div>
+            <hr
+              className="MuiDivider-root-130"
+            />
+            <div
+              style={
+                Object {
+                  "padding": "8px",
+                }
+              }
+            >
+              <button
+                className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-flat-140 full-width-left featureButton"
+                data-tippy-arrow="true"
+                data-tippy-boundary="window"
+                data-tippy-content="Click to start drawing a route."
+                data-tippy-placement="right"
+                disabled={false}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-136"
+                >
+                  <svg
+                    aria-hidden="true"
+                    className="MuiSvgIcon-root-85"
+                    focusable="false"
+                    role="presentation"
+                    style={
+                      Object {
+                        "color": "#0bb45a",
+                      }
+                    }
+                    viewBox="0 0 24 24"
+                  >
+                    <defs>
+                      <path
+                        d="M0 0h24v24H0V0z"
+                        id="a"
+                      />
+                    </defs>
+                    <path
+                      d="M23 8c0 1.1-.9 2-2 2-.18 0-.35-.02-.51-.07l-3.56 3.55c.05.16.07.34.07.52 0 1.1-.9 2-2 2s-2-.9-2-2c0-.18.02-.36.07-.52l-2.55-2.55c-.16.05-.34.07-.52.07s-.36-.02-.52-.07l-4.55 4.56c.05.16.07.33.07.51 0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.18 0 .35.02.51.07l4.56-4.55C8.02 9.36 8 9.18 8 9c0-1.1.9-2 2-2s2 .9 2 2c0 .18-.02.36-.07.52l2.55 2.55c.16-.05.34-.07.52-.07s.36.02.52.07l3.55-3.56C19.02 8.35 19 8.18 19 8c0-1.1.9-2 2-2s2 .9 2 2z"
+                    />
+                  </svg>
+                   
+                  <span
+                    style={
+                      Object {
+                        "paddingLeft": "10px",
+                      }
+                    }
+                  >
+                    What Routes do you bike today?
+                  </span>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-250"
+                />
+              </button>
+              <button
+                className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-flat-140 full-width-left featureButton"
+                data-tippy-arrow="true"
+                data-tippy-boundary="window"
+                data-tippy-content="Click to start drawing a route."
+                data-tippy-placement="right"
+                disabled={false}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-136"
+                >
+                  <svg
+                    aria-hidden="true"
+                    className="MuiSvgIcon-root-85"
+                    focusable="false"
+                    role="presentation"
+                    style={
+                      Object {
+                        "color": "#00a0fa",
+                      }
+                    }
+                    viewBox="0 0 24 24"
+                  >
+                    <defs>
+                      <path
+                        d="M0 0h24v24H0V0z"
+                        id="a"
+                      />
+                    </defs>
+                    <path
+                      d="M23 8c0 1.1-.9 2-2 2-.18 0-.35-.02-.51-.07l-3.56 3.55c.05.16.07.34.07.52 0 1.1-.9 2-2 2s-2-.9-2-2c0-.18.02-.36.07-.52l-2.55-2.55c-.16.05-.34.07-.52.07s-.36-.02-.52-.07l-4.55 4.56c.05.16.07.33.07.51 0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.18 0 .35.02.51.07l4.56-4.55C8.02 9.36 8 9.18 8 9c0-1.1.9-2 2-2s2 .9 2 2c0 .18-.02.36-.07.52l2.55 2.55c.16-.05.34-.07.52-.07s.36.02.52.07l3.55-3.56C19.02 8.35 19 8.18 19 8c0-1.1.9-2 2-2s2 .9 2 2z"
+                    />
+                  </svg>
+                   
+                  <span
+                    style={
+                      Object {
+                        "paddingLeft": "10px",
+                      }
+                    }
+                  >
+                    Where would you like to bike if it were safe and comfortable?
+                  </span>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-250"
+                />
+              </button>
+              <button
+                className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-flat-140 full-width-left featureButton"
+                data-tippy-arrow="true"
+                data-tippy-boundary="window"
+                data-tippy-content="Click to start drawing a point."
+                data-tippy-placement="right"
+                disabled={false}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-136"
+                >
+                  <svg
+                    aria-hidden="true"
+                    className="MuiSvgIcon-root-85"
+                    focusable="false"
+                    role="presentation"
+                    style={
+                      Object {
+                        "color": "#0bb45a",
+                      }
+                    }
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M0 0h24v24H0V0z"
+                      fill="none"
+                    />
+                    <path
+                      d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm4 8h-3v3h-2v-3H8V8h3V5h2v3h3v2z"
+                    />
+                  </svg>
+                   
+                  <span
+                    style={
+                      Object {
+                        "paddingLeft": "10px",
+                      }
+                    }
+                  >
+                    What destinations do you visit on your bike?
+                  </span>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-250"
+                />
+              </button>
+              <button
+                className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-flat-140 full-width-left featureButton"
+                data-tippy-arrow="true"
+                data-tippy-boundary="window"
+                data-tippy-content="Click to start straing a point."
+                data-tippy-placement="right"
+                disabled={false}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-136"
+                >
+                  <svg
+                    aria-hidden="true"
+                    className="MuiSvgIcon-root-85"
+                    focusable="false"
+                    role="presentation"
+                    style={
+                      Object {
+                        "color": "#00a0fa",
+                      }
+                    }
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M0 0h24v24H0V0z"
+                      fill="none"
+                    />
+                    <path
+                      d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm4 8h-3v3h-2v-3H8V8h3V5h2v3h3v2z"
+                    />
+                  </svg>
+                   
+                  <span
+                    style={
+                      Object {
+                        "paddingLeft": "10px",
+                      }
+                    }
+                  >
+                    What destinations would you like to visit if you had a safe and comfortable route?
+                  </span>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-250"
+                />
+              </button>
+              <button
+                className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-flat-140 full-width-left featureButton"
+                data-tippy-arrow="true"
+                data-tippy-boundary="window"
+                data-tippy-content="Click to start drawing a point."
+                data-tippy-placement="right"
+                disabled={false}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-136"
+                >
+                  <svg
+                    aria-hidden="true"
+                    className="MuiSvgIcon-root-85"
+                    focusable="false"
+                    role="presentation"
+                    style={
+                      Object {
+                        "color": "#aa093c",
+                      }
+                    }
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M0 0h24v24H0V0z"
+                      fill="none"
+                    />
+                    <path
+                      d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm4 8h-3v3h-2v-3H8V8h3V5h2v3h3v2z"
+                    />
+                  </svg>
+                   
+                  <span
+                    style={
+                      Object {
+                        "paddingLeft": "10px",
+                      }
+                    }
+                  >
+                    What locations feel unsafe or uncomfortable for biking?
+                  </span>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-250"
+                />
+              </button>
+            </div>
+          </div>
+          <br />
+          <div
+            className="MuiPaper-root-10 MuiPaper-elevation2-14 MuiPaper-rounded-11"
+            id="editPanel"
+            style={
+              Object {
+                "padding": "8px",
+              }
+            }
+          >
+            <button
+              className="MuiButtonBase-root-82 MuiButtonBase-disabled-83 MuiButton-root-135 MuiButton-text-137 MuiButton-flat-140 MuiButton-disabled-155 full-width-left"
+              disabled={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onContextMenu={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              tabIndex="-1"
+              type="button"
+            >
+              <span
+                className="MuiButton-label-136"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="MuiSvgIcon-root-85"
+                  focusable="false"
+                  role="presentation"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                  />
+                  <path
+                    d="M0 0h24v24H0z"
+                    fill="none"
+                  />
+                </svg>
+                    Edit Features
+              </span>
+            </button>
+            <button
+              className="MuiButtonBase-root-82 MuiButtonBase-disabled-83 MuiButton-root-135 MuiButton-text-137 MuiButton-flat-140 MuiButton-disabled-155 full-width-left"
+              disabled={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onContextMenu={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              tabIndex="-1"
+              type="button"
+            >
+              <span
+                className="MuiButton-label-136"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="MuiSvgIcon-root-85"
+                  focusable="false"
+                  role="presentation"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                  />
+                  <path
+                    d="M0 0h24v24H0z"
+                    fill="none"
+                  />
+                </svg>
+                    Delete Features
+              </span>
+            </button>
+          </div>
+          <br />
+          <button
+            className="MuiButtonBase-root-82 MuiButtonBase-disabled-83 MuiButton-root-135 MuiButton-contained-146 MuiButton-containedPrimary-147 MuiButton-raised-149 MuiButton-raisedPrimary-150 MuiButton-disabled-155 full-width"
+            disabled={true}
+            id="uploadButton"
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            tabIndex="-1"
+            type="button"
+          >
+            <span
+              className="MuiButton-label-136"
+            >
+              <svg
+                aria-hidden="true"
+                className="MuiSvgIcon-root-85"
+                focusable="false"
+                role="presentation"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M0 0h24v24H0z"
+                  fill="none"
+                />
+                <path
+                  d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"
+                />
+              </svg>
+                  Upload 
+            </span>
+          </button>
+        </div>
+        <button
+          className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-flat-140 MuiButton-sizeSmall-158"
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "marginTop": "10px",
+            }
+          }
+          tabIndex="0"
+          type="button"
+        >
+          <span
+            className="MuiButton-label-136"
+          >
+            <svg
+              aria-hidden="true"
+              className="MuiSvgIcon-root-85"
+              focusable="false"
+              role="presentation"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M0 0h24v24H0z"
+                fill="none"
+              />
+              <path
+                d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"
+              />
+            </svg>
+              Help
+          </span>
+          <span
+            className="MuiTouchRipple-root-250"
+          />
+        </button>
+        <span
+          className="MuiTypography-root-41 MuiTypography-caption-51 MuiTypography-colorTextSecondary-74"
+          style={
+            Object {
+              "paddingTop": "10px",
+            }
+          }
+        >
+          To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  
+          <a
+            href="http://www.nkc.org/departments/community_development/current_projects/bike_master_plan"
+          >
+            http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan
+          </a>
+          <br />
+          <br />
+          If you have any questions please reach out to the consultant team member Christina Hoxie, 
+          <a
+            href="mailto:choxie@hoxiecollective.com"
+          >
+            choxie@hoxiecollective.com
+          </a>
+          .
+        </span>
+      </div>
+    </div>
+  </div>
+  <button
+    className="MuiButtonBase-root-82 MuiFab-root-163 MuiFab-sizeSmall-171"
+    disabled={false}
+    id="basemapsFab"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onContextMenu={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    style={
+      Object {
+        "display": "flex",
+      }
+    }
+    tabIndex="0"
+    type="button"
+  >
+    <span
+      className="MuiFab-label-164"
+    >
+      <svg
+        aria-hidden="true"
+        className="MuiSvgIcon-root-85"
+        focusable="false"
+        role="presentation"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M0 0h24v24H0z"
+          fill="none"
+        />
+        <path
+          d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"
+        />
+      </svg>
+    </span>
+    <span
+      className="MuiTouchRipple-root-250"
+    />
+  </button>
+  <button
+    aria-label="Add"
+    className="MuiButtonBase-root-82 MuiFab-root-163 MuiFab-primary-165"
+    disabled={false}
+    id="add-button"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onContextMenu={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    tabIndex="0"
+    type="button"
+  >
+    <span
+      className="MuiFab-label-164"
+    >
+      <svg
+        aria-hidden="true"
+        className="MuiSvgIcon-root-85"
+        focusable="false"
+        role="presentation"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+        />
+        <path
+          d="M0 0h24v24H0z"
+          fill="none"
+        />
+      </svg>
+    </span>
+    <span
+      className="MuiTouchRipple-root-250"
+    />
+  </button>
+  <div />
+  <div />
+  <div />
+   
+  <div
+    id="map"
+    style={
+      Object {
+        "display": "block",
+      }
+    }
+  />
+  <div
+    id="tooltipAnchor"
+    style={
+      Object {
+        "bottom": "0",
+        "display": "block",
+        "height": "10px",
+        "position": "absolute",
+        "width": "100%",
+        "zIndex": "2000",
+      }
+    }
+  />
+  <div
+    className="MuiPaper-root-10 MuiPaper-elevation2-14 MuiPaper-rounded-11"
+    id="popover"
+    style={
+      Object {
+        "left": "-138px",
+        "padding": "15px",
+        "position": "absolute",
+        "top": "-218px",
+        "width": "250px",
+      }
+    }
+  >
+    <form
+      onSubmit={[Function]}
+    >
+      <div
+        className="MuiFormControl-root-175 MuiFormControl-marginNormal-176"
+        style={
+          Object {
+            "width": "100%",
+          }
+        }
+      >
+        <label
+          className="MuiFormLabel-root-190 MuiInputLabel-root-179 MuiInputLabel-formControl-184 MuiInputLabel-animated-187 MuiInputLabel-outlined-189"
+          data-shrink={false}
+          htmlFor="commentArea"
+        >
+          Add Comment:
+        </label>
+        <div
+          className="MuiInputBase-root-210 MuiOutlinedInput-root-197 MuiInputBase-formControl-211 MuiInputBase-multiline-218 MuiOutlinedInput-multiline-203"
+          onClick={[Function]}
+        >
+          <fieldset
+            aria-hidden={true}
+            className="MuiPrivateNotchedOutline-root-227 MuiOutlinedInput-notchedOutline-204"
+            style={
+              Object {
+                "paddingLeft": 8,
+              }
+            }
+          >
+            <legend
+              className="MuiPrivateNotchedOutline-legend-228"
+              style={
+                Object {
+                  "width": 0.01,
+                }
+              }
+            >
+              <span
+                dangerouslySetInnerHTML={
+                  Object {
+                    "__html": "&#8203;",
+                  }
+                }
+              />
+            </legend>
+          </fieldset>
+          <textarea
+            aria-invalid={false}
+            className="MuiInputBase-input-220 MuiOutlinedInput-input-205 MuiInputBase-inputMultiline-222 MuiOutlinedInput-inputMultiline-207"
+            disabled={false}
+            id="commentArea"
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            required={false}
+            rows="4"
+          />
+        </div>
+      </div>
+      <br />
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-textPrimary-138 MuiButton-flat-140 MuiButton-flatPrimary-141"
+        disabled={false}
+        onBlur={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        style={
+          Object {
+            "zIndex": 1200,
+          }
+        }
+        tabIndex="0"
+        type="submit"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          Save and close
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+    </form>
+    <div
+      className="arrow"
+    />
+  </div>
+  <div
+    className="MuiPaper-root-10 MuiPaper-elevation2-14 MuiPaper-rounded-11"
+    id="resultsPopover"
+    onMouseUp={[Function]}
+    style={
+      Object {
+        "left": "-138px",
+        "padding": "15px",
+        "position": "absolute",
+        "top": "-75px",
+        "width": "250px",
+      }
+    }
+  >
+    <div />
+    <div
+      className="arrow"
+    />
+  </div>
+  <template
+    id="tour1"
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "padding": "10px",
+          "textAlign": "left",
+        }
+      }
+    >
+      <h6
+        className="MuiTypography-root-41 MuiTypography-h6-58"
+      >
+        Step 1 - Create Features
+      </h6>
+      <p>
+        First, click a button to draw a line or a route to answer questions about where you currently bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.
+      </p>
+    </div>
+    <div
+      style={
+        Object {
+          "textAlign": "right",
+        }
+      }
+    >
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-textPrimary-138 MuiButton-flat-140 MuiButton-flatPrimary-141"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Close
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+       
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-contained-146 MuiButton-containedPrimary-147 MuiButton-raised-149 MuiButton-raisedPrimary-150"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M8 5v14l11-7z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Next
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+    </div>
+  </template>
+  <template
+    id="tour2"
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "padding": "10px",
+          "textAlign": "left",
+        }
+      }
+    >
+      <h6
+        className="MuiTypography-root-41 MuiTypography-h6-58"
+      >
+        Step 2 - Edit Features (Optional)
+      </h6>
+      <p>
+        After you create features you may edit or delete them using these tools.
+      </p>
+    </div>
+    <div
+      style={
+        Object {
+          "textAlign": "right",
+        }
+      }
+    >
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-textPrimary-138 MuiButton-flat-140 MuiButton-flatPrimary-141"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Close
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+       
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-contained-146 MuiButton-containedPrimary-147 MuiButton-raised-149 MuiButton-raisedPrimary-150"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M8 5v14l11-7z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Next
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+    </div>
+  </template>
+  <template
+    id="tour3"
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "padding": "10px",
+          "textAlign": "left",
+        }
+      }
+    >
+      <h6
+        className="MuiTypography-root-41 MuiTypography-h6-58"
+      >
+        Step 3 - Upload Features
+      </h6>
+      <p>
+        Upload your features to add them to the results map.
+      </p>
+    </div>
+    <div
+      style={
+        Object {
+          "textAlign": "right",
+        }
+      }
+    >
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-textPrimary-138 MuiButton-flat-140 MuiButton-flatPrimary-141"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Close
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+       
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-contained-146 MuiButton-containedPrimary-147 MuiButton-raised-149 MuiButton-raisedPrimary-150"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M8 5v14l11-7z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Next
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+    </div>
+  </template>
+  <template
+    id="tour4"
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "padding": "10px",
+          "textAlign": "left",
+        }
+      }
+    >
+      <h6
+        className="MuiTypography-root-41 MuiTypography-h6-58"
+      >
+        Step 4 - View Results
+      </h6>
+      <p>
+        Click the Results tab to view everyone's results on the map.
+      </p>
+    </div>
+    <div
+      style={
+        Object {
+          "textAlign": "right",
+        }
+      }
+    >
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-contained-146 MuiButton-containedPrimary-147 MuiButton-raised-149 MuiButton-raisedPrimary-150"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+            <path
+              d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"
+            />
+          </svg>
+           Done
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+       
+    </div>
+  </template>
+  <template
+    id="tour5"
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "padding": "10px",
+          "textAlign": "left",
+        }
+      }
+    >
+      <h6
+        className="MuiTypography-root-41 MuiTypography-h6-58"
+      >
+        Step 1 - Create Features
+      </h6>
+      <p>
+        First, click a button to draw a line or a route to answer questions about where you currently bike, where you would bike if it were safe and comfortable, and barriers to riding a bike.
+      </p>
+    </div>
+    <div
+      style={
+        Object {
+          "textAlign": "right",
+        }
+      }
+    >
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-textPrimary-138 MuiButton-flat-140 MuiButton-flatPrimary-141"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Close
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+       
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-contained-146 MuiButton-containedPrimary-147 MuiButton-raised-149 MuiButton-raisedPrimary-150"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M8 5v14l11-7z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Next
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+    </div>
+  </template>
+  <template
+    id="tour6"
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "padding": "10px",
+          "textAlign": "left",
+        }
+      }
+    >
+      <h6
+        className="MuiTypography-root-41 MuiTypography-h6-58"
+      >
+        Step 2 - Edit Features (Optional)
+      </h6>
+      <p>
+        Click the menu button to reveal additional tools for editing and deleteing features.
+      </p>
+    </div>
+    <div
+      style={
+        Object {
+          "textAlign": "right",
+        }
+      }
+    >
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-textPrimary-138 MuiButton-flat-140 MuiButton-flatPrimary-141"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Close
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+       
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-contained-146 MuiButton-containedPrimary-147 MuiButton-raised-149 MuiButton-raisedPrimary-150"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M8 5v14l11-7z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Next
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+    </div>
+  </template>
+  <template
+    id="tour7"
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "padding": "10px",
+          "textAlign": "left",
+        }
+      }
+    >
+      <h6
+        className="MuiTypography-root-41 MuiTypography-h6-58"
+      >
+        Step 3 - Upload Features
+      </h6>
+      <p>
+        Upload your features to add them to the results map.
+      </p>
+    </div>
+    <div
+      style={
+        Object {
+          "textAlign": "right",
+        }
+      }
+    >
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-text-137 MuiButton-textPrimary-138 MuiButton-flat-140 MuiButton-flatPrimary-141"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Close
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+       
+      <button
+        className="MuiButtonBase-root-82 MuiButton-root-135 MuiButton-contained-146 MuiButton-containedPrimary-147 MuiButton-raised-149 MuiButton-raisedPrimary-150"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiButton-label-136"
+        >
+          <svg
+            aria-hidden="true"
+            className="MuiSvgIcon-root-85"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M8 5v14l11-7z"
+            />
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+          </svg>
+           Next
+        </span>
+        <span
+          className="MuiTouchRipple-root-250"
+        />
+      </button>
+    </div>
+  </template>
+  <img
+    src="place.png"
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  />
+</div>
+`;
