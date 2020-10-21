@@ -192,12 +192,12 @@ class MainApp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      title: 'North Kansas City Bike Master Plan',
+      title: 'Walking and Biking in Bethany, MO',
       lineName: 'Draw Line',
       features:[
         {
           id: 0,
-          name:'What Routes do you bike today?',
+          name:'What routes do you walk/bike today?',
           prompt:'Click to start drawing a route.',
           type:'line',
           color: colors[0],
@@ -205,7 +205,7 @@ class MainApp extends Component {
         },
         {
           id: 1,
-          name:'Where would you like to bike if it were safe and comfortable?',
+          name:'Where would you like to walk or bike if it were safe and comfortable?',
           prompt:'Click to start drawing a route.',
           type:'line',
           color: colors[1],
@@ -213,7 +213,7 @@ class MainApp extends Component {
         },
         {
           id: 2,
-          name:'What destinations do you visit on your bike?',
+          name:'What destinations do you visit by walking or biking?',
           prompt:'Click to start drawing a point.',
           type:'point',
           color: (chroma(colors[0])).toString(),
@@ -229,7 +229,7 @@ class MainApp extends Component {
         },
         {
           id: 4,
-          name:'What locations feel unsafe or uncomfortable for biking?',
+          name:'What locations feel unsafe or uncomfortable for walking or biking?',
           prompt:'Click to start drawing a point.',
           type:'point',
           color: colors[2],
@@ -374,7 +374,6 @@ class MainApp extends Component {
   }
 
   switchView(event, value){
-    console.log(value);
     if(value === 1){
       this.setState({
         view: 1
@@ -401,6 +400,7 @@ class MainApp extends Component {
       hover.forEach((item)=>{
         map.addInteraction(item);
       })
+      this.changeMode(this.state.mode);
       this.getResults();
       if(clusterSelectClick !== null){
         map.addInteraction(clusterSelectClick);
@@ -805,12 +805,11 @@ class MainApp extends Component {
     this.setState({showHelp: false});
   }
   setBasemap(type){
-    console.log('change basemap');
     if(type==='aerial'){
       console.log(map.getLayers());
       let basemap=new TileLayer({ 
         source: new XYZ({ 
-          url: 'https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&scale=2',
+          url: 'https://mt0.google.com/vt/lyrs=s,h&hl=en&x={x}&y={y}&z={z}&scale=2',
           tilePixelRatio: 2, 
         }) 
       });
@@ -1154,7 +1153,7 @@ class MainApp extends Component {
     basemapLayers = [];
     basemapLayers.push(new TileLayer({
       source: new XYZ({
-        url: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+        url: 'https://mt0.google.com/vt/lyrs=s,h&hl=en&x={x}&y={y}&z={z}&scale=2',
         tilePixelRatio: 2,
       })
     }));
@@ -1353,7 +1352,7 @@ class MainApp extends Component {
         layers: basemapLayers.concat(layerArray),
         overlays: [overlay, resultsOverlay],
         view: new View({
-          center: fromLonLat([-94.573, 39.143]),
+          center: fromLonLat([-94.028333, 40.268333]),
           zoom: 14,
           maxZoom: 20,
           minZoom: 12

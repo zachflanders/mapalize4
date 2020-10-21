@@ -6,7 +6,8 @@ const UserModel = require('./user');
 
 dotenv.config()
 //Connect to Database
-const sequelize = new Sequelize(process.env.DATABASE , process.env.USERNAME, process.env.PASSWORD, {
+const sequelize = new Sequelize(
+  process.env.DATABASE , process.env.USERNAME, process.env.PASSWORD, {
   host: process.env.HOSTURL,
   dialect: 'postgres',
   ssl: true,
@@ -18,7 +19,8 @@ const sequelize = new Sequelize(process.env.DATABASE , process.env.USERNAME, pro
     min: 0,
     acquire: 30000,
     idle: 10000
-  }
+  },
+  operatorsAliases: false
 });
 
 const Feature = FeatureModel(sequelize, Sequelize);

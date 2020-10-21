@@ -204,7 +204,7 @@ class Sidebar extends Component {
       if(this.props.view === 0){
         let item = this.props.features[this.props.drawing];
         return (
-          <>
+          <div>
           <Drawer variant="permanent" className='desktop'>
             <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>        
               {this.props.drawing !== false && this.renderDrawingMenu(item)}
@@ -212,7 +212,7 @@ class Sidebar extends Component {
               {this.props.deleting === true && this.renderDeletingMenu()}
               {this.props.drawing === false && this.props.editing===false && this.props.deleting=== false && this.renderInputMenu()}
               {isAuthenticated() && (
-                  <>
+                  <div>
                   <br/>
                   <div style={{display:'flex', flexDirection: 'row'}}>
                   <Typography variant='caption' color='textSecondary' style={{padding:'8px', flexGrow:1}}>
@@ -223,13 +223,10 @@ class Sidebar extends Component {
                       <Button size='small' onClick={()=>logout(()=>{history.push('/')})}>Logout</Button>
                     </div>
                   </div>
-                  </>
+                  </div>
                 )}
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
-                <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
-                  To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
-                  If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
-                </Typography>
+          
             </div>
           </Drawer>
           <Drawer open={this.props.drawerOpen} onClose={this.props.toggleDrawer(false)}>
@@ -245,7 +242,7 @@ class Sidebar extends Component {
               {this.props.deleting === true && this.renderDeletingMenu()}
               {this.props.drawing === false && this.props.editing===false && this.props.deleting=== false && this.renderInputMenu()}
               {isAuthenticated() && (
-                  <>
+                  <div>
                   <br/>
                   <div style={{display:'flex', flexDirection: 'row'}}>
                   <Typography variant='caption' color='textSecondary' style={{padding:'8px', flexGrow:1}}>
@@ -256,7 +253,7 @@ class Sidebar extends Component {
                       <Button size='small' onClick={()=>logout(()=>{history.push('/')})}>Logout</Button>
                     </div>
                   </div>
-                  </>
+                  </div>
                 )}
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
@@ -266,13 +263,12 @@ class Sidebar extends Component {
               </div>
               </div>
             </Drawer>
-            </>
-          
+            </div>
           )
       }
       else{
         return(
-          <>
+          <div>
           <Drawer variant="permanent" className='desktop'>
             <div style={{width: drawerWidth, padding:'15px'}} id='sidebar'>
               <Paper>
@@ -299,7 +295,7 @@ class Sidebar extends Component {
               </Paper>
               <br />
               {this.props.mode==='cards' &&
-                <>
+                <div>
                   <Paper>
                     <div style={{padding:'8px'}}>
                       <SortIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>Sort Results</strong>
@@ -323,7 +319,7 @@ class Sidebar extends Component {
                     </div>
                   </Paper>
                   <br />
-                </>
+                </div>
               }
               <Paper>
                 <div style={{padding:'8px'}}>
@@ -338,7 +334,7 @@ class Sidebar extends Component {
                 </div>
              </Paper>
              {isAuthenticated() && (
-                  <>
+                  <div>
                   <br/>
                   <div style={{display:'flex', flexDirection: 'row'}}>
                   <Typography variant='caption' color='textSecondary' style={{padding:'8px', flexGrow:1}}>
@@ -349,13 +345,10 @@ class Sidebar extends Component {
                       <Button size='small' onClick={()=>logout(()=>{history.push('/')})}>Logout</Button>
                     </div>
                   </div>
-                  </>
+                  </div>
                 )}
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
-                <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
-                  To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
-                  If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
-                </Typography>
+          
            </div>
           </Drawer>
           <Drawer open={this.props.drawerOpen} onClose={this.props.toggleDrawer(false)}>
@@ -390,7 +383,7 @@ class Sidebar extends Component {
               </Paper>
               <br />
               {this.props.mode==='cards' &&
-                <>
+                <div>
                   <Paper>
                     <div style={{padding:'8px'}}>
                       <SortIcon style={{verticalAlign:"middle"}} /> &nbsp;&nbsp; <strong>Sort Results</strong>
@@ -414,7 +407,7 @@ class Sidebar extends Component {
                     </div>
                   </Paper>
                   <br />
-                </>
+                </div>
               }
               <Paper>
                 <div style={{padding:'8px'}}>
@@ -429,7 +422,7 @@ class Sidebar extends Component {
                 </div>
              </Paper>
              {isAuthenticated() && (
-                  <>
+                  <div>
                   <br/>
                   <div style={{display:'flex', flexDirection: 'row'}}>
                   <Typography variant='caption' color='textSecondary' style={{padding:'8px', flexGrow:1}}>
@@ -440,17 +433,14 @@ class Sidebar extends Component {
                       <Button size='small' onClick={()=>logout(()=>{history.push('/')})}>Logout</Button>
                     </div>
                   </div>
-                  </>
+                  </div>
                 )}
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
-                <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
-                  To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
-                  If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
-                </Typography>
+                
             </div>
             </div>
           </Drawer>
-          </>
+          </div>
         )
       }
    

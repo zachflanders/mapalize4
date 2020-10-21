@@ -20,7 +20,7 @@ module.exports = (sequelize, type) => {
     }
   }, {
     sequelize,
-    modelName: 'northkc',
+    modelName: 'bethanymo',
     timestamps: false,
     freezeTableName: true
   })
