@@ -14,6 +14,7 @@ const sequelize = new Sequelize(
     ssl: {
       require: true,
       rejectUnauthorized: false,
+    },
   },
   pool: {
     max: 5,
