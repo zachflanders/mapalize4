@@ -1353,7 +1353,7 @@ class MainApp extends Component {
         overlays: [overlay, resultsOverlay],
         view: new View({
           center: fromLonLat([-94.028333, 40.268333]),
-          zoom: 14.5,
+          zoom: 15,
           maxZoom: 20,
           minZoom: 12
         }),
