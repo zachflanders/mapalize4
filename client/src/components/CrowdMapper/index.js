@@ -158,7 +158,7 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
   //if statement should check to make sure geoJSON line is valid
   if(true){
     var length = turf.lineDistance(geoJSONLine, 'miles');
-    for(var i=(Math.random()*(0.02)); i <= length; i=i+0.02){
+    for(var i=(Math.random()*(0.01)); i <= length; i=i+0.01){
       if(length > 0 ){
         var thisPoint = turf.along(geoJSONLine, i, 'miles');
         if(resultsSourceArray[count]){
@@ -1353,7 +1353,7 @@ class MainApp extends Component {
         overlays: [overlay, resultsOverlay],
         view: new View({
           center: fromLonLat([-94.028333, 40.268333]),
-          zoom: 14,
+          zoom: 14.5,
           maxZoom: 20,
           minZoom: 12
         }),
