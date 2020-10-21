@@ -1040,12 +1040,12 @@ class MainApp extends Component {
               open={this.state.showHelp}
               onClose={this.closeHelp}
             >
-              <DialogTitle><img src={NkcLogo} width='200'/></DialogTitle>
+              <DialogTitle>Where would you like to walk and bike in Bethany, MO?</DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                <strong>Where would you like to bike in North Kansas City?.</strong><br />
-                North Kansas City is undertaking a Bike Master Plan in 2019 to coordinate projects and plan for a network that connects and serves all parts of the community.
-                We want to know where you want to bike in North Kansas City.  Draw a line (<LineIcon style={{height:'24px',verticalAlign:'middle' }} />) or drop a pin (<PlaceIcon style={{height:'24px', verticalAlign:'middle'}} />) to share routes and destinations where you might ride a bike.  You can also point out places you would like to ride but don't feel safe or comfortable for biking today.  Thank you for informing North Kansas City's Bike Master Plan!  To get involved and learn more about the Bike Master Plan, visit the <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan' target="_blank">North Kansas City Bike Master Plan project page.</a>                </DialogContentText>
+                <strong></strong><br />
+                We want to know where you want to walk and bike in Bethany, MO.  Draw a line (<LineIcon style={{height:'24px',verticalAlign:'middle' }} />) or drop a pin (<PlaceIcon style={{height:'24px', verticalAlign:'middle'}} />) to share routes and destinations where you might walk or ride a bike.  You can also point out places you would like to walk or bike to but don't feel safe or comfortable today.               
+                </DialogContentText>
               </DialogContent>
               <DialogActions>
                 <Button onClick={this.closeHelp} color="primary">
