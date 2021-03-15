@@ -11,6 +11,8 @@ import Tab from '@material-ui/core/Tab';
 import EditIcon from '@material-ui/icons/Edit';
 import FireIcon from '@material-ui/icons/Whatshot';
 import BikeIcon from '@material-ui/icons/DirectionsBike';
+import WalkIcon from '@material-ui/icons/DirectionsWalk';
+
 import MenuIcon from '@material-ui/icons/Menu';
 
 const Nav = (props) =>{
@@ -27,6 +29,7 @@ const Nav = (props) =>{
               >
                 <MenuIcon />
               </IconButton>
+                <WalkIcon style={{verticalAlign:'middle', marginBottom:'5px', height:'32px'}} />  
                 <BikeIcon style={{verticalAlign:'middle', marginBottom:'5px', height:'32px'}} />
                 &nbsp;&nbsp;{props.title}
               </Typography>

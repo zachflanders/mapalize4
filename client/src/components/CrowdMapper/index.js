@@ -197,7 +197,7 @@ class MainApp extends Component {
       features:[
         {
           id: 0,
-          name:'What Routes do you bike today?',
+          name:'What Routes do you walk/bike today?',
           prompt:'Click to start drawing a route.',
           type:'line',
           color: colors[0],
@@ -205,7 +205,7 @@ class MainApp extends Component {
         },
         {
           id: 1,
-          name:'Where would you like to bike if it were safe and comfortable?',
+          name:'Where would you like to walk/bike if it were safe and comfortable?',
           prompt:'Click to start drawing a route.',
           type:'line',
           color: colors[1],
@@ -213,7 +213,7 @@ class MainApp extends Component {
         },
         {
           id: 2,
-          name:'What destinations do you visit on your bike?',
+          name:'What destinations do you visit by walking or biking?',
           prompt:'Click to start drawing a point.',
           type:'point',
           color: (chroma(colors[0])).toString(),
@@ -229,7 +229,7 @@ class MainApp extends Component {
         },
         {
           id: 4,
-          name:'What locations feel unsafe or uncomfortable for biking?',
+          name:'What locations feel unsafe or uncomfortable for walking or biking?',
           prompt:'Click to start drawing a point.',
           type:'point',
           color: colors[2],
@@ -1044,9 +1044,8 @@ class MainApp extends Component {
               <DialogTitle><img src={Logo} width='200'/></DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                <strong>Where would you like to bike in North Kansas City?.</strong><br />
-                North Kansas City is undertaking a Bike Master Plan in 2019 to coordinate projects and plan for a network that connects and serves all parts of the community.
-                We want to know where you want to bike in North Kansas City.  Draw a line (<LineIcon style={{height:'24px',verticalAlign:'middle' }} />) or drop a pin (<PlaceIcon style={{height:'24px', verticalAlign:'middle'}} />) to share routes and destinations where you might ride a bike.  You can also point out places you would like to ride but don't feel safe or comfortable for biking today.  Thank you for informing North Kansas City's Bike Master Plan!  To get involved and learn more about the Bike Master Plan, visit the <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan' target="_blank">North Kansas City Bike Master Plan project page.</a>                </DialogContentText>
+                <strong>Where would you like to walk and bike in Grandview?</strong><br />
+                We want to know where you want to walk and bike in Grandview.  Draw a line (<LineIcon style={{height:'24px',verticalAlign:'middle' }} />) or drop a pin (<PlaceIcon style={{height:'24px', verticalAlign:'middle'}} />) to share routes and destinations where you might walk or ride a bike.  You can also point out places you would like to ride but don't feel safe or comfortable for walking or biking today.</DialogContentText>
               </DialogContent>
               <DialogActions>
                 <Button onClick={this.closeHelp} color="primary">
@@ -1353,7 +1352,7 @@ class MainApp extends Component {
         layers: basemapLayers.concat(layerArray),
         overlays: [overlay, resultsOverlay],
         view: new View({
-          center: fromLonLat([-94.573, 39.143]),
+          center: fromLonLat([-94.5225, 38.885]),
           zoom: 14,
           maxZoom: 20,
           minZoom: 12
