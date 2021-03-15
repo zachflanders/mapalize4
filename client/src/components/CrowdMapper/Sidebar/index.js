@@ -227,8 +227,7 @@ class Sidebar extends Component {
                 )}
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
-                  To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
-                  If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
+                Go Grandview  is the City's first bicycle and pedestrian master plan. This guiding document is an appendix to the upcoming Transportation Master Plan, which is derived from Grandview 2030, the Comprehensive City Plan.   
                 </Typography>
             </div>
           </Drawer>
@@ -260,8 +259,7 @@ class Sidebar extends Component {
                 )}
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
-                  To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
-                  If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
+                Go Grandview  is the City's first bicycle and pedestrian master plan. This guiding document is an appendix to the upcoming Transportation Master Plan, which is derived from Grandview 2030, the Comprehensive City Plan. 
                 </Typography>
               </div>
               </div>
@@ -353,8 +351,7 @@ class Sidebar extends Component {
                 )}
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
-                  To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
-                  If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
+                  Go Grandview  is the City's first bicycle and pedestrian master plan. This guiding document is an appendix to the upcoming Transportation Master Plan, which is derived from Grandview 2030, the Comprehensive City Plan. 
                 </Typography>
            </div>
           </Drawer>
@@ -444,8 +441,7 @@ class Sidebar extends Component {
                 )}
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
-                  To learn more about the NKC Bike Master Plan process underway and upcoming events, visit:  <a href='http://www.nkc.org/departments/community_development/current_projects/bike_master_plan'>http://www.nkc.org/departments/ community_development/ current_projects/bike_master_plan</a><br /><br />
-                  If you have any questions please reach out to the consultant team member Christina Hoxie, <a href='mailto:choxie@hoxiecollective.com'>choxie@hoxiecollective.com</a>.
+                  Go Grandview  is the City's first bicycle and pedestrian master plan. This guiding document is an appendix to the upcoming Transportation Master Plan, which is derived from Grandview 2030, the Comprehensive City Plan. 
                 </Typography>
             </div>
             </div>

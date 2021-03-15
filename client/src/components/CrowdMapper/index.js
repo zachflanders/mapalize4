@@ -6,7 +6,7 @@ import MainDisplay from './main.js';
 import Sidebar from './Sidebar';
 import Bottombar from './bottombar.js';
 import PlacePNG from '../../assets/place.png';
-import NkcLogo from '../../assets/nkclogo.png';
+import Logo from '../../assets/logo.png';
 import Nav from './Nav.js';
 
 //openlayers imports
@@ -192,7 +192,7 @@ class MainApp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      title: 'North Kansas City Bike Master Plan',
+      title: 'Go Grandview',
       lineName: 'Draw Line',
       features:[
         {
@@ -1041,7 +1041,7 @@ class MainApp extends Component {
               open={this.state.showHelp}
               onClose={this.closeHelp}
             >
-              <DialogTitle><img src={NkcLogo} width='200'/></DialogTitle>
+              <DialogTitle><img src={Logo} width='200'/></DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                 <strong>Where would you like to bike in North Kansas City?.</strong><br />
