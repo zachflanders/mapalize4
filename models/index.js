@@ -6,24 +6,27 @@ const UserModel = require('./user');
 
 dotenv.config()
 //Connect to Database
-const sequelize = new Sequelize(process.env.DATABASE , process.env.USERNAME, process.env.PASSWORD, {
+const sequelize = new Sequelize(
+  process.env.DATABASE , process.env.USERNAME, process.env.PASSWORD, {
   host: process.env.HOSTURL,
   dialect: 'postgres',
-  ssl: true,
   dialectOptions: {
-    ssl: true
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
   },
   pool: {
     max: 5,
     min: 0,
     acquire: 30000,
     idle: 10000
-  }
+  },
+  operatorsAliases: false
 });
 
 const Feature = FeatureModel(sequelize, Sequelize);
 const User = UserModel(sequelize, Sequelize);
-
 
 sequelize
   .authenticate()

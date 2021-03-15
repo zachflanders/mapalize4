@@ -158,7 +158,7 @@ var turnLineIntoArrayOfPoints = function(geoJSONLine, count){
   //if statement should check to make sure geoJSON line is valid
   if(true){
     var length = turf.lineDistance(geoJSONLine, 'miles');
-    for(var i=(Math.random()*(0.02)); i <= length; i=i+0.02){
+    for(var i=(Math.random()*(0.001)); i <= length; i=i+0.007){
       if(length > 0 ){
         var thisPoint = turf.along(geoJSONLine, i, 'miles');
         if(resultsSourceArray[count]){
