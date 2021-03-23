@@ -205,7 +205,7 @@ class MainApp extends Component {
         },
         {
           id: 1,
-          name:'Where would you like to walk/bike if it were safe and comfortable?',
+          name:'What routes would you like to walk/bike if it were safe and comfortable?',
           prompt:'Click to start drawing a route.',
           type:'line',
           color: colors[1],

@@ -228,6 +228,7 @@ class Sidebar extends Component {
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
                 Go Grandview  is the City's first bicycle and pedestrian master plan. This guiding document is an appendix to the upcoming Transportation Master Plan, which is derived from Grandview 2030, the Comprehensive City Plan.   
+                For more information visit: <a href='https://www.grandview.org/gograndview'>www.grandview.org/gograndview</a>
                 </Typography>
             </div>
           </Drawer>
@@ -260,6 +261,7 @@ class Sidebar extends Component {
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
                 Go Grandview  is the City's first bicycle and pedestrian master plan. This guiding document is an appendix to the upcoming Transportation Master Plan, which is derived from Grandview 2030, the Comprehensive City Plan. 
+                For more information visit: <a href='https://www.grandview.org/gograndview'>www.grandview.org/gograndview</a>
                 </Typography>
               </div>
               </div>
@@ -352,6 +354,7 @@ class Sidebar extends Component {
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
                   Go Grandview  is the City's first bicycle and pedestrian master plan. This guiding document is an appendix to the upcoming Transportation Master Plan, which is derived from Grandview 2030, the Comprehensive City Plan. 
+                  For more information visit: <a href='https://www.grandview.org/gograndview'>www.grandview.org/gograndview</a>
                 </Typography>
            </div>
           </Drawer>
@@ -442,6 +445,7 @@ class Sidebar extends Component {
                 <Button size='small' style={{marginTop:'10px'}} onClick={()=>{this.props.openHelp()}}><HelpIcon/>&nbsp;&nbsp;Help</Button>
                 <Typography variant='caption' color='textSecondary' style={{paddingTop:'10px'}}>
                   Go Grandview  is the City's first bicycle and pedestrian master plan. This guiding document is an appendix to the upcoming Transportation Master Plan, which is derived from Grandview 2030, the Comprehensive City Plan. 
+                  For more information visit: <a href='https://www.grandview.org/gograndview'>www.grandview.org/gograndview</a>
                 </Typography>
             </div>
             </div>
